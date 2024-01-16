@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeticaUnitySDK", "MeticaUnitySDK\MeticaUnitySDK.csproj", "{22ACF33C-4586-4487-B7BA-C9BF0932DC27}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Metica.Unity", "Metica.Unity\Metica.Unity.csproj", "{F64E5EF0-581E-483D-A737-87FCA0FF64EA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{22ACF33C-4586-4487-B7BA-C9BF0932DC27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22ACF33C-4586-4487-B7BA-C9BF0932DC27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22ACF33C-4586-4487-B7BA-C9BF0932DC27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22ACF33C-4586-4487-B7BA-C9BF0932DC27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F64E5EF0-581E-483D-A737-87FCA0FF64EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F64E5EF0-581E-483D-A737-87FCA0FF64EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F64E5EF0-581E-483D-A737-87FCA0FF64EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F64E5EF0-581E-483D-A737-87FCA0FF64EA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
