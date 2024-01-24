@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
+using UnityEditor;
 
 // ReSharper disable all NotAccessedField.Global
 // ReSharper disable file UnusedMember.Local
@@ -23,7 +26,6 @@ namespace Metica.Unity
         public string meticaEndpoint = "http://localhost:9090";
         public string[] placements = new String[] { };
 
-#if UNITY_EDITOR
         // Expose the GetOffers method in the editor
         [ContextMenu("Get Offers")]
         private void GetOffersInEditor()
@@ -48,13 +50,12 @@ namespace Metica.Unity
                     foreach (var p in placements)
                     {
                         var offers = result.Result.placements.ContainsKey(p) ? result.Result.placements[p] : new List<Offer>();
-                        Debug.Log($"Placement {p} offers: {JSON.Serialize(offers)}" );
+                        Debug.Log($"Placement {p} offers: {JsonConvert.SerializeObject(offers)}" );
                     }
                 }
             });
 
             EditorApplication.delayCall += () => { offersManager.GetOffers(new String[] { "main" }, resDelegate); };
         }
-#endif
     }
 }
