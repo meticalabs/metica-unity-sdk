@@ -38,13 +38,72 @@ namespace Metica.Unity
     {
         public Dictionary<string, List<Offer>> placements;
     }
+    
+    [Serializable]
+    public class DisplayLimit
+    {
+        public ulong timeWindowInHours;
+        public ulong maxDisplayCount;
+    }
 
+
+    [Serializable]
+    public class OfferVariant
+    {
+        public string offerId;
+        public string bundleId;
+        public string variantId;
+    }
+    
+    [Serializable]
+    public class MeticaAttributes
+    {
+        public OfferVariant offer;
+        public String placementId;
+
+    }
+  
+    [Serializable]
+    public class DisplayMetric
+    {
+        public String eventType = "meticaOfferImpression";
+        public String userId;
+        public String appId;
+        public MeticaAttributes meticaAttributes;
+    }
+    
+    [Serializable]
+    public class InteractionMetric
+    {
+        public String eventType = "meticaOfferInteraction";
+        public String userId;
+        public String appId;
+        public MeticaAttributes meticaAttributes;
+    }
+    
+    [Serializable]
+    public class PurchaseMetric
+    {
+        public String eventType = "meticaOfferInAppPurchase";
+        public String userId;
+        public String appId;
+        public MeticaAttributes meticaAttributes;
+    }
+    
+    [Serializable]
+    public class OfferMetrics
+    {
+        public DisplayMetric display;
+        public PurchaseMetric purchase;
+        public InteractionMetric interaction;
+    }
+    
     [Serializable]
     public class Offer
     {
         public string offerId;
         public double? price;
-        public Dictionary<string, object> metrics;
+        public OfferMetrics metrics;
         public List<Item> items;
         [CanBeNull] public string expirationTime;
         [CanBeNull] public string customPayload;
@@ -52,6 +111,7 @@ namespace Metica.Unity
         [CanBeNull] public string creativeOverride;
         [CanBeNull] public string iap;
         [CanBeNull] public string currencyId;
+        [CanBeNull] public List<DisplayLimit> displayLimits;
     }
 
     [Serializable]

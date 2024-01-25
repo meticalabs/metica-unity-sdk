@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -28,24 +28,27 @@ namespace Metica.Unity
     public class OffersManager
     {
         private MeticaContext _ctx;
-        [CanBeNull] private CachedOffersByPlacement _cachedOffers = null;
+        private CachedOffersByPlacement _cachedOffers = null;
+        private DisplayLog _displayLog = null;
 
         public void Init(MeticaContext ctx)
         {
             this._ctx = ctx;
 
             // load offers from disk
-            var cachedOffers = OffersCache.Read();
+            this._cachedOffers = OffersCache.Read();
+            this._displayLog = new DisplayLog();
         }
+        
+        private bool IsOffersCacheValid() => _cachedOffers != null && _cachedOffers.offers != null;
+        private bool IsOffersCacheUpToDate() => IsOffersCacheValid() && (new DateTime() - _cachedOffers.cacheTime).TotalHours < 2;
 
         public void GetOffers(string[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback)
         {
             var offers = new Dictionary<string, List<Offer>>();
 
             // if the cache is recent, and not running inside the editor, return the cached offers
-            if (_cachedOffers != null && _cachedOffers.offers != null &&
-                (new DateTime() - _cachedOffers.cacheTime).TotalHours < 2 &&
-                !Application.isEditor)
+            if (IsOffersCacheUpToDate() && !Application.isEditor)
             {
                 Debug.Log("Returning cached offers");
                 offersCallback(new SdkResultImpl<OffersByPlacement>(_cachedOffers.offers));
@@ -57,9 +60,7 @@ namespace Metica.Unity
             {
                 Debug.Log("No internet connection, returning cached offers");
                 offersCallback(new SdkResultImpl<OffersByPlacement>(
-                    _cachedOffers != null && _cachedOffers.offers != null
-                        ? _cachedOffers.offers
-                        : new OffersByPlacement()));
+                    IsOffersCacheValid() ? _cachedOffers.offers : new OffersByPlacement()));
                 return;
             }
 
@@ -90,6 +91,7 @@ namespace Metica.Unity
                 if (www.result != UnityWebRequest.Result.Success)
                 {
                     Debug.LogError("Error: " + www.error + ", status: " + www.responseCode);
+                    offers = this._cachedOffers.offers.placements;
                 }
                 else
                 {
@@ -100,18 +102,66 @@ namespace Metica.Unity
 
                     offers = offersList.placements;
 
+                    // persist the response and refresh the in-memory cache
                     OffersCache.Write(new OffersByPlacement()
                     {
                         placements = offers
                     });
+
+                    _cachedOffers = new CachedOffersByPlacement()
+                    {
+                        offers = new OffersByPlacement()
+                        {
+                            placements = offers
+                        },
+                        cacheTime = new DateTime()
+                    };
                 }
             }
 
+            // filter out the offers that have exceeded their display limit
+            var filteredDictionary = offers.ToDictionary(
+                offersByPlacement => offersByPlacement.Key, 
+                offersByPlacement => _displayLog.FilterOffers(offersByPlacement.Value));
+
+            LogDisplays(filteredDictionary);
+
             offersCallback(new SdkResultImpl<OffersByPlacement>(new OffersByPlacement()
             {
-                placements = offers
+                placements = filteredDictionary
             }));
         }
+
+        // Logs the display of offers by placement.
+        // 
+        // Parameters:
+        //   offersByPlacement: A dictionary containing offers grouped by placement.
+        //
+        // Returns: void
+        private void LogDisplays(Dictionary<string, List<Offer>> offersByPlacement)
+        {
+            var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            var offerIds = new HashSet<String>();
+
+            foreach (var entry in offersByPlacement)
+            {
+                var newEntries = from offer in entry.Value
+                    where !offerIds.Contains(offer.offerId)
+                    let displayLogEntry = new DisplayLogEntry()
+                    {
+                        displayedOn = currentTime,
+                        offerId = offer.offerId,
+                        offerVariantId = offer.metrics.display.meticaAttributes.offer.variantId,
+                        placementId = entry.Key
+                    }
+                    select displayLogEntry;
+
+                _displayLog.AppendDisplayLogs(newEntries);
+                
+                offerIds.UnionWith(from e in newEntries select e.offerId);
+            }
+        }
+
 
         private StoreTypeEnum mapRuntimePlatformToStoreType(RuntimePlatform runtimePlatform)
         {
@@ -133,12 +183,15 @@ namespace Metica.Unity
         {
             var supportedPlatforms = new List<RuntimePlatform>
             {
-                RuntimePlatform.Android, RuntimePlatform.IPhonePlayer, RuntimePlatform.tvOS, RuntimePlatform.OSXPlayer
+                RuntimePlatform.Android,
+                RuntimePlatform.IPhonePlayer,
+                RuntimePlatform.tvOS,
+                RuntimePlatform.OSXPlayer
             };
             return supportedPlatforms.Contains(Application.platform);
         }
 
-        private string CreateJsonRequestBody([CanBeNull] Dictionary<string, object> userData)
+        private string CreateJsonRequestBody(Dictionary<string, object> userData)
         {
             var locale = Thread.CurrentThread.CurrentCulture.Name;
 
@@ -161,16 +214,6 @@ namespace Metica.Unity
             };
 
             return JsonConvert.SerializeObject(request);
-        }
-
-        // Start is called before the first frame update
-        void Start()
-        {
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
         }
     }
 }
