@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 // ReSharper disable all NotAccessedField.Global
@@ -20,22 +21,56 @@ namespace Metica.Unity
             set { meticaOffersEndpoint = value; }
         }
 
-        public bool Initialized { get; set; }
+        public static bool Initialized { get; set; }
 
-        private OffersManager _offersManager;
+        private static ScriptingObjects _scriptingObjects;
+        private static OffersManager _offersManager;
         
-        void Initialise(string userId, string appId, string apiKey, MeticaSdkDelegate<bool> initCallback)
+        public static void Initialise(string userId, string appId, string apiKey, MeticaSdkDelegate<bool> initCallback)
         {
             MeticaAPI.UserId = userId;
             MeticaAPI.AppId = appId;
             MeticaAPI.ApiKey = apiKey;
-            this._offersManager = new OffersManager();
-            initCallback.Invoke(new SdkResultImpl<bool>(true));
+            
+            _scriptingObjects = new ScriptingObjects();
+            _scriptingObjects.Init();
+            
+            _offersManager = new OffersManager();
+            _offersManager.Init(new MeticaContext()
+            {
+                apiKey = MeticaAPI.ApiKey,
+                appId = MeticaAPI.AppId,
+                userId = MeticaAPI.UserId
+            });
+
+            Initialized = true;
+            
+            initCallback.Invoke(SdkResultImpl<bool>.WithResult(true));
         }
 
-        void GetOffers(String[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback)
+        public static void GetOffers(String[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback)
         {
-            this._offersManager.GetOffers(placements, offersCallback);
+            _offersManager.GetOffers(placements, offersCallback);
+        }
+
+        public void LogOfferDisplay(string offerId, string placementId)
+        {
+            
+        }
+        
+        public void LogOfferPurchase(string offerId, string placementId, double amount, string currency)
+        {
+            
+        }
+
+        public void LogOfferInteraction(string offerId, string placementId, string interactionType)
+        {
+            
+        }
+
+        public void LogUserAttributes(Dictionary<string, object> userAttributes)
+        {
+            
         }
     }
 }

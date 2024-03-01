@@ -1,3 +1,5 @@
+using System;
+
 namespace Metica.Unity
 {
     public delegate void MeticaSdkDelegate<T>(ISdkResult<T> result);
@@ -21,18 +23,28 @@ namespace Metica.Unity
     
     public class SdkResultImpl<T> : ISdkResult<T>
     {
-        public T Result { get; }
-        public string Error { get; }
+        // private T _result;
+        // private string _error;
+        
+        public T Result { get; internal set; }
+        public string Error { get; internal set;  }
 
-        public SdkResultImpl(T result)
+        public static ISdkResult<T> WithResult(T result)
         {
-            Result = result;
+            return new SdkResultImpl<T>()
+            {
+                Result = result
+            };
+        }
+        
+        public static ISdkResult<T> WithError(string error)  
+        {
+            return new SdkResultImpl<T>()
+            {
+                Error = error,
+            };
         }
 
-        public SdkResultImpl(string error)
-        {
-            Error = error;
-        }
     }
 
 }

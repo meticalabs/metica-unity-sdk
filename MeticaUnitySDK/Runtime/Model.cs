@@ -36,7 +36,7 @@ namespace Metica.Unity
     [Serializable]
     public class OffersByPlacement
     {
-        public Dictionary<string, List<Offer>> placements;
+        public Dictionary<string, List<Offer>> placements = new Dictionary<string, List<Offer>>();
     }
     
     [Serializable]

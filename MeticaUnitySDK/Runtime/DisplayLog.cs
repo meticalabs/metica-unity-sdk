@@ -58,7 +58,7 @@ namespace Metica.Unity
             }
 
             var filePath = Path.Combine(Application.persistentDataPath, "display_log.json");
-            var json = JsonConvert.SerializeObject(displayLogEntries);
+            var json = JsonConvert.SerializeObject(_displayLogs);
             File.WriteAllText(filePath, json);
         }
 

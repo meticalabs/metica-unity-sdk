@@ -37,10 +37,23 @@ namespace Metica.Unity
                 userId = "test-user"
             };
 
+            if (!MeticaAPI.Initialized)
+            {
+                MeticaAPI.Initialise(ctx.userId, ctx.appId, ctx.apiKey, result =>
+                {
+                    if (result.Error != null)
+                    {
+                        Debug.LogError(result);
+                    }
+                });
+            }
+            
             var offersManager = new OffersManager();
             offersManager.Init(ctx);
             var resDelegate = new MeticaSdkDelegate<OffersByPlacement>(result =>
             {
+                Debug.Log(result.Result);
+                Debug.Log(result.Error);
                 if (result.Error != null)
                 {
                     Debug.LogError("Error while fetching offers: " + result.Error);
