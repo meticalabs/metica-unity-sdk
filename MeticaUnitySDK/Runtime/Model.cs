@@ -8,6 +8,8 @@ using JetBrains.Annotations;
 
 namespace Metica.Unity
 {
+    using Event = List<Dictionary<string, object>>;
+    
     [Serializable]
     public struct MeticaContext
     {
@@ -16,6 +18,7 @@ namespace Metica.Unity
         public string userId;
     }
 
+    
     [Serializable]
     public enum StoreTypeEnum
     {

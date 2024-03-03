@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -24,7 +25,11 @@ namespace Metica.Unity
 
     internal abstract class PostRequestOperation
     {
-        public static IEnumerator PostRequest<T>(string url, string queryString, string apiKey, object body,
+        public static IEnumerator PostRequest<T>(
+            string url,
+            [CanBeNull] string queryString,
+            string apiKey,
+            object body,
             MeticaSdkDelegate<T> callback)
         {
             // if there is no internet connection, return the cached offers
@@ -52,7 +57,7 @@ namespace Metica.Unity
             }
             else
             {
-                var fullUrl = $"{url}?{UnityWebRequest.EscapeURL(queryString)}";
+                var fullUrl = queryString != null ? $"{url}?{UnityWebRequest.EscapeURL(queryString)}" : url;
                 using (var www = new UnityWebRequest(fullUrl, "POST"))
                 {
                     var jsonToSend = new UTF8Encoding().GetBytes(jsonBody);
@@ -80,7 +85,7 @@ namespace Metica.Unity
         }
     }
 
-    public abstract class BackendOperations
+    internal abstract class BackendOperations
     {
         public static void CallGetOffersAPI(MeticaContext ctx, string[] placements,
             MeticaSdkDelegate<OffersByPlacement> offersCallback)
@@ -91,6 +96,14 @@ namespace Metica.Unity
             op.OffersCallback = offersCallback;
         }
 
+        public static void CallSubmitEventsAPI(MeticaContext ctx, List<Dictionary<string, object>> events,
+            MeticaSdkDelegate<String> callback)
+        {
+            var op = ScriptingObjects.AddComponent<SubmitEventsOperation>();
+            op.Context = ctx;
+            op.Events = events;
+            op.EventsSubmitCallback = callback;
+        }
 
         private static StoreTypeEnum MapRuntimePlatformToStoreType(RuntimePlatform runtimePlatform)
         {
@@ -105,6 +118,11 @@ namespace Metica.Unity
                 default:
                     throw new Exception($"Got an unsupported application platform: {runtimePlatform}");
             }
+        }
+
+        internal static string CreateIngestionRequestBody(List<Dictionary<string, object>> events)
+        {
+            return $"{{ \"events\": {{{JsonConvert.SerializeObject(events)} }}";
         }
 
         // ReSharper disable once InconsistentNaming

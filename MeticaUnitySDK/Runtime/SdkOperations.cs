@@ -5,16 +5,48 @@ using UnityEngine;
 
 namespace Metica.Unity
 {
-    public class SubmitEventsOperation : MonoBehaviour
+    [ExecuteAlways]
+    internal class SubmitEventsOperation : MonoBehaviour
     {
         public MeticaContext Context { get; set; }
         public List<Dictionary<string, object>> Events { get; set; }
 
-        // TODO: implement this
+        public MeticaSdkDelegate<String> EventsSubmitCallback { get; set; }
+
+        internal IEnumerator Start()
+        {
+            return PostRequestOperation.PostRequest<String>($"{MeticaAPI.MeticaIngestionEndpoint}/ingest/v1/events",
+                null,
+                Context.apiKey,
+                BackendOperations.CreateIngestionRequestBody(Events),
+                result =>
+                {
+                    if (result.Error != null)
+                    {
+                        Debug.Log("Notifying error");
+                        EventsSubmitCallback(SdkResultImpl<String>.WithError(result.Error));
+                    }
+                    else
+                    {
+                        Debug.Log("Notifying result");
+                        EventsSubmitCallback(SdkResultImpl<String>.WithResult(result.Result));
+                    }
+
+                    Debug.Log("Destroying self");
+                    if (!Application.isEditor)
+                    {
+                        Destroy(this);
+                    }
+                    else
+                    {
+                        DestroyImmediate(this);
+                    }
+                });
+        }
     }
 
     [ExecuteAlways]
-    public class GetOffersOperation : MonoBehaviour
+    internal class GetOffersOperation : MonoBehaviour
     {
         public MeticaContext Context { get; set; }
 

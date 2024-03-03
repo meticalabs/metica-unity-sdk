@@ -9,7 +9,7 @@ namespace Metica.Unity
 {
     // Represents the impressions or displays of offers.
     [Serializable]
-    public struct DisplayLogEntry : IComparable<DisplayLogEntry>
+    internal struct DisplayLogEntry : IComparable<DisplayLogEntry>
     {
         public long displayedOn; // timestamp in epoch millis
         public string offerId;
@@ -23,7 +23,7 @@ namespace Metica.Unity
         }
     }
 
-    public class DisplayLog
+    internal class DisplayLog
     {
         private Dictionary<string, List<DisplayLogEntry>> _displayLogs;
 
@@ -62,6 +62,11 @@ namespace Metica.Unity
             File.WriteAllText(filePath, json);
         }
 
+        /// <summary>
+        /// Filters the input offers by applying the display limits against the display log. 
+        /// </summary>
+        /// <param name="offers">the input offers</param>
+        /// <returns>All the offers that haven't exceeded their display limit</returns>
         public List<Offer> FilterOffers(List<Offer> offers)
         {
             var filteredOffers = new List<Offer>();

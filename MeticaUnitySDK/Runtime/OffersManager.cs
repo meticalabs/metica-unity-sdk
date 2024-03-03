@@ -7,7 +7,8 @@ using UnityEngine;
 // ReSharper disable file UnusedMember.Local
 namespace Metica.Unity
 {
-    public class OffersManager
+    // TODO: add a history of the delivered offers
+    internal class OffersManager
     {
         private MeticaContext _ctx;
         private CachedOffersByPlacement _cachedOffers = null;
@@ -43,6 +44,7 @@ namespace Metica.Unity
             {
                 if (sdkResult.Error != null)
                 {
+                    Debug.LogError($"Error while fetching offers: {sdkResult.Error}");
                     offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(IsOffersCacheValid()
                         ? _cachedOffers.offers
                         : new OffersByPlacement()));

@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 // ReSharper disable all NotAccessedField.Global
@@ -9,16 +11,25 @@ namespace Metica.Unity
 {
     public class MeticaAPI : ScriptableObject
     {
-        private static string SDKVersion = "1.0.0";
+        public static string SDKVersion = "1.0.0";
         private static string meticaOffersEndpoint = "http://localhost:9090";
+        private static string meticaIngestionEndpoint = "http://localhost:8080";
         public static string UserId { get; private set; }
         public static string AppId { get; private set; }
         public static string ApiKey { get; private set; }
+
+        public static MeticaContext Context { get; private set; }
 
         public static string MeticaOffersEndpoint
         {
             get { return meticaOffersEndpoint;}
             set { meticaOffersEndpoint = value; }
+        }
+        
+        public static string MeticaIngestionEndpoint
+        {
+            get { return meticaIngestionEndpoint;}
+            set { meticaIngestionEndpoint = value; }
         }
 
         public static bool Initialized { get; set; }
@@ -31,17 +42,18 @@ namespace Metica.Unity
             MeticaAPI.UserId = userId;
             MeticaAPI.AppId = appId;
             MeticaAPI.ApiKey = apiKey;
+            MeticaAPI.Context = new MeticaContext()
+            {
+                apiKey = MeticaAPI.ApiKey,
+                appId = MeticaAPI.AppId,
+                userId = MeticaAPI.UserId
+            };
             
             _scriptingObjects = new ScriptingObjects();
             _scriptingObjects.Init();
             
             _offersManager = new OffersManager();
-            _offersManager.Init(new MeticaContext()
-            {
-                apiKey = MeticaAPI.ApiKey,
-                appId = MeticaAPI.AppId,
-                userId = MeticaAPI.UserId
-            });
+            _offersManager.Init(MeticaAPI.Context);
 
             Initialized = true;
             
@@ -71,6 +83,12 @@ namespace Metica.Unity
         public void LogUserAttributes(Dictionary<string, object> userAttributes)
         {
             
+        }
+        
+        public void LogUserEvent(Dictionary<string, object> userEvent)
+        {
+            
+            // BackendOperations.CallSubmitEventsAPI(MeticaAPI.Context, new ArrayList() userEvent, result => { });
         }
     }
 }
