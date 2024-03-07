@@ -8,7 +8,6 @@ namespace Metica.Unity
     [ExecuteAlways]
     internal class SubmitEventsOperation : MonoBehaviour
     {
-        public MeticaContext Context { get; set; }
         public List<Dictionary<string, object>> Events { get; set; }
 
         public MeticaSdkDelegate<String> EventsSubmitCallback { get; set; }
@@ -17,7 +16,7 @@ namespace Metica.Unity
         {
             return PostRequestOperation.PostRequest<String>($"{MeticaAPI.MeticaIngestionEndpoint}/ingest/v1/events",
                 null,
-                Context.apiKey,
+                MeticaAPI.Context.apiKey,
                 BackendOperations.CreateIngestionRequestBody(Events),
                 result =>
                 {
@@ -48,18 +47,16 @@ namespace Metica.Unity
     [ExecuteAlways]
     internal class GetOffersOperation : MonoBehaviour
     {
-        public MeticaContext Context { get; set; }
-
         public string[] Placements { get; set; }
 
         public MeticaSdkDelegate<OffersByPlacement> OffersCallback { get; set; }
 
         internal IEnumerator Start()
         {
-            return PostRequestOperation.PostRequest<ODSResponse>(
-                $"{MeticaAPI.MeticaOffersEndpoint}/offers/v1/apps/{Context.appId}/users/{Context.userId}?placements={String.Join(",", Placements)}",
+            yield return PostRequestOperation.PostRequest<ODSResponse>(
+                $"{MeticaAPI.MeticaOffersEndpoint}/offers/v1/apps/{MeticaAPI.Context.appId}/users/{MeticaAPI.Context.userId}?placements={String.Join(",", Placements)}",
                 $"placements={String.Join(",", Placements)}",
-                Context.apiKey,
+                MeticaAPI.Context.apiKey,
                 BackendOperations.CreateODSRequestBody(new Dictionary<string, object>()),
                 result =>
                 {
@@ -90,3 +87,4 @@ namespace Metica.Unity
         }
     }
 }
+

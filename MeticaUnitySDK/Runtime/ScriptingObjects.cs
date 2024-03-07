@@ -5,25 +5,13 @@ namespace Metica.Unity
     internal class ScriptingObjects
     {
         private static GameObject _scriptingRoot;
-        // private static GameObject ScriptingRoot
-        // {
-        //     get
-        //     {
-        //         if (_scriptingRoot == null)
-        //         {
-        //             _scriptingRoot = new GameObject("MeticaScriptingRoot");
-        //         }
-        //
-        //         return _scriptingRoot;
-        //     }
-        // }
 
-        public void Init()
+        const string ScriptingRootName = "MeticaScriptingRoot";
+
+        public static void Init()
         {
-            if (_scriptingRoot == null)
-            {
-                _scriptingRoot = new GameObject("MeticaScriptingRoot");
-            }
+            var existingRoot = GameObject.Find(ScriptingRootName);
+            _scriptingRoot = existingRoot != null ? existingRoot : new GameObject(ScriptingRootName);
         }
 
         public static T GetComponent<T>() where T : MonoBehaviour

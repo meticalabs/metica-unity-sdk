@@ -10,17 +10,15 @@ namespace Metica.Unity
     // TODO: add a history of the delivered offers
     internal class OffersManager
     {
-        private MeticaContext _ctx;
         private CachedOffersByPlacement _cachedOffers = null;
-        private DisplayLog _displayLog = null;
+        // private DisplayLog _displayLog = null;
 
-        public void Init(MeticaContext ctx)
+        public void Init()
         {
-            this._ctx = ctx;
-
             // load offers from disk
-            this._cachedOffers = OffersCache.Read();
-            this._displayLog = new DisplayLog();
+            _cachedOffers = OffersCache.Read();
+            // _displayLog = new DisplayLog();
+            // _displayLog.Init();
         }
 
         private bool IsOffersCacheValid() => _cachedOffers != null && _cachedOffers.offers != null;
@@ -30,6 +28,7 @@ namespace Metica.Unity
 
         public void GetOffers(string[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback)
         {
+            Debug.Log("Fetching offers from the server");
             var offers = new Dictionary<string, List<Offer>>();
 
             // if the cache is recent, and not running inside the editor, return the cached offers
@@ -40,7 +39,7 @@ namespace Metica.Unity
                 return;
             }
 
-            BackendOperations.CallGetOffersAPI(_ctx, placements, (sdkResult) =>
+            BackendOperations.CallGetOffersAPI(placements, (sdkResult) =>
             {
                 if (sdkResult.Error != null)
                 {
@@ -69,7 +68,7 @@ namespace Metica.Unity
                     // filter out the offers that have exceeded their display limit
                     var filteredDictionary = offers.ToDictionary(
                         offersByPlacement => offersByPlacement.Key,
-                        offersByPlacement => _displayLog.FilterOffers(offersByPlacement.Value));
+                        offersByPlacement => MeticaAPI.DisplayLog.FilterOffers(offersByPlacement.Value));
 
                     LogDisplays(filteredDictionary);
 
@@ -105,7 +104,7 @@ namespace Metica.Unity
                     }
                     select displayLogEntry;
 
-                _displayLog.AppendDisplayLogs(newEntries);
+                MeticaAPI.DisplayLog.AppendDisplayLogs(newEntries);
 
                 offerIds.UnionWith(from e in newEntries select e.offerId);
             }

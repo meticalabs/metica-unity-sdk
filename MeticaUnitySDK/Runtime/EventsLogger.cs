@@ -10,7 +10,7 @@ namespace Metica.Unity
         const UInt16 MaxPendingEventsCount = 256;
         
         // store the events in a list and flush them to the server every X minutes
-        private LinkedList<Dictionary<string, object>> _eventsList = new LinkedList<Dictionary<string, object>>();
+        private LinkedList<Dictionary<string, object>> _eventsList = new();
         private Coroutine _logEventsRoutine;
         public float LogInterval { get; set; } = 60;
 
@@ -74,7 +74,7 @@ namespace Metica.Unity
 
         private IEnumerator LogEventsRoutine()
         {
-            while (true)
+            while (isActiveAndEnabled)
             {
                 yield return new WaitForSeconds(LogInterval);
 
@@ -96,7 +96,7 @@ namespace Metica.Unity
             
             var copyList = new List<Dictionary<string, object>>(_eventsList);
             _eventsList = new LinkedList<Dictionary<string, object>>();
-            BackendOperations.CallSubmitEventsAPI(MeticaAPI.Context, copyList, (result) =>
+            BackendOperations.CallSubmitEventsAPI(copyList, (result) =>
             {
                 if (result.Error != null)
                 {
