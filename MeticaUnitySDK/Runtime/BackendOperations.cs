@@ -39,6 +39,18 @@ namespace Metica.Unity
                 yield break;
             }
 
+            if (apiKey == null)
+            {
+                callback(SdkResultImpl<T>.WithError("API Key is not set"));
+                yield break;
+            }
+            
+            if (body == null)
+            {
+                callback(SdkResultImpl<T>.WithError("Body is null"));
+                yield break;
+            }
+            
             string jsonBody = null;
             try
             {
@@ -87,20 +99,18 @@ namespace Metica.Unity
 
     internal abstract class BackendOperations
     {
-        public static void CallGetOffersAPI(MeticaContext ctx, string[] placements,
+        public static void CallGetOffersAPI(string[] placements,
             MeticaSdkDelegate<OffersByPlacement> offersCallback)
         {
             var op = ScriptingObjects.AddComponent<GetOffersOperation>();
-            op.Context = ctx;
             op.Placements = placements;
             op.OffersCallback = offersCallback;
         }
 
-        public static void CallSubmitEventsAPI(MeticaContext ctx, List<Dictionary<string, object>> events,
+        public static void CallSubmitEventsAPI(List<Dictionary<string, object>> events,
             MeticaSdkDelegate<String> callback)
         {
             var op = ScriptingObjects.AddComponent<SubmitEventsOperation>();
-            op.Context = ctx;
             op.Events = events;
             op.EventsSubmitCallback = callback;
         }

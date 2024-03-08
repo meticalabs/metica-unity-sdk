@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 // ReSharper disable all NotAccessedField.Global
@@ -14,49 +12,44 @@ namespace Metica.Unity
         public static string SDKVersion = "1.0.0";
         private static string meticaOffersEndpoint = "http://localhost:9090";
         private static string meticaIngestionEndpoint = "http://localhost:8080";
-        public static string UserId { get; private set; }
-        public static string AppId { get; private set; }
-        public static string ApiKey { get; private set; }
-
-        public static MeticaContext Context { get; private set; }
+        public static string UserId { get; internal set; }
+        public static string AppId { get; internal set; }
+        public static string ApiKey { get; internal set; }
 
         public static string MeticaOffersEndpoint
         {
-            get { return meticaOffersEndpoint;}
+            get { return meticaOffersEndpoint; }
             set { meticaOffersEndpoint = value; }
         }
-        
+
         public static string MeticaIngestionEndpoint
         {
-            get { return meticaIngestionEndpoint;}
+            get { return meticaIngestionEndpoint; }
             set { meticaIngestionEndpoint = value; }
         }
 
         public static bool Initialized { get; set; }
-
-        private static ScriptingObjects _scriptingObjects;
-        private static OffersManager _offersManager;
         
+        internal static DisplayLog DisplayLog { get; set; }
+
+        private static OffersManager _offersManager;
+
         public static void Initialise(string userId, string appId, string apiKey, MeticaSdkDelegate<bool> initCallback)
         {
-            MeticaAPI.UserId = userId;
-            MeticaAPI.AppId = appId;
-            MeticaAPI.ApiKey = apiKey;
-            MeticaAPI.Context = new MeticaContext()
-            {
-                apiKey = MeticaAPI.ApiKey,
-                appId = MeticaAPI.AppId,
-                userId = MeticaAPI.UserId
-            };
-            
-            _scriptingObjects = new ScriptingObjects();
-            _scriptingObjects.Init();
-            
-            _offersManager = new OffersManager();
-            _offersManager.Init(MeticaAPI.Context);
+            UserId = userId;
+            AppId = appId;
+            ApiKey = apiKey;
 
-            Initialized = true;
+            ScriptingObjects.Init();
+
+            _offersManager = new OffersManager();
+            _offersManager.Init();
+
+            DisplayLog = new DisplayLog();
+            DisplayLog.Init();
             
+            Initialized = true;
+
             initCallback.Invoke(SdkResultImpl<bool>.WithResult(true));
         }
 
@@ -65,30 +58,43 @@ namespace Metica.Unity
             _offersManager.GetOffers(placements, offersCallback);
         }
 
-        public void LogOfferDisplay(string offerId, string placementId)
+        public static void LogOfferDisplay(string offerId, string placementId)
         {
+            Debug.Log("UserId: " + UserId);
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogOfferDisplay(offerId, placementId);
+
             
-        }
-        
-        public void LogOfferPurchase(string offerId, string placementId, double amount, string currency)
-        {
-            
+            DisplayLog.AppendDisplayLogs(new []{ new DisplayLogEntry()
+            {
+                displayedOn = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
+                offerId = offerId,
+                placementId = placementId,
+            } });
         }
 
-        public void LogOfferInteraction(string offerId, string placementId, string interactionType)
+        public static void LogOfferPurchase(string offerId, string placementId, double amount, string currency)
         {
-            
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogOfferPurchase(offerId, placementId, amount, currency);
         }
 
-        public void LogUserAttributes(Dictionary<string, object> userAttributes)
+        public static void LogOfferInteraction(string offerId, string placementId, string interactionType)
         {
-            
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogOfferInteraction(offerId, placementId, interactionType);
         }
-        
-        public void LogUserEvent(Dictionary<string, object> userEvent)
+
+        public static void LogUserAttributes(Dictionary<string, object> userAttributes)
         {
-            
-            // BackendOperations.CallSubmitEventsAPI(MeticaAPI.Context, new ArrayList() userEvent, result => { });
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogUserAttributes(userAttributes);
+        }
+
+        public static void LogUserEvent(Dictionary<string, object> userEvent)
+        {
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogCustomEvent(userEvent);
         }
     }
 }

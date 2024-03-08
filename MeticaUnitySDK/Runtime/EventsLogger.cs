@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Metica.Unity
@@ -8,9 +9,12 @@ namespace Metica.Unity
     internal class EventsLogger : MonoBehaviour
     {
         const UInt16 MaxPendingEventsCount = 256;
-        
+
         // store the events in a list and flush them to the server every X minutes
-        private LinkedList<Dictionary<string, object>> _eventsList = new LinkedList<Dictionary<string, object>>();
+        private LinkedList<Dictionary<string, object>> _eventsList = new();
+
+        public List<Dictionary<string, object>> EventsQueue => _eventsList.ToList();
+
         private Coroutine _logEventsRoutine;
         public float LogInterval { get; set; } = 60;
 
@@ -31,13 +35,31 @@ namespace Metica.Unity
                 StopCoroutine(_logEventsRoutine);
         }
 
-        public void LogEvent(Dictionary<string, object> eventDetails)
+        private void LogEvent(Dictionary<string, object> eventDetails)
         {
             _eventsList.AddFirst(eventDetails);
             if (_eventsList.Count > MaxPendingEventsCount)
             {
                 _eventsList.RemoveLast();
             }
+        }
+
+        public void LogCustomEvent(Dictionary<string, object> eventDetails)
+        {
+            if (!eventDetails.ContainsKey("eventType"))
+            {
+                Debug.LogError("The event must contain an eventType key");
+                return;
+            }
+            
+            if (eventDetails["eventType"] is not string)
+            {
+                Debug.LogError("The eventType attribute must be a string");
+                return;
+            }
+
+            var eventDict = CreateCommonEventAttributes(eventDetails["eventType"] as string);
+            LogEvent(eventDict);
         }
 
         public void LogOfferDisplay(string offerId, string placementId)
@@ -74,7 +96,7 @@ namespace Metica.Unity
 
         private IEnumerator LogEventsRoutine()
         {
-            while (true)
+            while (isActiveAndEnabled)
             {
                 yield return new WaitForSeconds(LogInterval);
 
@@ -85,7 +107,7 @@ namespace Metica.Unity
             }
         }
 
-        private void FlushEvents()
+        internal void FlushEvents()
         {
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {
@@ -93,10 +115,10 @@ namespace Metica.Unity
                 Debug.LogWarning("No internet connection, events will be submitted later");
                 return;
             }
-            
+
             var copyList = new List<Dictionary<string, object>>(_eventsList);
             _eventsList = new LinkedList<Dictionary<string, object>>();
-            BackendOperations.CallSubmitEventsAPI(MeticaAPI.Context, copyList, (result) =>
+            BackendOperations.CallSubmitEventsAPI(copyList, (result) =>
             {
                 if (result.Error != null)
                 {
@@ -113,8 +135,8 @@ namespace Metica.Unity
         {
             return new Dictionary<string, object>()
             {
-                { "userId", MeticaAPI.Context.userId },
-                { "appId", MeticaAPI.Context.appId },
+                { "userId", MeticaAPI.UserId },
+                { "appId", MeticaAPI.AppId },
                 { "eventType", eventType },
                 { "eventTime", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ") },
                 { "meticaUnitSdk", MeticaAPI.SDKVersion }

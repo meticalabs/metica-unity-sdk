@@ -84,8 +84,8 @@ namespace Metica.Unity
                 var limitExceeded = (from displayLimit in offer.displayLimits
                     let timeWindowInHours = displayLimit.timeWindowInHours * 3600
                     let recentDisplayLogs =
-                        displayLogList.Where(log => (currentTime - log.displayedOn) <= (long)timeWindowInHours).ToList()
-                    where recentDisplayLogs.Count > (int)displayLimit.maxDisplayCount
+                        displayLogList.Count(log => (currentTime - log.displayedOn) <= (long)timeWindowInHours)
+                    where recentDisplayLogs > (int)displayLimit.maxDisplayCount
                     select displayLimit).Any();
 
                 if (!limitExceeded)
@@ -95,6 +95,11 @@ namespace Metica.Unity
             }
 
             return filteredOffers;
+        }
+
+        public List<DisplayLogEntry> GetEntriesForOffer(string offerId)
+        {
+            return _displayLogs.TryGetValue(offerId, out var displayLog) ? displayLog : new List<DisplayLogEntry>();
         }
     }
 }
