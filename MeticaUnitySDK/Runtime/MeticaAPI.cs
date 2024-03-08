@@ -12,11 +12,9 @@ namespace Metica.Unity
         public static string SDKVersion = "1.0.0";
         private static string meticaOffersEndpoint = "http://localhost:9090";
         private static string meticaIngestionEndpoint = "http://localhost:8080";
-        public static string UserId { get; private set; }
-        public static string AppId { get; private set; }
-        public static string ApiKey { get; private set; }
-
-        public static MeticaContext Context { get; set; }
+        public static string UserId { get; internal set; }
+        public static string AppId { get; internal set; }
+        public static string ApiKey { get; internal set; }
 
         public static string MeticaOffersEndpoint
         {
@@ -41,12 +39,6 @@ namespace Metica.Unity
             UserId = userId;
             AppId = appId;
             ApiKey = apiKey;
-            Context = new MeticaContext()
-            {
-                apiKey = ApiKey,
-                appId = AppId,
-                userId = UserId
-            };
 
             ScriptingObjects.Init();
 
@@ -68,8 +60,17 @@ namespace Metica.Unity
 
         public static void LogOfferDisplay(string offerId, string placementId)
         {
+            Debug.Log("UserId: " + UserId);
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
             logger.LogOfferDisplay(offerId, placementId);
+
+            
+            DisplayLog.AppendDisplayLogs(new []{ new DisplayLogEntry()
+            {
+                displayedOn = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
+                offerId = offerId,
+                placementId = placementId,
+            } });
         }
 
         public static void LogOfferPurchase(string offerId, string placementId, double amount, string currency)
@@ -92,10 +93,8 @@ namespace Metica.Unity
 
         public static void LogUserEvent(Dictionary<string, object> userEvent)
         {
-            Debug.Log(userEvent);
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            Debug.Log(logger);
-            logger.LogEvent(userEvent);
+            logger.LogCustomEvent(userEvent);
         }
     }
 }

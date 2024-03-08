@@ -16,7 +16,7 @@ namespace Metica.Unity
         {
             return PostRequestOperation.PostRequest<String>($"{MeticaAPI.MeticaIngestionEndpoint}/ingest/v1/events",
                 null,
-                MeticaAPI.Context.apiKey,
+                MeticaAPI.ApiKey,
                 BackendOperations.CreateIngestionRequestBody(Events),
                 result =>
                 {
@@ -54,9 +54,9 @@ namespace Metica.Unity
         internal IEnumerator Start()
         {
             yield return PostRequestOperation.PostRequest<ODSResponse>(
-                $"{MeticaAPI.MeticaOffersEndpoint}/offers/v1/apps/{MeticaAPI.Context.appId}/users/{MeticaAPI.Context.userId}?placements={String.Join(",", Placements)}",
+                $"{MeticaAPI.MeticaOffersEndpoint}/offers/v1/apps/{MeticaAPI.AppId}/users/{MeticaAPI.UserId}?placements={String.Join(",", Placements)}",
                 $"placements={String.Join(",", Placements)}",
-                MeticaAPI.Context.apiKey,
+                MeticaAPI.ApiKey,
                 BackendOperations.CreateODSRequestBody(new Dictionary<string, object>()),
                 result =>
                 {

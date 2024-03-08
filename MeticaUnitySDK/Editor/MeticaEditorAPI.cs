@@ -1,22 +1,16 @@
-using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Metica.Unity
 {
     public class MeticaEditorAPI
     {
-        [SerializeField]
         private string _appId;
-        [SerializeField]
         private string _apiKey;
-        [SerializeField]
         private string _ingestionEndpoint;
         private string _offersEndpoint;
-        [SerializeField]
         private string _userId;
-        
+
         public string AppId
         {
             get => _appId;
@@ -26,7 +20,7 @@ namespace Metica.Unity
                 Init();
             }
         }
-        
+
         public string APIKey
         {
             get => _apiKey;
@@ -37,7 +31,7 @@ namespace Metica.Unity
             }
         }
 
-        public string UserId 
+        public string UserId
         {
             get => _userId;
             set
@@ -56,43 +50,35 @@ namespace Metica.Unity
                 Init();
             }
         }
-        
+
         public string OffersEndpoint
         {
-            get => _ingestionEndpoint;
+            get => _offersEndpoint;
             set
             {
-                _ingestionEndpoint = value;
+                _offersEndpoint = value;
                 Init();
             }
         }
 
-        internal void Init()
+        private void Init()
         {
-            var ctx = new MeticaContext
-            {
-                appId = AppId,
-                apiKey = APIKey,
-                userId = UserId
-            };
-
+            MeticaAPI.AppId = AppId;
+            MeticaAPI.ApiKey = APIKey;
+            MeticaAPI.UserId = UserId;
             MeticaAPI.MeticaOffersEndpoint = OffersEndpoint;
             MeticaAPI.MeticaIngestionEndpoint = IngestionEndpoint;
-            
+
             if (!MeticaAPI.Initialized)
             {
                 Debug.Log("Initializing In-Editor Metica SDK");
-                MeticaAPI.Initialise(ctx.userId, ctx.appId, ctx.apiKey, result =>
+                MeticaAPI.Initialise(UserId, AppId, APIKey, result =>
                 {
                     if (result.Error != null)
                     {
                         Debug.LogError(result);
                     }
                 });
-            }
-            else
-            {
-                MeticaAPI.Context = ctx;
             }
         }
 
@@ -101,15 +87,47 @@ namespace Metica.Unity
             Init();
             return MeticaAPI.DisplayLog.GetEntriesForOffer(offerId);
         }
+
+        public void LogOfferDisplay(string offerId, string placementId)
+        {
+            Init();
+            MeticaAPI.LogOfferDisplay(offerId, placementId);
+        }
+
+        public void LogOfferPurchase(string offerId, string placementId, double amount, string currency)
+        {
+            Init();
+            MeticaAPI.LogOfferPurchase(offerId, placementId, amount, currency);
+        }
+
+        public void LogOfferInteraction(string offerId, string placementId, string interactionType)
+        {
+            Init();
+            MeticaAPI.LogOfferInteraction(offerId, placementId, interactionType);
+        }
+
+        public void LogUserEvent(Dictionary<string, object> userEvent)
+        {
+            Init();
+            MeticaAPI.LogUserEvent(userEvent);
+        }
+
+        public void LogUserAttributes(Dictionary<string, object> userEvent)
+        {
+            Init();
+            MeticaAPI.LogUserAttributes(userEvent);
+        }
         
         public void GetOffersInEditor(string[] placements, MeticaSdkDelegate<OffersByPlacement> callback)
         {
             Init();
             MeticaAPI.GetOffers(placements, callback);
-            // var offersManager = new OffersManager();
-            // offersManager.Init();
-            // offersManager.GetOffers(placements, callback); 
-            // EditorApplication.delayCall += () => { offersManager.GetOffers(new String[] { "main" }, resDelegate); };
+        }
+
+        internal EventsLogger GetEventsLogger()
+        {
+            Init();
+            return ScriptingObjects.GetComponent<EventsLogger>();
         }
     }
 }

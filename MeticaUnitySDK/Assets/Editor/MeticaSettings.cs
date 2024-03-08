@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
 namespace MeticaUnitySDK.Assets.Editor
@@ -14,21 +15,33 @@ namespace MeticaUnitySDK.Assets.Editor
     {
         private List<Offer> _offers = new();
 
-        [SerializeField] private string _appId = "";
+        [SerializeField] private string appId = "";
 
-        [SerializeField] private string _userId = "";
+        [SerializeField] private string userId = "";
 
-        [SerializeField] private string _apiKey = "";
+        [SerializeField] private string apiKey = "";
 
-        [SerializeField] private string _ingestionEndpoint = "";
+        [SerializeField] private string ingestionEndpoint = "";
 
-        [SerializeField] private string _offersEndpoint = "";
+        [SerializeField] private string offersEndpoint = "";
 
-        [SerializeField] private List<string> _placements = new();
+        [SerializeField] private List<string> placements = new();
 
-        private int _selectedPanel = 0;
+        [SerializeField] private int selectedEventTemplate;
+
+        [SerializeField] private string customEventPayload = "";
+
+        [SerializeField] private string eventOfferId = "";
+        [SerializeField] private string eventPlacementId = "";
+        [SerializeField] private double eventAmount;
+        [SerializeField] private string eventCurrency = "USD";
+        [SerializeField] private string eventInteractionType = "";
+
+        private int _selectedPanel;
         private Offer _selectedOffer;
-        private int _selectedPlacement = -1;
+
+        [SerializeField] private int selectedPlacement = 0;
+        [SerializeField] private int selectedOffersPlacement = 0;
 
         private ListView _offersListView;
         private VisualElement _detailsView;
@@ -48,35 +61,38 @@ namespace MeticaUnitySDK.Assets.Editor
 
         public MeticaSettings()
         {
-            _placements.Add("main");
+            placements.Add("main");
         }
 
         void OnEnable()
         {
             PopulateView();
+            _editorAPI.AppId = appId;
+            _editorAPI.APIKey = apiKey;
+            _editorAPI.UserId = userId;
         }
 
         private void PopulateView()
         {
             rootVisualElement.Clear();
             PopulateToolbar();
-            if (_selectedPanel == 0)
+            switch (_selectedPanel)
             {
-                PopulateSettingsPanel();
-            }
-            else if (_selectedPanel == 1)
-            {
-                PopulateOffersPanel();
-            }
-            else
-            {
-                PopulateEventsPanel();
+                case 0:
+                    PopulateSettingsPanel();
+                    break;
+                case 1:
+                    PopulateOffersPanel();
+                    break;
+                default:
+                    PopulateEventsPanel();
+                    break;
             }
         }
 
         private void PopulateToolbar()
         {
-            var toolbar = new Toolbar()
+            var toolbar = new Toolbar
             {
                 style =
                 {
@@ -131,7 +147,7 @@ namespace MeticaUnitySDK.Assets.Editor
 
         private void FetchOffers()
         {
-            _editorAPI.GetOffersInEditor(new[] { "main" }, result =>
+            _editorAPI.GetOffersInEditor(new[] { placements[selectedOffersPlacement] }, result =>
             {
                 if (result.Error != null)
                 {
@@ -142,10 +158,17 @@ namespace MeticaUnitySDK.Assets.Editor
                     foreach (var p in result.Result.placements.Keys)
                     {
                         var offers = result.Result.placements[p];
-
+                        _offers = offers;
                         Debug.Log($"Placement {p} offers: {JsonConvert.SerializeObject(offers)}");
                     }
                 }
+
+                if (_offers.Count > 0)
+                {
+                    _selectedOffer = _offers[0];
+                }
+
+                PopulateView();
             });
         }
 
@@ -164,9 +187,12 @@ namespace MeticaUnitySDK.Assets.Editor
             }
 
             var offersParentView = rootVisualElement;
-            // rootVisualElement.Add(offersParentView);
 
-            var placementOptions = new DropdownField("Placements", _placements, 0);
+            var placementOptions = new DropdownField("Placements", placements, 0);
+            placementOptions.RegisterValueChangedCallback(evt =>
+                selectedOffersPlacement = placements.IndexOf(evt.newValue));
+            placementOptions.index = selectedOffersPlacement;
+
             offersParentView.Add(placementOptions);
 
             // Fetch Button
@@ -174,7 +200,7 @@ namespace MeticaUnitySDK.Assets.Editor
             fetchButton.style.unityTextAlign = TextAnchor.MiddleCenter;
             offersParentView.Add(fetchButton);
 
-            var panelTitle = new TextElement()
+            var panelTitle = new TextElement
             {
                 text =
                     "<size=14>Eligible Offers</size><br><size=12>The list of eligible offers for the user. Click on an offer to see its details.</size>",
@@ -205,6 +231,8 @@ namespace MeticaUnitySDK.Assets.Editor
                     height = _offers.Count * 20
                 }
             };
+
+
             _offersListView.onSelectionChange += OnOfferSelectionChange;
             mainSplitView.Add(_offersListView);
 
@@ -221,51 +249,51 @@ namespace MeticaUnitySDK.Assets.Editor
             var scrollPanel = new ScrollView(ScrollViewMode.Vertical);
             rootVisualElement.Add(scrollPanel);
 
-            var appId = new TextField("Application ID");
-            appId.value = _appId;
-            appId.RegisterValueChangedCallback(evt =>
+            var appIdField = new TextField("Application ID");
+            appIdField.value = appId;
+            appIdField.RegisterValueChangedCallback(evt =>
             {
                 _editorAPI.AppId = evt.newValue;
-                _appId = evt.newValue;
+                appId = evt.newValue;
             });
 
-            var apiKey = new TextField("API Key", 32, false, true, '*');
-            apiKey.value = _apiKey;
-            apiKey.RegisterValueChangedCallback(evt =>
+            var apiKeyField = new TextField("API Key", 32, false, true, '*');
+            apiKeyField.value = apiKey;
+            apiKeyField.RegisterValueChangedCallback(evt =>
             {
-                _apiKey = evt.newValue;
+                apiKey = evt.newValue;
                 _editorAPI.APIKey = evt.newValue;
             });
 
-            var userId = new TextField("User ID");
-            userId.value = _userId;
-            userId.RegisterValueChangedCallback(evt =>
+            var userIdField = new TextField("User ID");
+            userIdField.value = userId;
+            userIdField.RegisterValueChangedCallback(evt =>
             {
                 _editorAPI.UserId = evt.newValue;
-                _userId = evt.newValue;
+                userId = evt.newValue;
             });
 
-            var ingestionEndpoint = new TextField("Ingestion Endpoint");
-            ingestionEndpoint.value = _ingestionEndpoint;
-            ingestionEndpoint.RegisterValueChangedCallback(evt =>
+            var ingestionEndpointField = new TextField("Ingestion Endpoint");
+            ingestionEndpointField.value = ingestionEndpoint;
+            ingestionEndpointField.RegisterValueChangedCallback(evt =>
             {
                 _editorAPI.IngestionEndpoint = evt.newValue;
-                _ingestionEndpoint = evt.newValue;
+                ingestionEndpoint = evt.newValue;
             });
 
-            var offersEndpoint = new TextField("Offers Endpoint");
-            offersEndpoint.value = _offersEndpoint;
-            offersEndpoint.RegisterValueChangedCallback(evt =>
+            var offersEndpointField = new TextField("Offers Endpoint");
+            offersEndpointField.value = offersEndpoint;
+            offersEndpointField.RegisterValueChangedCallback(evt =>
             {
                 _editorAPI.OffersEndpoint = evt.newValue;
-                _offersEndpoint = evt.newValue;
+                offersEndpoint = evt.newValue;
             });
 
-            scrollPanel.Add(appId);
-            scrollPanel.Add(apiKey);
-            scrollPanel.Add(userId);
-            scrollPanel.Add(ingestionEndpoint);
-            scrollPanel.Add(offersEndpoint);
+            scrollPanel.Add(appIdField);
+            scrollPanel.Add(apiKeyField);
+            scrollPanel.Add(userIdField);
+            scrollPanel.Add(ingestionEndpointField);
+            scrollPanel.Add(offersEndpointField);
 
             // var label = new Label("Placements")
             // {
@@ -328,9 +356,9 @@ namespace MeticaUnitySDK.Assets.Editor
             _deleteButton = new Button(() => DeleteSelectedOffer()) { text = "Delete" };
             _detailsView.Add(_deleteButton);
 
-            var displayLogFoldout = new Foldout()
+            var displayLogFoldout = new Foldout
             {
-                text = "Display Log",
+                text = "Past Displays",
                 style =
                 {
                     marginTop = 10
@@ -339,12 +367,12 @@ namespace MeticaUnitySDK.Assets.Editor
             _detailsView.Add(displayLogFoldout);
 
             var displayLogEntries = _editorAPI.GetDisplayLog(_selectedOffer.offerId)
-                .Where(entry => entry.placementId == _placements[_selectedPlacement]).ToList();
+                .Where(entry => entry.placementId == placements[selectedOffersPlacement]).ToList();
             var displayLogList = new ListView(displayLogEntries, itemHeight: 20, makeItem: () => new Label(),
                 bindItem: (item, index) =>
                 {
                     (item as Label).text =
-                        $"Date: {displayLogEntries[index].displayedOn}";
+                        $"Date: {DateTimeOffset.FromUnixTimeMilliseconds(displayLogEntries[index].displayedOn).ToString("F")}";
                 })
             {
                 style = { marginBottom = 10 }
@@ -389,6 +417,7 @@ namespace MeticaUnitySDK.Assets.Editor
             });
         }
 
+        // Used in the settings panel
         private void PopulatePlacementsUI(VisualElement parent)
         {
             var group = new GroupBox("Placements")
@@ -400,20 +429,20 @@ namespace MeticaUnitySDK.Assets.Editor
             };
             parent.Add(group);
 
-            var placements = new ListView(_placements, itemHeight: 20, makeItem: () =>
+            var placementsListView = new ListView(placements, itemHeight: 20, makeItem: () =>
                 {
                     var txt = new TextField();
                     txt.RegisterValueChangedCallback(evt =>
                     {
-                        var idx = _placements.IndexOf(evt.previousValue);
+                        var idx = placements.IndexOf(evt.previousValue);
                         if (idx >= 0)
                         {
-                            _placements[idx] = evt.newValue;
+                            placements[idx] = evt.newValue;
                         }
                     });
                     return txt;
                 },
-                bindItem: (item, index) => { (item as TextField).value = _placements[index]; })
+                bindItem: (item, index) => { (item as TextField).value = placements[index]; })
             {
                 selectionType = SelectionType.Single,
                 showBorder = true,
@@ -422,7 +451,7 @@ namespace MeticaUnitySDK.Assets.Editor
                     flexGrow = 1
                 }
             };
-            placements.onSelectionChange += OnPlacementSelectionChange;
+            placementsListView.onSelectionChange += OnPlacementSelectionChange;
 
             // Input field for adding or editing items
             _placementInput = new TextField
@@ -437,9 +466,9 @@ namespace MeticaUnitySDK.Assets.Editor
             // Add button
             var addButton = new Button(() =>
             {
-                _placements.Add(_placementInput.value);
+                placements.Add(_placementInput.value);
                 _placementInput.value = "";
-                placements.Rebuild();
+                placementsListView.Rebuild();
             })
             {
                 text = "Add"
@@ -448,10 +477,10 @@ namespace MeticaUnitySDK.Assets.Editor
             // Remove button
             _deletePlacementButton = new Button(() =>
             {
-                if (_selectedPlacement >= 0 && _selectedPlacement < _placements.Count)
+                if (selectedPlacement >= 0 && selectedPlacement < placements.Count)
                 {
-                    _placements.RemoveAt(_selectedPlacement);
-                    placements.Rebuild();
+                    placements.RemoveAt(selectedPlacement);
+                    placementsListView.Rebuild();
                     ClearPlacementSelection();
                 }
             })
@@ -461,10 +490,10 @@ namespace MeticaUnitySDK.Assets.Editor
             };
             _deletePlacementButton.SetEnabled(false); // Initially disabled
 
-            group.Add(placements);
+            group.Add(placementsListView);
             group.Add(_deletePlacementButton);
 
-            var addNew = new Foldout() { text = "Add new" };
+            var addNew = new Foldout { text = "Add new" };
             group.Add(addNew);
 
             // group.Add(new Label("Add new placement:"));
@@ -472,23 +501,168 @@ namespace MeticaUnitySDK.Assets.Editor
             addNew.Add(addButton);
         }
 
+        private List<string> templates = new()
+        {
+            "Offer Display",
+            "Offer Interaction",
+            "Offer Purchase",
+            "User Properties Update",
+            "Custom Event"
+        };
+
         private void PopulateEventsPanel()
         {
-            var eventsJson = new TextField("Event Payload", 4096, true, false, '*');
-            rootVisualElement.Add(eventsJson);
-            var submitButton = new Button(() =>
+            PopulateEventsSubmissionPanel();
+            PopulateEventsQueuePanel();
+        }
+
+        private void PopulateEventsQueuePanel()
+        {
+            var foldout = new Foldout();
+            foldout.text = "Events Queue";
+
+            var logger = _editorAPI.GetEventsLogger();
+            var events = logger != null ? logger.EventsQueue : new List<Dictionary<string, object>>();
+            var eventsListView = new ListView(events, itemHeight: 20, makeItem: () =>
+                    new TextField("Payload", 4096, true, false, '*')
+                    {
+                        isReadOnly = true,
+                        multiline = true,
+                        style =
+                        {
+                            height = 100,
+                            flexGrow = 1
+                        }
+                    },
+                bindItem: (item, index) =>
+                {
+                    // (item as TextElement).text = JsonConvert.SerializeObject(events[index], Formatting.Indented);
+                    (item as TextField).value = JsonConvert.SerializeObject(events[index]);
+                })
             {
-                try
+                selectionType = SelectionType.Single,
+                showBorder = true,
+                style =
                 {
-                    var json = JsonConvert.DeserializeObject<Dictionary<string, object>>(eventsJson.value);
-                    _editorAPI.Init();
-                    MeticaAPI.LogUserEvent(json);
+                    flexGrow = 1
                 }
-                catch (Exception e)
-                {
-                    Debug.LogError("Error while submitting event: " + e);
-                }
-            }) { text = "Submit Event" };
+            };
+
+            rootVisualElement.Add(foldout);
+            foldout.Add(eventsListView);
+
+            var flushQueueBtn = new Button(() =>
+            {
+                _editorAPI.GetEventsLogger().FlushEvents();
+                PopulateView();
+            });
+            flushQueueBtn.text = "Flush Queue";
+            rootVisualElement.Add(flushQueueBtn);
+        }
+
+        private void PopulateEventsSubmissionPanel()
+        {
+            var eventTemplates = new DropdownField("Templates")
+            {
+                index = selectedEventTemplate,
+                value = templates[selectedEventTemplate],
+                choices = new List<string>(templates)
+            };
+            eventTemplates.RegisterValueChangedCallback(evt =>
+            {
+                Debug.Log("new selected template: " + evt.newValue);
+                selectedEventTemplate = templates.IndexOf(evt.newValue);
+                eventTemplates.value = templates[selectedEventTemplate];
+                PopulateView();
+            });
+
+            var eventsJson = new TextField("Event Payload", 4096, true, false, '*');
+            eventsJson.RegisterValueChangedCallback(evt => { customEventPayload = evt.newValue; });
+
+            var offerIdField = new TextField("Offer ID");
+            offerIdField.value = eventOfferId;
+            offerIdField.RegisterValueChangedCallback(evt => { eventOfferId = evt.newValue; });
+
+            var placementIdField = new TextField("Placement ID");
+            placementIdField.value = eventPlacementId;
+            placementIdField.RegisterValueChangedCallback(evt => { eventPlacementId = evt.newValue; });
+
+            var amountField = new DoubleField("Amount");
+            amountField.value = eventAmount;
+            amountField.RegisterValueChangedCallback(evt => { eventAmount = evt.newValue; });
+
+            var currencyField = new TextField("Currency");
+            currencyField.value = eventCurrency;
+            currencyField.RegisterValueChangedCallback(evt => { eventCurrency = evt.newValue; });
+
+            var interactionTypeField = new TextField("Interaction Type");
+            interactionTypeField.value = eventInteractionType;
+            interactionTypeField.RegisterValueChangedCallback(evt => { eventInteractionType = evt.newValue; });
+
+            var submitButton = new Button { text = "Submit Event" };
+
+            rootVisualElement.Add(eventTemplates);
+
+            switch (selectedEventTemplate)
+            {
+                case 0:
+                    rootVisualElement.Add(offerIdField);
+                    rootVisualElement.Add(placementIdField);
+                    submitButton.RegisterCallback<MouseUpEvent>(evt =>
+                    {
+                        _editorAPI.LogOfferDisplay(eventOfferId, eventPlacementId);
+                        PopulateView();
+                    });
+                    break;
+                case 1:
+                    rootVisualElement.Add(offerIdField);
+                    rootVisualElement.Add(placementIdField);
+                    rootVisualElement.Add(interactionTypeField);
+                    submitButton.RegisterCallback<MouseUpEvent>(evt =>
+                    {
+                        _editorAPI.LogOfferInteraction(eventOfferId, eventPlacementId, eventInteractionType);
+                        PopulateView();
+                    });
+                    break;
+                case 2:
+                    rootVisualElement.Add(offerIdField);
+                    rootVisualElement.Add(placementIdField);
+                    rootVisualElement.Add(amountField);
+                    rootVisualElement.Add(currencyField);
+                    submitButton.RegisterCallback<MouseUpEvent>(evt =>
+                    {
+                        _editorAPI.LogOfferPurchase(eventOfferId, eventPlacementId, eventAmount, eventCurrency);
+                        PopulateView();
+                    });
+                    break;
+                case 3:
+                case 4:
+                    eventsJson.value = customEventPayload;
+                    rootVisualElement.Add(eventsJson);
+                    submitButton.RegisterCallback<MouseUpEvent>(evt =>
+                    {
+                        try
+                        {
+                            var json = JsonConvert.DeserializeObject<Dictionary<string, object>>(eventsJson.value);
+                            if (selectedEventTemplate == 3)
+                            {
+                                _editorAPI.LogUserAttributes(json);
+                            }
+                            else
+                            {
+                                _editorAPI.LogUserEvent(json);
+                            }
+
+                            PopulateView();
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError("Error while submitting event: " + e);
+                        }
+                    });
+                    break;
+            }
+
             rootVisualElement.Add(submitButton);
         }
 
@@ -498,7 +672,7 @@ namespace MeticaUnitySDK.Assets.Editor
             if (selectedItems.Count > 0)
             {
                 var selectedValue = selectedItems[0] as string;
-                _selectedPlacement = _placements.IndexOf(selectedValue);
+                selectedPlacement = placements.IndexOf(selectedValue);
                 _placementInput.value = selectedValue;
                 _deletePlacementButton.SetEnabled(true);
             }
@@ -510,7 +684,7 @@ namespace MeticaUnitySDK.Assets.Editor
 
         private void ClearPlacementSelection()
         {
-            _selectedPlacement = -1;
+            selectedPlacement = -1;
             _placementInput.value = "";
             _deletePlacementButton.SetEnabled(false);
         }
@@ -541,14 +715,13 @@ namespace MeticaUnitySDK.Assets.Editor
 
         private void DeleteSelectedOffer()
         {
-            if (_selectedOffer != null)
-            {
-                _offers.Remove(_selectedOffer);
-                _offersListView.Rebuild();
-                _selectedOffer = null;
-                _deleteButton.SetEnabled(false);
-                ClearSelectedOfferDetails();
-            }
+            if (_selectedOffer == null) return;
+
+            _offers.Remove(_selectedOffer);
+            _offersListView.Rebuild();
+            _selectedOffer = null;
+            _deleteButton.SetEnabled(false);
+            ClearSelectedOfferDetails();
         }
     }
 }
