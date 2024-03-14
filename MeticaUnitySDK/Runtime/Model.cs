@@ -109,9 +109,9 @@ namespace Metica.Unity
         public OfferMetrics metrics;
         public List<Item> items;
         [CanBeNull] public string expirationTime;
-        [CanBeNull] public string customPayload;
+        [CanBeNull] public Dictionary<string, object> customPayload;
         [CanBeNull] public string creativeId;
-        [CanBeNull] public string creativeOverride;
+        [CanBeNull] public Dictionary<string, object> creativeOverride;
         [CanBeNull] public string iap;
         [CanBeNull] public string currencyId;
         [CanBeNull] public List<DisplayLimit> displayLimits;

@@ -118,10 +118,10 @@ namespace Metica.Unity
             MeticaAPI.LogUserAttributes(userEvent);
         }
         
-        public void GetOffersInEditor(string[] placements, MeticaSdkDelegate<OffersByPlacement> callback)
+        public void GetOffersInEditor(string[] placements, MeticaSdkDelegate<OffersByPlacement> callback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
             Init();
-            MeticaAPI.GetOffers(placements, callback);
+            MeticaAPI.GetOffers(placements, callback, userProperties, deviceInfo);
         }
 
         internal EventsLogger GetEventsLogger()

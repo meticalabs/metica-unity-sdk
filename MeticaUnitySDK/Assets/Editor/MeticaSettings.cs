@@ -42,6 +42,7 @@ namespace MeticaUnitySDK.Assets.Editor
 
         [SerializeField] private int selectedPlacement = 0;
         [SerializeField] private int selectedOffersPlacement = 0;
+        [SerializeField] private string overrideUserProperties;
 
         private ListView _offersListView;
         private VisualElement _detailsView;
@@ -70,6 +71,8 @@ namespace MeticaUnitySDK.Assets.Editor
             _editorAPI.AppId = appId;
             _editorAPI.APIKey = apiKey;
             _editorAPI.UserId = userId;
+            _editorAPI.IngestionEndpoint = ingestionEndpoint;
+            _editorAPI.OffersEndpoint = offersEndpoint;
         }
 
         private void PopulateView()
@@ -148,28 +151,32 @@ namespace MeticaUnitySDK.Assets.Editor
         private void FetchOffers()
         {
             _editorAPI.GetOffersInEditor(new[] { placements[selectedOffersPlacement] }, result =>
-            {
-                if (result.Error != null)
                 {
-                    Debug.LogError("Error while fetching offers: " + result.Error);
-                }
-                else
-                {
-                    foreach (var p in result.Result.placements.Keys)
+                    if (result.Error != null)
                     {
-                        var offers = result.Result.placements[p];
-                        _offers = offers;
-                        Debug.Log($"Placement {p} offers: {JsonConvert.SerializeObject(offers)}");
+                        Debug.LogError("Error while fetching offers: " + result.Error);
                     }
-                }
+                    else
+                    {
+                        Debug.Log("Successfully fetched offers" + JsonConvert.SerializeObject(result, Formatting.Indented));
+                        foreach (var p in result.Result.placements.Keys)
+                        {
+                            var offers = result.Result.placements[p];
+                            _offers = offers;
+                            Debug.Log($"Placement {p} offers: {JsonConvert.SerializeObject(offers)}");
+                        }
+                    }
 
-                if (_offers.Count > 0)
-                {
-                    _selectedOffer = _offers[0];
-                }
+                    if (_offers.Count > 0)
+                    {
+                        _selectedOffer = _offers[0];
+                    }
 
-                PopulateView();
-            });
+                    PopulateView();
+                },
+                overrideUserProperties != null
+                    ? JsonConvert.DeserializeObject<Dictionary<string, object>>(overrideUserProperties)
+                    : null);
         }
 
         private void PopulateOffersPanel()
@@ -180,7 +187,7 @@ namespace MeticaUnitySDK.Assets.Editor
                 _offers.Add(new Offer
                 {
                     offerId = "123",
-                    customPayload = "{}",
+                    customPayload = new Dictionary<string, object>(),
                     price = 1.23,
                     expirationTime = "2024-05-01T00:00:00Z"
                 });
@@ -194,6 +201,13 @@ namespace MeticaUnitySDK.Assets.Editor
             placementOptions.index = selectedOffersPlacement;
 
             offersParentView.Add(placementOptions);
+
+            var userPropsFoldout = new Foldout { text = "Override User Properties" };
+            var userPropsTextField = new TextField("Properties JSON", 4096, true, false, '*');
+            userPropsTextField.value = overrideUserProperties;
+            userPropsTextField.RegisterValueChangedCallback(evt => overrideUserProperties = evt.newValue);
+            userPropsFoldout.Add(userPropsTextField);
+            offersParentView.Add(userPropsFoldout);
 
             // Fetch Button
             var fetchButton = new Button(() => FetchOffers()) { text = "Fetch Offers" };
@@ -233,7 +247,7 @@ namespace MeticaUnitySDK.Assets.Editor
             };
 
 
-            _offersListView.onSelectionChange += OnOfferSelectionChange;
+            _offersListView.selectionChanged += OnOfferSelectionChange;
             mainSplitView.Add(_offersListView);
 
             _offersListView.Rebuild();
@@ -342,11 +356,11 @@ namespace MeticaUnitySDK.Assets.Editor
             _detailsView.Add(itemsList);
 
             idField.value = _selectedOffer.offerId;
-            payloadField.value = _selectedOffer.customPayload;
+            payloadField.value = JsonConvert.SerializeObject(_selectedOffer.customPayload, Formatting.Indented);
             expirationTimeField.value = _selectedOffer.expirationTime;
             priceField.value = _selectedOffer.price ?? 0.0;
             creativeId.value = _selectedOffer.creativeId;
-            creativeOverride.value = _selectedOffer.creativeOverride;
+            creativeOverride.value = JsonConvert.SerializeObject(_selectedOffer.creativeOverride, Formatting.Indented);
             currencyId.value = _selectedOffer.currencyId;
             iap.value = _selectedOffer.iap ?? "";
 
@@ -386,7 +400,8 @@ namespace MeticaUnitySDK.Assets.Editor
             });
             payloadField.RegisterValueChangedCallback(evt =>
             {
-                if (_selectedOffer != null) _selectedOffer.customPayload = evt.newValue;
+                if (_selectedOffer != null) _selectedOffer.customPayload =
+                    JsonConvert.DeserializeObject<Dictionary<string, object>>(evt.newValue);
             });
             expirationTimeField.RegisterValueChangedCallback(evt =>
             {
@@ -406,7 +421,7 @@ namespace MeticaUnitySDK.Assets.Editor
             });
             creativeOverride.RegisterValueChangedCallback(evt =>
             {
-                if (_selectedOffer != null) _selectedOffer.creativeOverride = evt.newValue;
+                if (_selectedOffer != null) _selectedOffer.creativeOverride = JsonConvert.DeserializeObject<Dictionary<string, object>>(evt.newValue);
             });
             priceField.RegisterValueChangedCallback(evt =>
             {
@@ -451,7 +466,7 @@ namespace MeticaUnitySDK.Assets.Editor
                     flexGrow = 1
                 }
             };
-            placementsListView.onSelectionChange += OnPlacementSelectionChange;
+            placementsListView.selectionChanged += OnPlacementSelectionChange;
 
             // Input field for adding or editing items
             _placementInput = new TextField
@@ -501,7 +516,7 @@ namespace MeticaUnitySDK.Assets.Editor
             addNew.Add(addButton);
         }
 
-        private List<string> templates = new()
+        private readonly List<string> templates = new()
         {
             "Offer Display",
             "Offer Interaction",

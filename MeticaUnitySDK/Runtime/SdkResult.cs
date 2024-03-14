@@ -23,11 +23,9 @@ namespace Metica.Unity
     
     public class SdkResultImpl<T> : ISdkResult<T>
     {
-        // private T _result;
-        // private string _error;
-        
         public T Result { get; internal set; }
-        public string Error { get; internal set;  }
+
+        public string Error { get; internal set; }
 
         public static ISdkResult<T> WithResult(T result)
         {
