@@ -139,8 +139,9 @@ namespace Metica.Unity
 
     internal abstract class BackendOperations
     {
-        public static void CallGetOffersAPI(string[] placements, 
-            MeticaSdkDelegate<OffersByPlacement> offersCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        public static void CallGetOffersAPI(string[] placements,
+            MeticaSdkDelegate<OffersByPlacement> offersCallback, Dictionary<string, object> userProperties = null,
+            DeviceInfo deviceInfo = null)
         {
             var op = ScriptingObjects.AddComponent<GetOffersOperation>();
             op.Placements = placements;
@@ -178,21 +179,22 @@ namespace Metica.Unity
         }
 
         // ReSharper disable once InconsistentNaming
-        internal static ODSRequest CreateODSRequestBody(Dictionary<string, object> userData, DeviceInfo overrideDeviceInfo = null)
+        internal static ODSRequest CreateODSRequestBody(Dictionary<string, object> userData,
+            DeviceInfo overrideDeviceInfo = null)
         {
             var locale = Thread.CurrentThread.CurrentCulture.Name;
 
             var systemTz = TimeZoneInfo.Local.BaseUtcOffset;
+            var timezone = systemTz.TotalMinutes == 0
+                ? "+00:00"
+                : $"{systemTz.Hours:D2}:{systemTz.Minutes:D2}";
             Debug.Log(TimeZoneInfo.Local.BaseUtcOffset.TotalMinutes);
-            var deviceInfo = overrideDeviceInfo ?? new DeviceInfo
-            {
-                locale = locale,
-                store = MapRuntimePlatformToStoreType(Application.platform).ToString(),
-                timezone = systemTz.TotalMinutes == 0
-                    ? "+00:00"
-                    : $"{systemTz.Hours:D2}:{systemTz.Minutes:D2}",
-                appVersion = Application.version
-            };
+            var deviceInfo = overrideDeviceInfo ?? new DeviceInfo();
+            deviceInfo.locale = overrideDeviceInfo?.locale ?? locale;
+            deviceInfo.store = overrideDeviceInfo?.store ??
+                               MapRuntimePlatformToStoreType(Application.platform).ToString();
+            deviceInfo.timezone = overrideDeviceInfo?.timezone ?? timezone;
+            deviceInfo.appVersion = overrideDeviceInfo?.appVersion ?? Application.version;
 
             var request = new ODSRequest
             {
