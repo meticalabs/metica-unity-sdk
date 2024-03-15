@@ -51,7 +51,7 @@ namespace Metica.Unity
                 Debug.LogError("The event must contain an eventType key");
                 return;
             }
-            
+
             if (eventDetails["eventType"] is not string)
             {
                 Debug.LogError("The eventType attribute must be a string");
@@ -65,7 +65,7 @@ namespace Metica.Unity
         public void LogOfferDisplay(string offerId, string placementId)
         {
             var eventDict = CreateCommonEventAttributes("meticaOfferImpression");
-            eventDict["meticaAttributes"] = CreateMeticaAttributes(offerId, placementId);
+            eventDict["meticaAttributes"] = GetOrCreateMeticaAttributes(offerId, placementId);
             LogEvent(eventDict);
         }
 
@@ -73,7 +73,7 @@ namespace Metica.Unity
         public void LogOfferPurchase(string offerId, string placementId, double amount, string currency)
         {
             var eventDict = CreateCommonEventAttributes("meticaOfferInAppPurchase");
-            eventDict["meticaAttributes"] = CreateMeticaAttributes(offerId, placementId);
+            eventDict["meticaAttributes"] = GetOrCreateMeticaAttributes(offerId, placementId);
             eventDict["currencyCode"] = currency;
             eventDict["totalAmount"] = amount;
             LogEvent(eventDict);
@@ -82,7 +82,7 @@ namespace Metica.Unity
         public void LogOfferInteraction(string offerId, string placementId, string interactionType)
         {
             var eventDict = CreateCommonEventAttributes("meticaOfferInteraction");
-            eventDict["meticaAttributes"] = CreateMeticaAttributes(offerId, placementId);
+            eventDict["meticaAttributes"] = GetOrCreateMeticaAttributes(offerId, placementId);
             eventDict["interactionType"] = interactionType;
             LogEvent(eventDict);
         }
@@ -143,7 +143,32 @@ namespace Metica.Unity
             };
         }
 
-        // TODO: add missing variantId and bundleId
+
+        private Dictionary<string, object> GetOrCreateMeticaAttributes(string offerId, string placementId)
+        {
+            var cachedOffers = MeticaAPI.OffersManager.GetCachedOffersByPlacement(placementId);
+            var offerDetails = cachedOffers.Find(offer => offer.offerId == offerId);
+            return (offerDetails == null)
+                ? CreateMeticaAttributes(offerId, placementId)
+                : CopyMetricsFromOfferDetails(offerDetails);
+        }
+
+        private Dictionary<string, object> CopyMetricsFromOfferDetails(Offer offerDetails)
+        {
+            return new Dictionary<string, object>()
+            {
+                {
+                    "offer", new Dictionary<string, object>()
+                    {
+                        { "offerId", offerDetails.metrics.display.meticaAttributes.offer.offerId },
+                        { "variantId", offerDetails.metrics.display.meticaAttributes.offer.variantId },
+                        { "bundleId", offerDetails.metrics.display.meticaAttributes.offer.bundleId }
+                    }
+                },
+                { "placementId", offerDetails.metrics.display.meticaAttributes.placementId }
+            };
+        }
+
         private Dictionary<string, object> CreateMeticaAttributes(
             string offerId,
             string placementId,

@@ -35,7 +35,7 @@ namespace Metica.Unity
         
         internal static DisplayLog DisplayLog { get; set; }
 
-        private static OffersManager _offersManager;
+        internal static OffersManager OffersManager{ get; set; }
 
         /// <summary>
         /// Initializes the Metica API.
@@ -52,8 +52,8 @@ namespace Metica.Unity
 
             ScriptingObjects.Init();
 
-            _offersManager = new OffersManager();
-            _offersManager.Init();
+            OffersManager = new OffersManager();
+            OffersManager.Init();
 
             DisplayLog = new DisplayLog();
             DisplayLog.Init();
@@ -72,7 +72,7 @@ namespace Metica.Unity
         /// <param name="deviceInfo">Optional. A DeviceInfo object containing device information to be included in the request.</param>
         public static void GetOffers(String[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
-            _offersManager.GetOffers(placements, offersCallback, userProperties, deviceInfo);
+            OffersManager.GetOffers(placements, offersCallback, userProperties, deviceInfo);
         }
 
         /// <summary>

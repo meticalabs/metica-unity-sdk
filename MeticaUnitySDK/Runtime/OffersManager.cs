@@ -11,14 +11,11 @@ namespace Metica.Unity
     internal class OffersManager
     {
         private CachedOffersByPlacement _cachedOffers = null;
-        // private DisplayLog _displayLog = null;
-
+        
         public void Init()
         {
             // load offers from disk
             _cachedOffers = OffersCache.Read();
-            // _displayLog = new DisplayLog();
-            // _displayLog.Init();
         }
 
         private bool IsOffersCacheValid() => _cachedOffers != null && _cachedOffers.offers != null;
@@ -81,6 +78,11 @@ namespace Metica.Unity
                 userProperties, deviceInfo);
         }
 
+        internal List<Offer> GetCachedOffersByPlacement(string placement)
+        {
+            return _cachedOffers.offers.placements[placement];
+        }
+        
         // Logs the display of offers by placement.
         // 
         // Parameters:
