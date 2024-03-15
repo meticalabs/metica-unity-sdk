@@ -26,10 +26,10 @@ namespace Metica.Unity
         private bool IsOffersCacheUpToDate() =>
             IsOffersCacheValid() && (new DateTime() - _cachedOffers.cacheTime).TotalHours < 2;
 
-        public void GetOffers(string[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback)
+        public void GetOffers(string[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback,
+            Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
             Debug.Log("Fetching offers from the server");
-            var offers = new Dictionary<string, List<Offer>>();
 
             // if the cache is recent, and not running inside the editor, return the cached offers
             if (IsOffersCacheUpToDate() && !Application.isEditor)
@@ -40,44 +40,45 @@ namespace Metica.Unity
             }
 
             BackendOperations.CallGetOffersAPI(placements, (sdkResult) =>
-            {
-                if (sdkResult.Error != null)
                 {
-                    Debug.LogError($"Error while fetching offers: {sdkResult.Error}");
-                    offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(IsOffersCacheValid()
-                        ? _cachedOffers.offers
-                        : new OffersByPlacement()));
-                }
-                else
-                {
-                    // persist the response and refresh the in-memory cache
-                    OffersCache.Write(new OffersByPlacement()
+                    if (sdkResult.Error != null)
                     {
-                        placements = offers
-                    });
-
-                    _cachedOffers = new CachedOffersByPlacement()
+                        Debug.LogError($"Error while fetching offers: {sdkResult.Error}");
+                        offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(IsOffersCacheValid()
+                            ? _cachedOffers.offers
+                            : new OffersByPlacement()));
+                    }
+                    else
                     {
-                        offers = new OffersByPlacement()
+                        // persist the response and refresh the in-memory cache
+                        OffersCache.Write(new OffersByPlacement()
                         {
-                            placements = offers
-                        },
-                        cacheTime = new DateTime()
-                    };
+                            placements = sdkResult.Result.placements
+                        });
 
-                    // filter out the offers that have exceeded their display limit
-                    var filteredDictionary = offers.ToDictionary(
-                        offersByPlacement => offersByPlacement.Key,
-                        offersByPlacement => MeticaAPI.DisplayLog.FilterOffers(offersByPlacement.Value));
+                        _cachedOffers = new CachedOffersByPlacement()
+                        {
+                            offers = new OffersByPlacement()
+                            {
+                                placements = sdkResult.Result.placements
+                            },
+                            cacheTime = new DateTime()
+                        };
 
-                    LogDisplays(filteredDictionary);
+                        // filter out the offers that have exceeded their display limit
+                        var filteredDictionary = sdkResult.Result.placements.ToDictionary(
+                            offersByPlacement => offersByPlacement.Key,
+                            offersByPlacement => MeticaAPI.DisplayLog.FilterOffers(offersByPlacement.Value));
 
-                    offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(new OffersByPlacement()
-                    {
-                        placements = filteredDictionary
-                    }));
-                }
-            });
+                        LogDisplays(filteredDictionary);
+
+                        offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(new OffersByPlacement()
+                        {
+                            placements = filteredDictionary
+                        }));
+                    }
+                },
+                userProperties, deviceInfo);
         }
 
         // Logs the display of offers by placement.

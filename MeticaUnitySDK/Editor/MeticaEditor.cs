@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
-using UnityEditor;
 
 // ReSharper disable all NotAccessedField.Global
 // ReSharper disable file UnusedMember.Local
@@ -68,19 +67,12 @@ namespace Metica.Unity
 
         public string[] placements = new String[] { };
         
-        private MeticaContext Init()
+        private void Init()
         {
-            var ctx = new MeticaContext
-            {
-                appId = _appId,
-                apiKey = _apiKey,
-                userId = _userId
-            };
-
             if (!MeticaAPI.Initialized)
             {
                 Debug.Log("Initializing In-Editor Metica SDK");
-                MeticaAPI.Initialise(ctx.userId, ctx.appId, ctx.apiKey, result =>
+                MeticaAPI.Initialise(userId, appId, apiKey, result =>
                 {
                     if (result.Error != null)
                     {
@@ -88,8 +80,6 @@ namespace Metica.Unity
                     }
                 });
             }
-
-            return ctx;
         }
 
         

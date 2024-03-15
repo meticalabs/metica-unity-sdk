@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
 namespace MeticaUnitySDK.Assets.Editor
@@ -42,6 +41,11 @@ namespace MeticaUnitySDK.Assets.Editor
 
         [SerializeField] private int selectedPlacement = 0;
         [SerializeField] private int selectedOffersPlacement = 0;
+        [SerializeField] private string overrideUserProperties;
+        [SerializeField] private string deviceInfoAppStore;
+        [SerializeField] private string deviceInfoTimezone;
+        [SerializeField] private string deviceInfoLocale;
+        [SerializeField] private string deviceInfoAppVersion;
 
         private ListView _offersListView;
         private VisualElement _detailsView;
@@ -70,6 +74,8 @@ namespace MeticaUnitySDK.Assets.Editor
             _editorAPI.AppId = appId;
             _editorAPI.APIKey = apiKey;
             _editorAPI.UserId = userId;
+            _editorAPI.IngestionEndpoint = ingestionEndpoint;
+            _editorAPI.OffersEndpoint = offersEndpoint;
         }
 
         private void PopulateView()
@@ -147,29 +153,73 @@ namespace MeticaUnitySDK.Assets.Editor
 
         private void FetchOffers()
         {
-            _editorAPI.GetOffersInEditor(new[] { placements[selectedOffersPlacement] }, result =>
+            var userProperties = overrideUserProperties != null
+                ? JsonConvert.DeserializeObject<Dictionary<string, object>>(overrideUserProperties)
+                : null;
+
+            var deviceInfo = new DeviceInfo()
             {
-                if (result.Error != null)
+                store = deviceInfoAppStore,
+                locale = deviceInfoLocale,
+                timezone = deviceInfoTimezone,
+                appVersion = deviceInfoAppVersion
+            };
+            
+            _editorAPI.GetOffersInEditor(new[] { placements[selectedOffersPlacement] }, result =>
                 {
-                    Debug.LogError("Error while fetching offers: " + result.Error);
-                }
-                else
-                {
-                    foreach (var p in result.Result.placements.Keys)
+                    if (result.Error != null)
                     {
-                        var offers = result.Result.placements[p];
-                        _offers = offers;
-                        Debug.Log($"Placement {p} offers: {JsonConvert.SerializeObject(offers)}");
+                        Debug.LogError("Error while fetching offers: " + result.Error);
                     }
-                }
+                    else
+                    {
+                        Debug.Log("Successfully fetched offers" +
+                                  JsonConvert.SerializeObject(result, Formatting.Indented));
+                        foreach (var p in result.Result.placements.Keys)
+                        {
+                            var offers = result.Result.placements[p];
+                            _offers = offers;
+                            Debug.Log($"Placement {p} offers: {JsonConvert.SerializeObject(offers)}");
+                        }
+                    }
 
-                if (_offers.Count > 0)
-                {
-                    _selectedOffer = _offers[0];
-                }
+                    if (_offers.Count > 0)
+                    {
+                        _selectedOffer = _offers[0];
+                    }
 
-                PopulateView();
-            });
+                    PopulateView();
+                },
+                userProperties,
+                deviceInfo);
+        }
+
+        private Foldout CreateDeviceInfoFoldout()
+        {
+            var deviceInfoFoldout = new Foldout { text = "Override Device Info" };
+            var appstoreField = new DropdownField("App Store",
+                new List<string>() { StoreTypeEnum.GooglePlayStore.ToString(), StoreTypeEnum.AppStore.ToString() }, 0);
+            appstoreField.value = deviceInfoAppStore;
+            appstoreField.RegisterValueChangedCallback(evt => deviceInfoAppStore = evt.newValue);
+
+            var timezoneField = new TextField("Timezone (e.g. +02:00)");
+            timezoneField.value = deviceInfoTimezone;
+            timezoneField.RegisterValueChangedCallback(evt => deviceInfoTimezone = evt.newValue);
+
+            var localeField = new TextField("Locale (e.g. en_US)");
+            localeField.value = deviceInfoLocale;
+            localeField.RegisterValueChangedCallback(evt => deviceInfoLocale = evt.newValue);
+
+            var appVersionField = new TextField("App Version (semantic versioning format)");
+            appVersionField.value = deviceInfoAppVersion;
+            appVersionField.RegisterValueChangedCallback(evt => deviceInfoAppVersion = evt.newValue);
+
+            deviceInfoFoldout.Add(appstoreField);
+            deviceInfoFoldout.Add(timezoneField);
+            deviceInfoFoldout.Add(localeField);
+            deviceInfoFoldout.Add(appVersionField);
+
+            return deviceInfoFoldout;
         }
 
         private void PopulateOffersPanel()
@@ -180,7 +230,7 @@ namespace MeticaUnitySDK.Assets.Editor
                 _offers.Add(new Offer
                 {
                     offerId = "123",
-                    customPayload = "{}",
+                    customPayload = new Dictionary<string, object>(),
                     price = 1.23,
                     expirationTime = "2024-05-01T00:00:00Z"
                 });
@@ -194,6 +244,16 @@ namespace MeticaUnitySDK.Assets.Editor
             placementOptions.index = selectedOffersPlacement;
 
             offersParentView.Add(placementOptions);
+
+            var userPropsFoldout = new Foldout { text = "Override User Properties" };
+            var userPropsTextField = new TextField("Properties JSON", 4096, true, false, '*');
+            userPropsTextField.value = overrideUserProperties;
+            userPropsTextField.RegisterValueChangedCallback(evt => overrideUserProperties = evt.newValue);
+            userPropsFoldout.Add(userPropsTextField);
+            offersParentView.Add(userPropsFoldout);
+
+            var deviceInfoFoldout = CreateDeviceInfoFoldout();
+            offersParentView.Add(deviceInfoFoldout);
 
             // Fetch Button
             var fetchButton = new Button(() => FetchOffers()) { text = "Fetch Offers" };
@@ -233,7 +293,7 @@ namespace MeticaUnitySDK.Assets.Editor
             };
 
 
-            _offersListView.onSelectionChange += OnOfferSelectionChange;
+            _offersListView.selectionChanged += OnOfferSelectionChange;
             mainSplitView.Add(_offersListView);
 
             _offersListView.Rebuild();
@@ -342,11 +402,11 @@ namespace MeticaUnitySDK.Assets.Editor
             _detailsView.Add(itemsList);
 
             idField.value = _selectedOffer.offerId;
-            payloadField.value = _selectedOffer.customPayload;
+            payloadField.value = JsonConvert.SerializeObject(_selectedOffer.customPayload, Formatting.Indented);
             expirationTimeField.value = _selectedOffer.expirationTime;
             priceField.value = _selectedOffer.price ?? 0.0;
             creativeId.value = _selectedOffer.creativeId;
-            creativeOverride.value = _selectedOffer.creativeOverride;
+            creativeOverride.value = JsonConvert.SerializeObject(_selectedOffer.creativeOverride, Formatting.Indented);
             currencyId.value = _selectedOffer.currencyId;
             iap.value = _selectedOffer.iap ?? "";
 
@@ -386,7 +446,9 @@ namespace MeticaUnitySDK.Assets.Editor
             });
             payloadField.RegisterValueChangedCallback(evt =>
             {
-                if (_selectedOffer != null) _selectedOffer.customPayload = evt.newValue;
+                if (_selectedOffer != null)
+                    _selectedOffer.customPayload =
+                        JsonConvert.DeserializeObject<Dictionary<string, object>>(evt.newValue);
             });
             expirationTimeField.RegisterValueChangedCallback(evt =>
             {
@@ -406,7 +468,9 @@ namespace MeticaUnitySDK.Assets.Editor
             });
             creativeOverride.RegisterValueChangedCallback(evt =>
             {
-                if (_selectedOffer != null) _selectedOffer.creativeOverride = evt.newValue;
+                if (_selectedOffer != null)
+                    _selectedOffer.creativeOverride =
+                        JsonConvert.DeserializeObject<Dictionary<string, object>>(evt.newValue);
             });
             priceField.RegisterValueChangedCallback(evt =>
             {
@@ -451,7 +515,7 @@ namespace MeticaUnitySDK.Assets.Editor
                     flexGrow = 1
                 }
             };
-            placementsListView.onSelectionChange += OnPlacementSelectionChange;
+            placementsListView.selectionChanged += OnPlacementSelectionChange;
 
             // Input field for adding or editing items
             _placementInput = new TextField
@@ -501,7 +565,7 @@ namespace MeticaUnitySDK.Assets.Editor
             addNew.Add(addButton);
         }
 
-        private List<string> templates = new()
+        private readonly List<string> templates = new()
         {
             "Offer Display",
             "Offer Interaction",
@@ -583,15 +647,16 @@ namespace MeticaUnitySDK.Assets.Editor
             offerIdField.value = eventOfferId;
             offerIdField.RegisterValueChangedCallback(evt => { eventOfferId = evt.newValue; });
 
-            var placementIdField = new TextField("Placement ID");
-            placementIdField.value = eventPlacementId;
-            placementIdField.RegisterValueChangedCallback(evt => { eventPlacementId = evt.newValue; });
+            var placementOptions = new DropdownField("Placements", placements, 0);
+            placementOptions.value = eventPlacementId;
+            placementOptions.RegisterValueChangedCallback(evt =>
+                eventPlacementId = evt.newValue);
 
             var amountField = new DoubleField("Amount");
             amountField.value = eventAmount;
             amountField.RegisterValueChangedCallback(evt => { eventAmount = evt.newValue; });
 
-            var currencyField = new TextField("Currency");
+            var currencyField = new TextField("Currency Code");
             currencyField.value = eventCurrency;
             currencyField.RegisterValueChangedCallback(evt => { eventCurrency = evt.newValue; });
 
@@ -599,7 +664,14 @@ namespace MeticaUnitySDK.Assets.Editor
             interactionTypeField.value = eventInteractionType;
             interactionTypeField.RegisterValueChangedCallback(evt => { eventInteractionType = evt.newValue; });
 
-            var submitButton = new Button { text = "Submit Event" };
+            var submitButton = new Button
+            {
+                text = "Submit Event",
+                style =
+                {
+                    marginTop = 15
+                }
+            };
 
             rootVisualElement.Add(eventTemplates);
 
@@ -607,7 +679,7 @@ namespace MeticaUnitySDK.Assets.Editor
             {
                 case 0:
                     rootVisualElement.Add(offerIdField);
-                    rootVisualElement.Add(placementIdField);
+                    rootVisualElement.Add(placementOptions);
                     submitButton.RegisterCallback<MouseUpEvent>(evt =>
                     {
                         _editorAPI.LogOfferDisplay(eventOfferId, eventPlacementId);
@@ -616,7 +688,7 @@ namespace MeticaUnitySDK.Assets.Editor
                     break;
                 case 1:
                     rootVisualElement.Add(offerIdField);
-                    rootVisualElement.Add(placementIdField);
+                    rootVisualElement.Add(placementOptions);
                     rootVisualElement.Add(interactionTypeField);
                     submitButton.RegisterCallback<MouseUpEvent>(evt =>
                     {
@@ -626,7 +698,7 @@ namespace MeticaUnitySDK.Assets.Editor
                     break;
                 case 2:
                     rootVisualElement.Add(offerIdField);
-                    rootVisualElement.Add(placementIdField);
+                    rootVisualElement.Add(placementOptions);
                     rootVisualElement.Add(amountField);
                     rootVisualElement.Add(currencyField);
                     submitButton.RegisterCallback<MouseUpEvent>(evt =>

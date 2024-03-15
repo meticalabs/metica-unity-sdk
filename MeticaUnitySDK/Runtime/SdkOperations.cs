@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Metica.Unity
@@ -22,12 +23,10 @@ namespace Metica.Unity
                 {
                     if (result.Error != null)
                     {
-                        Debug.Log("Notifying error");
                         EventsSubmitCallback(SdkResultImpl<String>.WithError(result.Error));
                     }
                     else
                     {
-                        Debug.Log("Notifying result");
                         EventsSubmitCallback(SdkResultImpl<String>.WithResult(result.Result));
                     }
 
@@ -48,26 +47,29 @@ namespace Metica.Unity
     internal class GetOffersOperation : MonoBehaviour
     {
         public string[] Placements { get; set; }
+        public Dictionary<string, object> UserProperties { get; set; }
+        public DeviceInfo DeviceInfo { get; set; }
 
         public MeticaSdkDelegate<OffersByPlacement> OffersCallback { get; set; }
 
         internal IEnumerator Start()
         {
             yield return PostRequestOperation.PostRequest<ODSResponse>(
-                $"{MeticaAPI.MeticaOffersEndpoint}/offers/v1/apps/{MeticaAPI.AppId}/users/{MeticaAPI.UserId}?placements={String.Join(",", Placements)}",
-                $"placements={String.Join(",", Placements)}",
+                $"{MeticaAPI.MeticaOffersEndpoint}/offers/v1/apps/{MeticaAPI.AppId}/users/{MeticaAPI.UserId}",
+                new Dictionary<string, object>
+                {
+                    { "placements", Placements },
+                },
                 MeticaAPI.ApiKey,
-                BackendOperations.CreateODSRequestBody(new Dictionary<string, object>()),
+                BackendOperations.CreateODSRequestBody(UserProperties, DeviceInfo),
                 result =>
                 {
                     if (result.Error != null)
                     {
-                        Debug.Log("Notifying error");
                         OffersCallback(SdkResultImpl<OffersByPlacement>.WithError(result.Error));
                     }
                     else
                     {
-                        Debug.Log("Notifying result");
                         OffersCallback(SdkResultImpl<OffersByPlacement>.WithResult(new OffersByPlacement
                         {
                             placements = result.Result.placements
@@ -87,4 +89,3 @@ namespace Metica.Unity
         }
     }
 }
-
