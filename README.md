@@ -2,13 +2,40 @@
 
 This document provides a quick summary on how to use the MeticaAPI Unity SDK.
 
-## Introduction
+## Overview
 
-In the SDK's context, an 'event' refers to a user's action or interaction with the system. For example, clicking a button, entering text, etc. The properties or attributes associated with these events could be numerous e.g., `event.totalAmount` could represent the total amount spent by a user purchasing an in-app offer.
+The MeticaAPI Unity SDK provides a simple interface to interact with the backend Metica API. The SDK provides methods to fetch offers, and log user interactions with the system as events.
 
-## Available Operations
 
-The Metica API provides the following operations:
+```mermaid
+graph LR
+    App -- Submits Events --> SDK[Metica SDK] -- Events --> Ingestion[Ingestion Service]
+    App -- Requests Offers --> SDK
+    SDK <-- Offers --> ODS[Offers Decision Service]
+    subgraph Metica Backend
+        Ingestion[Ingestion Service]
+        ODS[Offers Decision Service]
+    end
+```
+
+### Terminology
+_Event_
+
+An 'event' refers to a user's action or interaction with the system. For example, clicking a button, entering text, etc. The properties or attributes associated with these events could be numerous e.g., `event.totalAmount` could represent the total amount spent by a user purchasing an in-app offer.
+This is more dynamic information about the user, and is used to derive information amount the user and predict their future actions.
+
+_User Attributes_
+
+The attributes that describe a user of the app. These could be game progression, demographic information, user preferences, etc. 
+This is more static information about the user, and is used to personalize the offers and make them more relevant to the user.
+
+## Installation
+The installation can be done simply through the Package Manager in Unity. Select Window > Package Manager and click on the '+' button in the top left corner. Select "Add package from git URL" and enter the following URL:
+
+```https://github.com/meticalabs/metica-unity-sdk.git?path=/MeticaUnitySDK```
+
+## Available SDK Operations
+
 
 ### 1. Initialize the API
 
@@ -70,3 +97,5 @@ Dictionary<string, object> customUserEvent = new Dictionary<string, object> { { 
 MeticaAPI.LogUserAttributes(userAttributes); 
 MeticaAPI.LogUserEvent(userEvent);
 ```
+
+## Editor Components
