@@ -11,7 +11,7 @@ namespace Metica.Unity
     internal class OffersManager
     {
         private CachedOffersByPlacement _cachedOffers = null;
-        
+
         public void Init()
         {
             // load offers from disk
@@ -80,9 +80,11 @@ namespace Metica.Unity
 
         internal List<Offer> GetCachedOffersByPlacement(string placement)
         {
-            return _cachedOffers.offers.placements[placement];
+            return _cachedOffers.offers.placements.ContainsKey(placement)
+                ? _cachedOffers.offers.placements[placement]
+                : new List<Offer>();
         }
-        
+
         // Logs the display of offers by placement.
         // 
         // Parameters:
