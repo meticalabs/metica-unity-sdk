@@ -1,5 +1,5 @@
 {
-  "name": "com.metica.unity",
+  "name": "MeticaUnitySDK",
   "version": "1.0.0",
   "displayName": "Metica Unity SDK",
   "description": "Unity components to interface with the Metica offers platform.",
