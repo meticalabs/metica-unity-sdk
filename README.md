@@ -32,7 +32,7 @@ This is more static information about the user, and is used to personalize the o
 ## Installation
 The installation can be done simply through the Package Manager in Unity. Select Window > Package Manager and click on the '+' button in the top left corner. Select "Add package from git URL" and enter the following URL:
 
-```https://github.com/meticalabs/metica-unity-sdk.git?path=/MeticaUnitySDK```
+```https://github.com/meticalabs/metica-unity-sdk.git```
 
 ## Available SDK Operations
 
