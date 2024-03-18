@@ -41,9 +41,9 @@ namespace Metica.Unity
         /// Initializes the Metica API.
         /// </summary>
         /// <param name="userId">The user's ID.</param>
-        /// <param name="appId">The app's ID.</param>
-        /// <param name="apiKey">The API key.</param>
-        /// <param name="initCallback">The callback function to be invoked after initialization.</param>
+        /// <param name="appId">The application's ID. It must match the ID with which it was registered in the Metica platform</param>
+        /// <param name="apiKey">The API key provided by Metica.</param>
+        /// <param name="initCallback">The callback function to be invoked after initialization. If the initialisation was successful, then the result value will be true</param>
         public static void Initialise(string userId, string appId, string apiKey, MeticaSdkDelegate<bool> initCallback)
         {
             UserId = userId;
@@ -79,7 +79,7 @@ namespace Metica.Unity
         /// Logs the display of an offer.
         /// </summary>
         /// <param name="offerId">The ID of the offer.</param>
-        /// <param name="placementId">The ID of the placement.</param>
+        /// <param name="placementId">The ID of the placement where the offer is displayed.</param>
         public static void LogOfferDisplay(string offerId, string placementId)
         {
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
@@ -111,7 +111,7 @@ namespace Metica.Unity
         /// Logs an offer interaction event.
         /// </summary>
         /// <param name="offerId">The ID of the offer.</param>
-        /// <param name="placementId">The ID of the placement.</param>
+        /// <param name="placementId">The ID of the placement where the offer is displayed.</param>
         /// <param name="interactionType">The type of interaction.</param>
         public static void LogOfferInteraction(string offerId, string placementId, string interactionType)
         {

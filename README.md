@@ -39,13 +39,11 @@ The installation can be done simply through the Package Manager in Unity. Select
 
 ### 1. Initialize the API
 
-Use the `Initialise` method to prepare the MeticaAPI for use.
+Use the `Initialise` method to prepare the MeticaAPI for use. To obtain your API key please contact Metica. 
 
-- **Short Description**: Prepares the Metica API for operation, initializing internal components.
-- **Example Code**: 
 ```csharp
 MeticaAPI.Initialise("userId", "appId", "apiKey", result => { 
-    if (result.IsSuccess) { Debug.Log("Metica API Initialized"); } 
+    if (result.Result) { Debug.Log("Metica API Initialized"); } 
     else { Debug.Log("Failed to Initialize Metica API: " + result.Error); } 
 });
 ```
@@ -54,13 +52,17 @@ MeticaAPI.Initialise("userId", "appId", "apiKey", result => {
 
 After initialization, use the `GetOffers` method to obtain offers available for particular placements.
 
-- **Short Description**: Asynchronously fetches offers for specified placements from the Metica API.
-- **Example Code**: 
+Asynchronously fetches offers for specified placements from the Metica API. 
+The result is delivered through a callback and is a dictionary of placements and their respective offers.
+
+A dictionary of user attributes can be passed to the method to personalize the offers. If not, then the last known user attributes are used.
+
+Also, a `DeviceInfo` object can be passed to the method to provide device information. If not, then the device information is automatically collected.
 
 ```csharp
 MeticaAPI.GetOffers(new string[] { "placementId1", "placementId2" }, result => { 
     if (result.IsSuccess) { 
-        foreach (var offer in result.Payload.Data) 
+        foreach (var offer in result.placements["placementId1"]) 
         { 
             Debug.Log(offer); 
         } 
@@ -71,12 +73,9 @@ MeticaAPI.GetOffers(new string[] { "placementId1", "placementId2" }, result => {
 });
 ```
 
-### 3. Log Offer Display, Purchase, and Interaction
+### 3. Offer Lifecycle Events
 
-You can log user interaction with the system using methods `LogOfferDisplay`, `LogOfferPurchase`, and `LogOfferInteraction`.
-
-- **Short Description**: Logs user interactions like offer display, offer purchase, and offer interaction.
-- **Example Code**: 
+Logs offer related events like offer display, offer purchase, and offer interaction.
 
 ```csharp
 MeticaAPI.LogOfferDisplay("offerId", "placementId"); 
@@ -84,18 +83,40 @@ MeticaAPI.LogOfferPurchase("offerId", "placementId", 10.0, "USD");
 MeticaAPI.LogOfferInteraction("offerId", "placementId", "interactionType");
 ```
 
-### 4. User Attributes Logging and Custom Event Logging
+### 4. User Attributes Logging 
 
-Use `LogUserAttributes` and `LogUserEvent` methods to log user attributes and custom events respectively.
+Logs updates to user attributes and custom user events.
 
-- **Short Description**: Logs updates to user attributes and custom user events.
-- **Example Code**: 
 
 ```csharp
 Dictionary<string, object> userAttributes = new Dictionary<string, object> { { "age", 25 }, { "gender", "male" } };
-Dictionary<string, object> customUserEvent = new Dictionary<string, object> { { "eventType", "completed level" }, { "eventDetails", "level 5" } };
 MeticaAPI.LogUserAttributes(userAttributes); 
+```
+
+### 5. Custom Event Logging
+
+Logs custom application events. The only required field is `eventType` which is used by Metica to distinguish the different types of events.
+
+```csharp
+Dictionary<string, object> customUserEvent = new Dictionary<string, object> { { "eventType", "completed_level" }, { "eventDetails", "level 5" } };
 MeticaAPI.LogUserEvent(userEvent);
 ```
 
 ## Editor Components
+
+Besides the programmatic integration, you can also test the Metica integration directly from the Unity Editor.
+
+Select Window > Metica to open the Metica window. Here you can initialize the API, fetch offers, and log events.
+
+### Settings Panel
+In this panel you can setup the API and defined the available placements.
+![SettingsPanel](images/SettingsPanel.png "Settings Panel")
+
+### Offers Panel
+In this panel you can fetch offers for the defined placements.
+![OffersPanel](images/OffersPanel.png "Offers Panel")
+
+### Events Panel
+In this panel you can log events.
+
+![EventsPanel](images/EventsPanel.png "Events Panel")

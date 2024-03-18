@@ -56,11 +56,11 @@ namespace MeticaUnitySDK.Assets.Editor
 
         private readonly MeticaEditorAPI _editorAPI = new();
 
-        [MenuItem("Window/Metica Settings")]
+        [MenuItem("Window/Metica")]
         public static void ShowWindow()
         {
-            EditorWindow wnd = GetWindow<MeticaSettings>("Metica Settings");
-            wnd.titleContent = new GUIContent("Metica Settings");
+            EditorWindow wnd = GetWindow<MeticaSettings>("Metica");
+            wnd.titleContent = new GUIContent("Metica");
         }
 
         public MeticaSettings()
