@@ -21,7 +21,7 @@ namespace Metica.Unity
         private bool IsOffersCacheValid() => _cachedOffers != null && _cachedOffers.offers != null;
 
         private bool IsOffersCacheUpToDate() =>
-            IsOffersCacheValid() && (new DateTime() - _cachedOffers.cacheTime).TotalHours < 2;
+            IsOffersCacheValid() && (DateTime.Now - _cachedOffers.cacheTime).TotalHours < 2;
 
         public void GetOffers(string[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback,
             Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
@@ -41,9 +41,17 @@ namespace Metica.Unity
                     if (sdkResult.Error != null)
                     {
                         Debug.LogError($"Error while fetching offers: {sdkResult.Error}");
-                        offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(IsOffersCacheValid()
-                            ? _cachedOffers.offers
-                            : new OffersByPlacement()));
+                        if (IsOffersCacheUpToDate())
+                        {
+                            Debug.Log("Returning cached offers");
+                            Debug.Log("cache time: " + _cachedOffers.cacheTime);
+                            offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(_cachedOffers.offers));
+                        }
+                        else
+                        {
+                            Debug.LogError("Failed to fetch offers from the server");
+                            offersCallback(SdkResultImpl<OffersByPlacement>.WithError(sdkResult.Error));
+                        }
                     }
                     else
                     {
@@ -59,7 +67,7 @@ namespace Metica.Unity
                             {
                                 placements = sdkResult.Result.placements
                             },
-                            cacheTime = new DateTime()
+                            cacheTime = DateTime.Now
                         };
 
                         // filter out the offers that have exceeded their display limit

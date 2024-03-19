@@ -20,6 +20,7 @@ namespace Metica.Unity
             try
             {
                 // Ensure the file exists
+                Debug.Log(FilePath);
                 if (File.Exists(FilePath))
                 {
                     using (StreamReader reader = new StreamReader(FilePath))
