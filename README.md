@@ -101,6 +101,8 @@ Logs custom application events. The only required field is `eventType` which is 
 Dictionary<string, object> customUserEvent = new Dictionary<string, object> { { "eventType", "completed_level" }, { "eventDetails", "level 5" } };
 MeticaAPI.LogUserEvent(userEvent);
 ```
+### Code Sample
+An example usage of the above operations can be found in a small code sample can be found at [Samples/MeticaSample.cs](Samples/MeticaSample.cs).
 
 ## Editor Components
 
