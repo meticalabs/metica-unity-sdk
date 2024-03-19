@@ -30,7 +30,6 @@ namespace Metica.Unity
                         EventsSubmitCallback(SdkResultImpl<String>.WithResult(result.Result));
                     }
 
-                    Debug.Log("Destroying self");
                     if (!Application.isEditor)
                     {
                         Destroy(this);
@@ -76,7 +75,6 @@ namespace Metica.Unity
                         }));
                     }
 
-                    Debug.Log("Destroying self");
                     if (!Application.isEditor)
                     {
                         Destroy(this);

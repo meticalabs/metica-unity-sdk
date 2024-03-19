@@ -90,8 +90,6 @@ namespace Metica.Unity
              
             var resDelegate = new MeticaSdkDelegate<OffersByPlacement>(result =>
             {
-                Debug.Log(result.Result);
-                Debug.Log(result.Error);
                 if (result.Error != null)
                 {
                     Debug.LogError("Error while fetching offers: " + result.Error);

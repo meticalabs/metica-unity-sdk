@@ -173,8 +173,6 @@ namespace MeticaUnitySDK.Assets.Editor
                     }
                     else
                     {
-                        Debug.Log("Successfully fetched offers" +
-                                  JsonConvert.SerializeObject(result, Formatting.Indented));
                         foreach (var p in result.Result.placements.Keys)
                         {
                             var offers = result.Result.placements[p];
@@ -224,18 +222,6 @@ namespace MeticaUnitySDK.Assets.Editor
 
         private void PopulateOffersPanel()
         {
-            Debug.Log("Offers count: " + _offers.Count);
-            if (_offers.Count == 0)
-            {
-                _offers.Add(new Offer
-                {
-                    offerId = "123",
-                    customPayload = new Dictionary<string, object>(),
-                    price = 1.23,
-                    expirationTime = "2024-05-01T00:00:00Z"
-                });
-            }
-
             var offersParentView = rootVisualElement;
 
             var placementOptions = new DropdownField("Placements", placements, 0);
@@ -411,10 +397,10 @@ namespace MeticaUnitySDK.Assets.Editor
             iap.value = _selectedOffer.iap ?? "";
 
             var updateButton = new Button(() => Debug.Log("updating...")) { text = "Update" };
-            _detailsView.Add(updateButton);
+            // _detailsView.Add(updateButton);
 
             _deleteButton = new Button(() => DeleteSelectedOffer()) { text = "Delete" };
-            _detailsView.Add(_deleteButton);
+            // _detailsView.Add(_deleteButton);
 
             var displayLogFoldout = new Foldout
             {
@@ -634,7 +620,6 @@ namespace MeticaUnitySDK.Assets.Editor
             };
             eventTemplates.RegisterValueChangedCallback(evt =>
             {
-                Debug.Log("new selected template: " + evt.newValue);
                 selectedEventTemplate = templates.IndexOf(evt.newValue);
                 eventTemplates.value = templates[selectedEventTemplate];
                 PopulateView();

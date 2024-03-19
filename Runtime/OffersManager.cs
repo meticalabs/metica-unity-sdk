@@ -26,8 +26,6 @@ namespace Metica.Unity
         public void GetOffers(string[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback,
             Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
-            Debug.Log("Fetching offers from the server");
-
             // if the cache is recent, and not running inside the editor, return the cached offers
             if (IsOffersCacheUpToDate() && !Application.isEditor)
             {
@@ -43,8 +41,7 @@ namespace Metica.Unity
                         Debug.LogError($"Error while fetching offers: {sdkResult.Error}");
                         if (IsOffersCacheUpToDate())
                         {
-                            Debug.Log("Returning cached offers");
-                            Debug.Log("cache time: " + _cachedOffers.cacheTime);
+                            Debug.Log("Returning cached offers as fallback");
                             offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(_cachedOffers.offers));
                         }
                         else

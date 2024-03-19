@@ -8,10 +8,6 @@ namespace Metica.Unity
     {
         GameObject canvas;
         Text textElement;
-        Button fetchOffersButton;
-
-        // For controlling panel visibility
-        private bool isPanelVisible = false;
 
         void Start()
         {
