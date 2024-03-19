@@ -122,3 +122,7 @@ In this panel you can fetch offers for the defined placements.
 In this panel you can log events.
 
 ![EventsPanel](images/EventsPanel.png "Events Panel")
+
+## Privacy Manifest
+For iOS, iPadOS, tvOS and watchOS apps, we provide a [privacy manifest](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files) at [Assets/Plugins/PrivacyInfo.xcprivacy](Assets/Plugins/PrivacyInfo.xcprivacy)
+that describes the data collected by the Metica SDK. 
