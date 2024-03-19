@@ -13,8 +13,8 @@ namespace Metica.Unity
     public class MeticaAPI : ScriptableObject
     {
         public static string SDKVersion = "1.0.0";
-        private static string meticaOffersEndpoint = "http://localhost:9090";
-        private static string meticaIngestionEndpoint = "http://localhost:8080";
+        private static string meticaOffersEndpoint = "https://api.prod-eu.metica.com";
+        private static string meticaIngestionEndpoint = "https://api.prod-eu.metica.com";
         public static string UserId { get; internal set; }
         public static string AppId { get; internal set; }
         public static string ApiKey { get; internal set; }
