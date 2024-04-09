@@ -279,7 +279,7 @@ namespace MeticaUnitySDK.Assets.Editor
             };
 
 
-            _offersListView.selectionChanged += OnOfferSelectionChange;
+            _offersListView.onSelectionChange += OnOfferSelectionChange;
             mainSplitView.Add(_offersListView);
 
             _offersListView.Rebuild();
@@ -501,7 +501,7 @@ namespace MeticaUnitySDK.Assets.Editor
                     flexGrow = 1
                 }
             };
-            placementsListView.selectionChanged += OnPlacementSelectionChange;
+            placementsListView.onSelectionChange += OnPlacementSelectionChange;
 
             // Input field for adding or editing items
             _placementInput = new TextField
