@@ -707,7 +707,7 @@ namespace MeticaUnitySDK.Assets.Editor
                             }
                             else
                             {
-                                _editorAPI.LogUserEvent(json);
+                                _editorAPI.LogUserEvent(json["eventType"] as string, json);
                             }
 
                             PopulateView();

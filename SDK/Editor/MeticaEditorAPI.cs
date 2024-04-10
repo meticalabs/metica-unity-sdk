@@ -106,10 +106,10 @@ namespace Metica.Unity
             MeticaAPI.LogOfferInteraction(offerId, placementId, interactionType);
         }
 
-        public void LogUserEvent(Dictionary<string, object> userEvent)
+        public void LogUserEvent(string eventType, Dictionary<string, object> userEvent)
         {
             Init();
-            MeticaAPI.LogUserEvent(userEvent);
+            MeticaAPI.LogUserEvent(eventType, userEvent);
         }
 
         public void LogUserAttributes(Dictionary<string, object> userEvent)
