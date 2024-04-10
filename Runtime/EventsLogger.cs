@@ -44,9 +44,9 @@ namespace Metica.Unity
             }
         }
 
-        public void LogCustomEvent(Dictionary<string, object> eventDetails)
+        public void LogCustomEvent(string eventType, Dictionary<string, object> eventDetails)
         {
-            if (!eventDetails.ContainsKey("eventType"))
+            if (eventType == null)
             {
                 Debug.LogError("The event must contain an eventType key");
                 return;
@@ -58,7 +58,7 @@ namespace Metica.Unity
                 return;
             }
 
-            var eventDict = CreateCommonEventAttributes(eventDetails["eventType"] as string);
+            var eventDict = CreateCommonEventAttributes(eventType);
             LogEvent(eventDict);
         }
 
@@ -68,7 +68,6 @@ namespace Metica.Unity
             eventDict["meticaAttributes"] = GetOrCreateMeticaAttributes(offerId, placementId);
             LogEvent(eventDict);
         }
-
 
         public void LogOfferPurchase(string offerId, string placementId, double amount, string currency)
         {

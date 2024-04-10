@@ -132,11 +132,12 @@ namespace Metica.Unity
         /// <summary>
         /// Logs a custom user event to the Metica API.
         /// </summary>
+        /// <param name="eventType">The name/type of the event</param>
         /// <param name="userEvent">A dictionary containing the details of the user event. The dictionary should have string keys and object values.</param>
-        public static void LogUserEvent(Dictionary<string, object> userEvent)
+        public static void LogUserEvent(string eventType, Dictionary<string, object> userEvent)
         {
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogCustomEvent(userEvent);
+            logger.LogCustomEvent(eventType, userEvent);
         }
     }
 }
