@@ -89,7 +89,7 @@ Logs updates to user attributes and custom user events.
 
 
 ```csharp
-Dictionary<string, object> userAttributes = new Dictionary<string, object> { { "age", 25 }, { "gender", "male" } };
+Dictionary<string, object> userAttributes = new Dictionary<string, object> { { "level", 25 }, { "favoriteItem", "shield" } };
 MeticaAPI.LogUserAttributes(userAttributes); 
 ```
 
