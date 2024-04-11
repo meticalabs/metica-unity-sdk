@@ -1,0 +1,11 @@
+{
+  "name": "Metica.Unity.Tests",
+  "references": [
+    "Metica.Unity"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": []
+}

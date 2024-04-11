@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Metica.Unity
 {
-    internal class EventsLogger : MonoBehaviour
+    public class EventsLogger : MonoBehaviour
     {
         const UInt16 MaxPendingEventsCount = 256;
 
@@ -48,18 +48,18 @@ namespace Metica.Unity
         {
             if (eventType == null)
             {
-                Debug.LogError("The event must contain an eventType key");
+                Debug.LogError("The event type must be specified");
                 return;
             }
-
-            if (eventDetails["eventType"] is not string)
-            {
-                Debug.LogError("The eventType attribute must be a string");
-                return;
-            }
-
-            var eventDict = CreateCommonEventAttributes(eventType);
-            LogEvent(eventDict);
+            
+            var commonDict = CreateCommonEventAttributes(eventType);
+            var merged = commonDict
+                .Concat(
+                    eventDetails.Where(it => !commonDict.ContainsKey(it.Key))
+                )
+                .ToDictionary(it => it.Key, it => it.Value);
+            
+            LogEvent(merged);
         }
 
         public void LogOfferDisplay(string offerId, string placementId)
