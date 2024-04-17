@@ -1,18 +1,26 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace Metica.Unity
 {
     [ExecuteAlways]
-    internal class SubmitEventsOperation : MonoBehaviour
+    internal class CallEventsIngestionOperation : MonoBehaviour
     {
-        public List<Dictionary<string, object>> Events { get; set; }
+        public IObjectPool<CallEventsIngestionOperation> pool;
+        
+        public ICollection<Dictionary<string, object>> Events { get; set; }
 
         public MeticaSdkDelegate<String> EventsSubmitCallback { get; set; }
 
+        public void OnDestroyPoolObject()
+        {
+            pool.Release(this);
+            Destroy(this);
+        }
+        
         internal IEnumerator Start()
         {
             return PostRequestOperation.PostRequest<String>($"{MeticaAPI.MeticaIngestionEndpoint}/ingest/v1/events",
@@ -29,15 +37,6 @@ namespace Metica.Unity
                     {
                         EventsSubmitCallback(SdkResultImpl<String>.WithResult(result.Result));
                     }
-
-                    if (!Application.isEditor)
-                    {
-                        Destroy(this);
-                    }
-                    else
-                    {
-                        DestroyImmediate(this);
-                    }
                 });
         }
     }
@@ -45,11 +44,18 @@ namespace Metica.Unity
     [ExecuteAlways]
     internal class GetOffersOperation : MonoBehaviour
     {
+        public IObjectPool<GetOffersOperation> pool;
         public string[] Placements { get; set; }
         public Dictionary<string, object> UserProperties { get; set; }
         public DeviceInfo DeviceInfo { get; set; }
 
         public MeticaSdkDelegate<OffersByPlacement> OffersCallback { get; set; }
+
+        public void OnDestroyPoolObject()
+        {
+            pool.Release(this);
+            Destroy(this);
+        }
 
         internal IEnumerator Start()
         {
@@ -73,15 +79,6 @@ namespace Metica.Unity
                         {
                             placements = result.Result.placements
                         }));
-                    }
-
-                    if (!Application.isEditor)
-                    {
-                        Destroy(this);
-                    }
-                    else
-                    {
-                        DestroyImmediate(this);
                     }
                 });
         }

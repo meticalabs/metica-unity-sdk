@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Pool;
 
 namespace Metica.Unity
 {
@@ -139,21 +140,47 @@ namespace Metica.Unity
 
     internal abstract class BackendOperations
     {
+        private static readonly LinkedPool<GetOffersOperation> GetOffersPool = new(
+            createFunc: () =>
+            {
+                var item = ScriptingObjects.AddComponent<GetOffersOperation>();
+                return item;
+            },
+            actionOnGet: item => item.gameObject.SetActive(true),
+            actionOnRelease: item => item.gameObject.SetActive(false),
+            actionOnDestroy: item => { item.OnDestroyPoolObject(); },
+            maxSize: 100
+        );
+
         public static void CallGetOffersAPI(string[] placements,
             MeticaSdkDelegate<OffersByPlacement> offersCallback, Dictionary<string, object> userProperties = null,
             DeviceInfo deviceInfo = null)
         {
-            var op = ScriptingObjects.AddComponent<GetOffersOperation>();
+            var op = GetOffersPool.Get();
+            op.pool = GetOffersPool;
             op.Placements = placements;
             op.OffersCallback = offersCallback;
             op.UserProperties = userProperties;
             op.DeviceInfo = deviceInfo;
         }
 
-        public static void CallSubmitEventsAPI(List<Dictionary<string, object>> events,
+        private static readonly LinkedPool<CallEventsIngestionOperation> CallIngestionPool = new(
+            createFunc: () =>
+            {
+                var item = ScriptingObjects.AddComponent<CallEventsIngestionOperation>();
+                return item;
+            },
+            actionOnGet: item => item.gameObject.SetActive(true),
+            actionOnRelease: item => item.gameObject.SetActive(false),
+            actionOnDestroy: item => { item.OnDestroyPoolObject(); },
+            maxSize: 100
+        );
+        
+        public static void CallSubmitEventsAPI(ICollection<Dictionary<string, object>> events,
             MeticaSdkDelegate<String> callback)
         {
-            var op = ScriptingObjects.AddComponent<SubmitEventsOperation>();
+            var op = CallIngestionPool.Get();
+            op.pool = CallIngestionPool;
             op.Events = events;
             op.EventsSubmitCallback = callback;
         }
@@ -173,9 +200,9 @@ namespace Metica.Unity
             }
         }
 
-        internal static object CreateIngestionRequestBody(List<Dictionary<string, object>> events)
+        internal static object CreateIngestionRequestBody(ICollection<Dictionary<string, object>> events)
         {
-            return new Dictionary<string, object>() { { "events", events } };
+            return new Dictionary<string, object> { { "events", events } };
         }
 
         // ReSharper disable once InconsistentNaming
