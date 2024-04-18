@@ -51,14 +51,14 @@ namespace Metica.Unity
                 Debug.LogError("The event type must be specified");
                 return;
             }
-            
+
             var commonDict = CreateCommonEventAttributes(eventType);
             var merged = commonDict
                 .Concat(
                     eventDetails.Where(it => !commonDict.ContainsKey(it.Key))
                 )
                 .ToDictionary(it => it.Key, it => it.Value);
-            
+
             LogEvent(merged);
         }
 
@@ -72,17 +72,19 @@ namespace Metica.Unity
         public void LogOfferPurchase(string offerId, string placementId, double amount, string currency)
         {
             var eventDict = CreateCommonEventAttributes("meticaOfferInAppPurchase");
-            eventDict["meticaAttributes"] = GetOrCreateMeticaAttributes(offerId, placementId);
-            eventDict["currencyCode"] = currency;
-            eventDict["totalAmount"] = amount;
+            var meticaAttributes = GetOrCreateMeticaAttributes(offerId, placementId);
+            meticaAttributes["currencyCode"] = currency;
+            meticaAttributes["totalAmount"] = amount;
+            eventDict["meticaAttributes"] = meticaAttributes;
             LogEvent(eventDict);
         }
 
         public void LogOfferInteraction(string offerId, string placementId, string interactionType)
         {
             var eventDict = CreateCommonEventAttributes("meticaOfferInteraction");
-            eventDict["meticaAttributes"] = GetOrCreateMeticaAttributes(offerId, placementId);
-            eventDict["interactionType"] = interactionType;
+            var meticaAttributes = GetOrCreateMeticaAttributes(offerId, placementId);
+            meticaAttributes["interactionType"] = interactionType;
+            eventDict["meticaAttributes"] = meticaAttributes;
             LogEvent(eventDict);
         }
 
@@ -115,7 +117,7 @@ namespace Metica.Unity
                 return;
             }
 
-            var copyList = new List<Dictionary<string, object>>(_eventsList);
+            var copyList = _eventsList;
             _eventsList = new LinkedList<Dictionary<string, object>>();
             BackendOperations.CallSubmitEventsAPI(copyList, (result) =>
             {
@@ -130,7 +132,7 @@ namespace Metica.Unity
             });
         }
 
-        private Dictionary<string, object> CreateCommonEventAttributes(string eventType)
+        private static Dictionary<string, object> CreateCommonEventAttributes(string eventType)
         {
             return new Dictionary<string, object>()
             {
@@ -143,7 +145,7 @@ namespace Metica.Unity
         }
 
 
-        private Dictionary<string, object> GetOrCreateMeticaAttributes(string offerId, string placementId)
+        private static Dictionary<string, object> GetOrCreateMeticaAttributes(string offerId, string placementId)
         {
             var cachedOffers = MeticaAPI.OffersManager.GetCachedOffersByPlacement(placementId);
             var offerDetails = cachedOffers.Find(offer => offer.offerId == offerId);
@@ -152,7 +154,7 @@ namespace Metica.Unity
                 : CopyMetricsFromOfferDetails(offerDetails);
         }
 
-        private Dictionary<string, object> CopyMetricsFromOfferDetails(Offer offerDetails)
+        private static Dictionary<string, object> CopyMetricsFromOfferDetails(Offer offerDetails)
         {
             return new Dictionary<string, object>()
             {
@@ -168,7 +170,7 @@ namespace Metica.Unity
             };
         }
 
-        private Dictionary<string, object> CreateMeticaAttributes(
+        private static Dictionary<string, object> CreateMeticaAttributes(
             string offerId,
             string placementId,
             string variantId = null,

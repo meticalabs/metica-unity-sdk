@@ -35,7 +35,7 @@ namespace Metica.Unity
         
         internal static DisplayLog DisplayLog { get; set; }
 
-        internal static OffersManager OffersManager{ get; set; }
+        public static IOffersManager OffersManager{ get; set; }
 
         /// <summary>
         /// Initializes the Metica API.

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Metica.Unity;
+using Moq;
 using NUnit.Framework;
 using UnityEngine;
 using Assert = NUnit.Framework.Assert;
@@ -9,35 +10,140 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
     [TestFixture]
     public class EventsLoggerTest
     {
-        private const string testUserId = "testUser";
-        private const string testApp = "testApp";
-        private const string testKey = "testKey";
+        private const string TestUserId = "testUser";
+        private const string TestApp = "testApp";
+        private const string TestKey = "testKey";
+
+        private const string testOfferId = "testOffer";
+        private const string testBundleId = "testBundle";
+        private const string testVariantId = "testVariant";
+        private const string testPlacementId = "testPlacement";
 
         [SetUp]
         public void Setup()
         {
-            MeticaAPI.Initialise(testUserId, testApp, testKey, result => { Assert.True(result.Result);});
+            MeticaAPI.Initialise(TestUserId, TestApp, TestKey, result => { Assert.True(result.Result); });
         }
-        
+
         [Test]
-        public void TestTheCommonAttributesOfTheLoggedEvents()
+        public void TestTheCommonAttributesOfTheCustomEvents()
         {
             var logger = new GameObject().AddComponent<EventsLogger>();
 
             var eventType = "test";
-            var eventData = new Dictionary<string, object> {{"userId", "rejected"}, {"key2", "value2"}};
+            var eventData = new Dictionary<string, object> { { "userId", "rejected" }, { "key2", "value2" } };
 
             logger.LogCustomEvent(eventType, eventData);
 
             var recordedEvent = logger.EventsQueue[0];
-            Assert.AreEqual( "test", recordedEvent["eventType"]);
-            Assert.AreEqual( testUserId, recordedEvent["userId"]);
-            Assert.AreEqual( testApp, recordedEvent["appId"]);
-            Assert.AreEqual( "value2", recordedEvent["key2"]);
-            Assert.NotNull( recordedEvent["eventTime"]);
-            Assert.AreEqual( MeticaAPI.SDKVersion, recordedEvent["meticaUnitSdk"]);
+            Assert.AreEqual("test", recordedEvent["eventType"]);
+            Assert.AreEqual("value2", recordedEvent["key2"]);
+            assertCommonAttributes("test", recordedEvent);
+        }
+
+        [Test]
+        public void TestTheAttributesOfOfferPurchase()
+        {
+            var offersManager = new Mock<IOffersManager>();
+            offersManager.Setup(manager => manager.GetCachedOffersByPlacement(testPlacementId)).Returns(createOfferCache());
+
+            MeticaAPI.OffersManager = offersManager.Object;
+            
+            var logger = new GameObject().AddComponent<EventsLogger>();
+            logger.LogOfferPurchase(testOfferId, testPlacementId, 1.0, "USD");
+            var recordedEvent = logger.EventsQueue[0];
+            
+            assertCommonAttributes("meticaOfferInAppPurchase", recordedEvent);
+
+            var meticaAttributes = (Dictionary<string, object>)recordedEvent["meticaAttributes"];
+            var offerDetails = (Dictionary<string, object>)meticaAttributes["offer"];
+            Assert.AreEqual(testBundleId, offerDetails["bundleId"]);
+            Assert.AreEqual(testVariantId, offerDetails["variantId"]);
+            Assert.AreEqual(testPlacementId, meticaAttributes["placementId"]);
+            Assert.AreEqual(1.0, meticaAttributes["totalAmount"]);
+            Assert.AreEqual("USD", meticaAttributes["currencyCode"]);
         }
         
+        [Test]
+        public void TestTheAttributesOfOfferDisplay()
+        {
+            var offersManager = new Mock<IOffersManager>();
+            offersManager.Setup(manager => manager.GetCachedOffersByPlacement(testPlacementId)).Returns(createOfferCache());
+
+            MeticaAPI.OffersManager = offersManager.Object;
+            
+            var logger = new GameObject().AddComponent<EventsLogger>();
+            logger.LogOfferDisplay(testOfferId, testPlacementId);
+            
+            var recordedEvent = logger.EventsQueue[0];
+            
+            assertCommonAttributes("meticaOfferImpression", recordedEvent);
+
+            var meticaAttributes = (Dictionary<string, object>)recordedEvent["meticaAttributes"];
+            var offerDetails = (Dictionary<string, object>)meticaAttributes["offer"];
+            Assert.AreEqual(testBundleId, offerDetails["bundleId"]);
+            Assert.AreEqual(testVariantId, offerDetails["variantId"]);
+            Assert.AreEqual(testPlacementId, meticaAttributes["placementId"]);
+        }
+
+        
+        [Test]
+        public void TestTheAttributesOfOfferInteraction()
+        {
+            var offersManager = new Mock<IOffersManager>();
+            offersManager.Setup(manager => manager.GetCachedOffersByPlacement(testPlacementId)).Returns(createOfferCache());
+
+            MeticaAPI.OffersManager = offersManager.Object;
+            
+            var logger = new GameObject().AddComponent<EventsLogger>();
+            logger.LogOfferInteraction(testOfferId, testPlacementId, "click");
+            
+            var recordedEvent = logger.EventsQueue[0];
+            
+            assertCommonAttributes("meticaOfferInteraction", recordedEvent);
+
+            var meticaAttributes = (Dictionary<string, object>)recordedEvent["meticaAttributes"];
+            var offerDetails = (Dictionary<string, object>)meticaAttributes["offer"];
+            Assert.AreEqual(testBundleId, offerDetails["bundleId"]);
+            Assert.AreEqual(testVariantId, offerDetails["variantId"]);
+            Assert.AreEqual(testPlacementId, meticaAttributes["placementId"]);
+            Assert.AreEqual("click", meticaAttributes["interactionType"]);
+        }
+
+        [Test]
+        public void TestTheAttributesOfUserStateUpdate()
+        {
+            var offersManager = new Mock<IOffersManager>();
+            offersManager.Setup(manager => manager.GetCachedOffersByPlacement(testPlacementId)).Returns(new List<Offer>());
+
+            MeticaAPI.OffersManager = offersManager.Object;
+            
+            var logger = new GameObject().AddComponent<EventsLogger>();
+            var userAttributes = new Dictionary<string, object>()
+            {
+                { "name", "test"},
+                { "score", 123 },
+            };
+            logger.LogUserAttributes(userAttributes);
+            
+            var recordedEvent = logger.EventsQueue[0];
+            
+            assertCommonAttributes("meticaUserStateUpdate", recordedEvent);
+
+            var stateAttributes = (Dictionary<string, object>)recordedEvent["userStateAttributes"];
+            Assert.AreEqual(userAttributes, stateAttributes);
+        }
+
+        
+        private static void assertCommonAttributes(string eventType, Dictionary<string, object> recordedEvent)
+        {
+            Assert.AreEqual(eventType, recordedEvent["eventType"]);
+            Assert.AreEqual(TestUserId, recordedEvent["userId"]);
+            Assert.AreEqual(TestApp, recordedEvent["appId"]);
+            Assert.NotNull(recordedEvent["eventTime"]);
+            Assert.AreEqual(MeticaAPI.SDKVersion, recordedEvent["meticaUnitSdk"]);
+        }
+
         [Test]
         public void TestTheLimitOfTheEnqueuedEventsBuffer()
         {
@@ -52,6 +158,33 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             }
 
             Assert.AreEqual(256, logger.EventsQueue.Count);
+        }
+
+        private List<Offer> createOfferCache()
+        {
+            return new List<Offer>()
+            {
+                new()
+                {
+                    offerId = "testOffer",
+                    metrics = new OfferMetrics()
+                    {
+                        display = new DisplayMetric()
+                        {
+                            meticaAttributes = new MeticaAttributes()
+                            {
+                                offer = new OfferVariant()
+                                {
+                                    offerId = testOfferId,
+                                    bundleId = testBundleId,
+                                    variantId = testVariantId
+                                },
+                                placementId = testPlacementId
+                            }
+                        }
+                    }
+                }
+            };
         }
     }
 }

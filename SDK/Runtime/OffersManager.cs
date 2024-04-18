@@ -7,8 +7,18 @@ using UnityEngine;
 // ReSharper disable file UnusedMember.Local
 namespace Metica.Unity
 {
+    public interface IOffersManager
+    {
+        void Init();
+
+        void GetOffers(string[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback,
+            Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null);
+
+         List<Offer> GetCachedOffersByPlacement(string placement);
+    }
+    
     // TODO: add a history of the delivered offers
-    internal class OffersManager
+    public class OffersManager : IOffersManager
     {
         private CachedOffersByPlacement _cachedOffers = null;
 
@@ -83,7 +93,7 @@ namespace Metica.Unity
                 userProperties, deviceInfo);
         }
 
-        internal List<Offer> GetCachedOffersByPlacement(string placement)
+        public List<Offer> GetCachedOffersByPlacement(string placement)
         {
             return _cachedOffers.offers.placements.ContainsKey(placement)
                 ? _cachedOffers.offers.placements[placement]

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -9,6 +10,17 @@ namespace Metica.Unity
     {
         public OffersByPlacement offers;
         public DateTime cacheTime;
+
+        public static CachedOffersByPlacement Empty()
+        {
+            return new CachedOffersByPlacement()
+            {
+                offers = new OffersByPlacement()
+                {
+                    placements = new Dictionary<string, List<Offer>>()
+                }
+            };
+        }
     }
     
     public class OffersCache
@@ -34,7 +46,7 @@ namespace Metica.Unity
                 Debug.LogError($"Error while trying to load the offers cache: {e}");
             }
 
-            return null;
+            return CachedOffersByPlacement.Empty();
         }
 
         public static void Write(OffersByPlacement offers)
