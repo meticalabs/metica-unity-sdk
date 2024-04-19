@@ -108,7 +108,7 @@ namespace Metica.Unity
             }
         }
 
-        internal void FlushEvents()
+        public void FlushEvents()
         {
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {

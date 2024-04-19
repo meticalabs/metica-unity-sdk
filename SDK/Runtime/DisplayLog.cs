@@ -9,7 +9,7 @@ namespace Metica.Unity
 {
     // Represents the impressions or displays of offers.
     [Serializable]
-    internal struct DisplayLogEntry : IComparable<DisplayLogEntry>
+    public struct DisplayLogEntry : IComparable<DisplayLogEntry>
     {
         public long displayedOn; // timestamp in epoch millis
         public string offerId;
@@ -23,7 +23,7 @@ namespace Metica.Unity
         }
     }
 
-    internal class DisplayLog
+    public class DisplayLog
     {
         private Dictionary<string, List<DisplayLogEntry>> _displayLogs;
 

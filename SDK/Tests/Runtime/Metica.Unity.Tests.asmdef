@@ -1,5 +1,6 @@
 {
   "name": "Metica.Unity.Tests",
+  "rootNamespace": "Metica.Unity",
   "references": [
     "Metica.Unity"
   ],

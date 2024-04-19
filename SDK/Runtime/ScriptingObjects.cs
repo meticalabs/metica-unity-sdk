@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Metica.Unity
 {
-    internal class ScriptingObjects
+    public class ScriptingObjects
     {
         private static GameObject _scriptingRoot;
 

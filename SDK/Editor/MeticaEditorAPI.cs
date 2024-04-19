@@ -124,7 +124,7 @@ namespace Metica.Unity
             MeticaAPI.GetOffers(placements, callback, userProperties, deviceInfo);
         }
 
-        internal EventsLogger GetEventsLogger()
+        public EventsLogger GetEventsLogger()
         {
             Init();
             return ScriptingObjects.GetComponent<EventsLogger>();

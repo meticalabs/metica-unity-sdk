@@ -15,9 +15,9 @@ namespace Metica.Unity
         public static string SDKVersion = "1.0.0";
         private static string meticaOffersEndpoint = "https://api.prod-eu.metica.com";
         private static string meticaIngestionEndpoint = "https://api.prod-eu.metica.com";
-        public static string UserId { get; internal set; }
-        public static string AppId { get; internal set; }
-        public static string ApiKey { get; internal set; }
+        public static string UserId { get; set; }
+        public static string AppId { get; set; }
+        public static string ApiKey { get; set; }
 
         public static string MeticaOffersEndpoint
         {
@@ -32,10 +32,10 @@ namespace Metica.Unity
         }
 
         public static bool Initialized { get; set; }
-        
-        internal static DisplayLog DisplayLog { get; set; }
 
-        public static IOffersManager OffersManager{ get; set; }
+        public static DisplayLog DisplayLog { get; set; }
+
+        public static IOffersManager OffersManager { get; set; }
 
         /// <summary>
         /// Initializes the Metica API.
@@ -57,7 +57,7 @@ namespace Metica.Unity
 
             DisplayLog = new DisplayLog();
             DisplayLog.Init();
-            
+
             Initialized = true;
 
             initCallback.Invoke(SdkResultImpl<bool>.WithResult(true));
@@ -70,7 +70,8 @@ namespace Metica.Unity
         /// <param name="offersCallback">A callback function to handle the retrieved offers.</param>
         /// <param name="userProperties">Optional. A dictionary of user properties to be included in the request.</param>
         /// <param name="deviceInfo">Optional. A DeviceInfo object containing device information to be included in the request.</param>
-        public static void GetOffers(String[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        public static void GetOffers(String[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback,
+            Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
             OffersManager.GetOffers(placements, offersCallback, userProperties, deviceInfo);
         }
@@ -85,13 +86,16 @@ namespace Metica.Unity
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
             logger.LogOfferDisplay(offerId, placementId);
 
-            
-            DisplayLog.AppendDisplayLogs(new []{ new DisplayLogEntry()
+
+            DisplayLog.AppendDisplayLogs(new[]
             {
-                displayedOn = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
-                offerId = offerId,
-                placementId = placementId,
-            } });
+                new DisplayLogEntry()
+                {
+                    displayedOn = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
+                    offerId = offerId,
+                    placementId = placementId,
+                }
+            });
         }
 
         /// <summary>
