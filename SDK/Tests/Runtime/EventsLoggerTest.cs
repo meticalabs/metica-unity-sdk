@@ -22,7 +22,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         [SetUp]
         public void Setup()
         {
-            MeticaAPI.Initialise(TestUserId, TestApp, TestKey, result => { Assert.True(result.Result); });
+            MeticaAPI.Initialise(TestUserId, TestApp, TestKey, result => { Assert.That(result.Result); });
         }
 
         [Test]
@@ -36,8 +36,8 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             logger.LogCustomEvent(eventType, eventData);
 
             var recordedEvent = logger.EventsQueue[0];
-            Assert.AreEqual("test", recordedEvent["eventType"]);
-            Assert.AreEqual("value2", recordedEvent["key2"]);
+            Assert.That( recordedEvent["eventType"], Is.EqualTo("test"));
+            Assert.That( recordedEvent["key2"], Is.EqualTo("value2"));
             assertCommonAttributes("test", recordedEvent);
         }
 
@@ -57,11 +57,11 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
 
             var meticaAttributes = (Dictionary<string, object>)recordedEvent["meticaAttributes"];
             var offerDetails = (Dictionary<string, object>)meticaAttributes["offer"];
-            Assert.AreEqual(testBundleId, offerDetails["bundleId"]);
-            Assert.AreEqual(testVariantId, offerDetails["variantId"]);
-            Assert.AreEqual(testPlacementId, meticaAttributes["placementId"]);
-            Assert.AreEqual(1.0, meticaAttributes["totalAmount"]);
-            Assert.AreEqual("USD", meticaAttributes["currencyCode"]);
+            Assert.That(offerDetails["bundleId"], Is.EqualTo(testBundleId));
+            Assert.That(offerDetails["variantId"], Is.EqualTo(testVariantId));
+            Assert.That(meticaAttributes["placementId"], Is.EqualTo(testPlacementId));
+            Assert.That(meticaAttributes["totalAmount"], Is.EqualTo(1.0));
+            Assert.That(meticaAttributes["currencyCode"], Is.EqualTo("USD"));
         }
         
         [Test]
@@ -81,9 +81,9 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
 
             var meticaAttributes = (Dictionary<string, object>)recordedEvent["meticaAttributes"];
             var offerDetails = (Dictionary<string, object>)meticaAttributes["offer"];
-            Assert.AreEqual(testBundleId, offerDetails["bundleId"]);
-            Assert.AreEqual(testVariantId, offerDetails["variantId"]);
-            Assert.AreEqual(testPlacementId, meticaAttributes["placementId"]);
+            Assert.That(offerDetails["bundleId"], Is.EqualTo(testBundleId));
+            Assert.That(offerDetails["variantId"], Is.EqualTo(testVariantId));
+            Assert.That(meticaAttributes["placementId"], Is.EqualTo(testPlacementId));
         }
 
         
@@ -104,10 +104,10 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
 
             var meticaAttributes = (Dictionary<string, object>)recordedEvent["meticaAttributes"];
             var offerDetails = (Dictionary<string, object>)meticaAttributes["offer"];
-            Assert.AreEqual(testBundleId, offerDetails["bundleId"]);
-            Assert.AreEqual(testVariantId, offerDetails["variantId"]);
-            Assert.AreEqual(testPlacementId, meticaAttributes["placementId"]);
-            Assert.AreEqual("click", meticaAttributes["interactionType"]);
+            Assert.That(offerDetails["bundleId"], Is.EqualTo(testBundleId));
+            Assert.That(offerDetails["variantId"], Is.EqualTo(testVariantId));
+            Assert.That(meticaAttributes["placementId"], Is.EqualTo(testPlacementId));
+            Assert.That(meticaAttributes["interactionType"], Is.EqualTo("click"));
         }
 
         [Test]
@@ -131,17 +131,17 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             assertCommonAttributes("meticaUserStateUpdate", recordedEvent);
 
             var stateAttributes = (Dictionary<string, object>)recordedEvent["userStateAttributes"];
-            Assert.AreEqual(userAttributes, stateAttributes);
+            Assert.That(userAttributes, Is.EqualTo(stateAttributes));
         }
 
         
         private static void assertCommonAttributes(string eventType, Dictionary<string, object> recordedEvent)
         {
-            Assert.AreEqual(eventType, recordedEvent["eventType"]);
-            Assert.AreEqual(TestUserId, recordedEvent["userId"]);
-            Assert.AreEqual(TestApp, recordedEvent["appId"]);
-            Assert.NotNull(recordedEvent["eventTime"]);
-            Assert.AreEqual(MeticaAPI.SDKVersion, recordedEvent["meticaUnitSdk"]);
+            Assert.That(recordedEvent["eventType"], Is.EqualTo(eventType));
+            Assert.That(recordedEvent["userId"], Is.EqualTo(TestUserId));
+            Assert.That(recordedEvent["appId"], Is.EqualTo(TestApp));
+            Assert.That(recordedEvent["meticaUnitSdk"], Is.EqualTo(MeticaAPI.SDKVersion));
+            Assert.That(recordedEvent["eventTime"] != null);
         }
 
         [Test]
@@ -157,7 +157,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
                 logger.LogCustomEvent(eventType, eventData);
             }
 
-            Assert.AreEqual(256, logger.EventsQueue.Count);
+            Assert.That(logger.EventsQueue.Count, Is.EqualTo(256));
         }
 
         private List<Offer> createOfferCache()

@@ -12,6 +12,11 @@ namespace Metica.Unity
         {
             var existingRoot = GameObject.Find(ScriptingRootName);
             _scriptingRoot = existingRoot != null ? existingRoot : new GameObject(ScriptingRootName);
+
+            if (!Application.isEditor)
+            {
+                Object.DontDestroyOnLoad(_scriptingRoot);
+            }
         }
 
         public static T GetComponent<T>() where T : MonoBehaviour
