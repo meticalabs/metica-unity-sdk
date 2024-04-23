@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,23 +24,57 @@ namespace Metica.Unity
         }
     }
 
-    public class DisplayLog
+    public class DisplayLog : MonoBehaviour
     {
+        private const UInt16 MaxEntriesInLog = 256;
+
         private Dictionary<string, List<DisplayLogEntry>> _displayLogs;
+        private Coroutine _saveLogRoutine;
+
+        private string DisplayLogPath => Path.Combine(Application.persistentDataPath, "display_log.json");
 
         public void Init()
         {
-            var filePath = Path.Combine(Application.persistentDataPath, "display_log.json");
-            if (File.Exists(filePath))
+            _displayLogs = LoadDisplayLog();
+        }
+
+        private void Awake()
+        {
+            DontDestroyOnLoad(this);
+        }
+
+        private void Start()
+        {
+            if (Application.isEditor)
             {
-                var json = File.ReadAllText(filePath);
-                _displayLogs = JsonConvert.DeserializeObject<Dictionary<string, List<DisplayLogEntry>>>(json);
+                Debug.LogWarning("The displays log will not run in the editor");
+                return;
             }
-            else
+
+            _saveLogRoutine = StartCoroutine(SaveDisplayLogRoutine());
+        }
+
+        private void OnApplicationQuit()
+        {
+            PersistDisplayLog();
+        }
+
+        private IEnumerator SaveDisplayLogRoutine()
+        {
+            while (isActiveAndEnabled)
             {
-                _displayLogs = new Dictionary<string, List<DisplayLogEntry>>();
+                yield return new WaitForSeconds(60);
+
+                PersistDisplayLog();
             }
         }
+
+        private void OnDestroy()
+        {
+            if (_saveLogRoutine != null)
+                StopCoroutine(_saveLogRoutine);
+        }
+
 
         public void AppendDisplayLogs(IEnumerable<DisplayLogEntry> displayLogEntries)
         {
@@ -56,10 +91,6 @@ namespace Metica.Unity
                     _displayLogs.Add(entry.Key, entry.Value);
                 }
             }
-
-            var filePath = Path.Combine(Application.persistentDataPath, "display_log.json");
-            var json = JsonConvert.SerializeObject(_displayLogs);
-            File.WriteAllText(filePath, json);
         }
 
         /// <summary>
@@ -100,6 +131,29 @@ namespace Metica.Unity
         public List<DisplayLogEntry> GetEntriesForOffer(string offerId)
         {
             return _displayLogs.TryGetValue(offerId, out var displayLog) ? displayLog : new List<DisplayLogEntry>();
+        }
+
+
+        private void PersistDisplayLog()
+        {
+            var result = _displayLogs
+                .SelectMany(pair => pair.Value)
+                .OrderByDescending(entry => entry.displayedOn)
+                .Take(MaxEntriesInLog)
+                .ToList();
+
+            var json = JsonConvert.SerializeObject(result);
+            File.WriteAllText(DisplayLogPath, json);
+        }
+
+        private Dictionary<string, List<DisplayLogEntry>> LoadDisplayLog()
+        {
+            if (!File.Exists(DisplayLogPath)) return new Dictionary<string, List<DisplayLogEntry>>();
+
+            var json = File.ReadAllText(DisplayLogPath);
+            var entries = JsonConvert.DeserializeObject<List<DisplayLogEntry>>(json);
+            return entries.GroupBy(entry => entry.offerId)
+                .ToDictionary(group => group.Key, group => group.ToList());
         }
     }
 }
