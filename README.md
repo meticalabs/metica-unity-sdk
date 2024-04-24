@@ -48,6 +48,20 @@ MeticaAPI.Initialise("userId", "appId", "apiKey", result => {
 });
 ```
 
+You can optionally pass an instance of SdkConfig as well, if you want to have greater control over the SDK's operations.
+The SdkConfig provides the following configuration parameters
+
+
+| Property | Description |
+| --- | --- |
+| `offersEndpoint` | The full endpoint to the Metica offers endpoint. |
+| `ingestionEndpoint` | The full endpoint to the Metica ingestion service. |
+| `maxDisplayLogEntries` | The maximum number of entries stored in the displays log. This limit is shared by all offers and once reached, oldest entries will be removed and replaced by newly incoming ones. |
+| `displayLogFlushCadence` | The cadence, in seconds, by which the displays log will be persisted to the filesystem. |
+| `eventsLogFlushCadence` | The cadence, in seconds, by which the logged events will be sent to the ingestion service. |
+| `maxPendingLoggedEvents` | The maximum number of pending logged events before they are sent to the ingestion service. When this value is reached, oldest accumulated events will be dropped to accommodate most recent ones. |
+
+
 ### 2. Get Offers
 
 After initialization, use the `GetOffers` method to obtain offers available for particular placements.
