@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 namespace Metica.Unity
 {
-    public struct MeticaSDKConfig
+    public struct SdkConfig
     {
         /// <summary>
         /// The full endpoint to the Metica offers endpoint.
@@ -48,9 +48,9 @@ namespace Metica.Unity
         /// </remarks>
         public uint maxPendingLoggedEvents;
 
-        public static MeticaSDKConfig Default()
+        public static SdkConfig Default()
         {
-            return new MeticaSDKConfig()
+            return new SdkConfig()
             {
                 ingestionEndpoint = "https://api.prod-eu.metica.com",
                 offersEndpoint = "https://api.prod-eu.metica.com",
@@ -78,7 +78,7 @@ namespace Metica.Unity
 
         public static IOffersManager OffersManager { get; set; }
 
-        public static MeticaSDKConfig Config { get; private set; }
+        public static SdkConfig Config { get; private set; }
 
         /// <summary>
         /// Initializes the Metica API.
@@ -89,10 +89,10 @@ namespace Metica.Unity
         /// <param name="initCallback">The callback function to be invoked after initialization. If the initialisation was successful, then the result value will be true</param>
         public static void Initialise(string userId, string appId, string apiKey, MeticaSdkDelegate<bool> initCallback)
         {
-            Initialise(userId, appId, apiKey, MeticaSDKConfig.Default(), initCallback);
+            Initialise(userId, appId, apiKey, SdkConfig.Default(), initCallback);
         }
 
-        public static void Initialise(string userId, string appId, string apiKey, MeticaSDKConfig sdkConfig,
+        public static void Initialise(string userId, string appId, string apiKey, SdkConfig sdkConfig,
             MeticaSdkDelegate<bool> initCallback)
         {
             UserId = userId;

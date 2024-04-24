@@ -66,7 +66,7 @@ namespace Metica.Unity
             MeticaAPI.AppId = AppId;
             MeticaAPI.ApiKey = APIKey;
             MeticaAPI.UserId = UserId;
-            var config = MeticaSDKConfig.Default();
+            var config = SdkConfig.Default();
             config.offersEndpoint = OffersEndpoint;
             config.ingestionEndpoint = IngestionEndpoint;
 
