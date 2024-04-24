@@ -1,41 +1,84 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // ReSharper disable all NotAccessedField.Global
 // ReSharper disable file UnusedMember.Local
 
 namespace Metica.Unity
 {
+    public struct SdkConfig
+    {
+        /// <summary>
+        /// The full endpoint to the Metica offers endpoint.
+        /// </summary>
+        public string offersEndpoint;
+
+        /// <summary>
+        /// The full endpoint to the Metica ingestion service.
+        /// </summary>
+        public string ingestionEndpoint;
+
+        /// <summary>
+        /// The maximum number of entries stored in the displays log. 
+        /// </summary>
+        /// <remarks>
+        /// This limit is shared by all offers. Once the limit is reached, then the oldest entries
+        /// will be removed and replaced by the newly incoming ones.
+        /// </remarks>
+        public uint maxDisplayLogEntries;
+
+        /// <summary>
+        /// The cadence, in seconds, by which the displays log will be persisted to the filesystem.
+        /// </summary>
+        public uint displayLogFlushCadence;
+
+        /// <summary>
+        /// The cadence, in seconds, by which the logged events will be sent to the ingestion service.
+        /// </summary>
+        public uint eventsLogFlushCadence;
+
+        /// <summary>
+        /// The maximum number of pending logged events before they are sent to the ingestion service.
+        /// </summary>
+        /// <remarks>
+        /// When the number of pending logged events reaches this maximum value, then the oldest accumulated events
+        /// will be dropped to accomodate the most recent ones.
+        /// </remarks>
+        public uint maxPendingLoggedEvents;
+
+        public static SdkConfig Default()
+        {
+            return new SdkConfig()
+            {
+                ingestionEndpoint = "https://api.prod-eu.metica.com",
+                offersEndpoint = "https://api.prod-eu.metica.com",
+                maxDisplayLogEntries = 256,
+                maxPendingLoggedEvents = 256,
+                displayLogFlushCadence = 60,
+                eventsLogFlushCadence = 60
+            };
+        }
+    }
+
     /// <summary>
     /// The main class for interacting with the Metica API.
     /// </summary>
     public class MeticaAPI : ScriptableObject
     {
         public static string SDKVersion = "1.0.0";
-        private static string meticaOffersEndpoint = "https://api.prod-eu.metica.com";
-        private static string meticaIngestionEndpoint = "https://api.prod-eu.metica.com";
         public static string UserId { get; set; }
         public static string AppId { get; set; }
         public static string ApiKey { get; set; }
-
-        public static string MeticaOffersEndpoint
-        {
-            get { return meticaOffersEndpoint; }
-            set { meticaOffersEndpoint = value; }
-        }
-
-        public static string MeticaIngestionEndpoint
-        {
-            get { return meticaIngestionEndpoint; }
-            set { meticaIngestionEndpoint = value; }
-        }
 
         public static bool Initialized { get; set; }
 
         public static DisplayLog DisplayLog { get; set; }
 
         public static IOffersManager OffersManager { get; set; }
+
+        public static SdkConfig Config { get; private set; }
 
         /// <summary>
         /// Initializes the Metica API.
@@ -46,9 +89,16 @@ namespace Metica.Unity
         /// <param name="initCallback">The callback function to be invoked after initialization. If the initialisation was successful, then the result value will be true</param>
         public static void Initialise(string userId, string appId, string apiKey, MeticaSdkDelegate<bool> initCallback)
         {
+            Initialise(userId, appId, apiKey, SdkConfig.Default(), initCallback);
+        }
+
+        public static void Initialise(string userId, string appId, string apiKey, SdkConfig sdkConfig,
+            MeticaSdkDelegate<bool> initCallback)
+        {
             UserId = userId;
             AppId = appId;
             ApiKey = apiKey;
+            Config = sdkConfig;
 
             ScriptingObjects.Init();
 

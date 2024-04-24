@@ -10,6 +10,7 @@
   "includePlatforms": [],
   "excludePlatforms": [],
   "precompiledReferences": [
+    "nunit.framework.dll",
     "Moq.dll"
   ]
 }

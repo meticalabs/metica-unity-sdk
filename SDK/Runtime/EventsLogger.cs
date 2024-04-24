@@ -8,8 +8,6 @@ namespace Metica.Unity
 {
     public class EventsLogger : MonoBehaviour
     {
-        const UInt16 MaxPendingEventsCount = 256;
-
         // store the events in a list and flush them to the server every X minutes
         private LinkedList<Dictionary<string, object>> _eventsList = new();
 
@@ -34,11 +32,16 @@ namespace Metica.Unity
             if (_logEventsRoutine != null)
                 StopCoroutine(_logEventsRoutine);
         }
+        
+        private void OnApplicationQuit()
+        {
+            FlushEvents();
+        }
 
         private void LogEvent(Dictionary<string, object> eventDetails)
         {
             _eventsList.AddFirst(eventDetails);
-            if (_eventsList.Count > MaxPendingEventsCount)
+            if (_eventsList.Count > MeticaAPI.Config.maxPendingLoggedEvents)
             {
                 _eventsList.RemoveLast();
             }

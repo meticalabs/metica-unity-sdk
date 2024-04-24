@@ -66,13 +66,14 @@ namespace Metica.Unity
             MeticaAPI.AppId = AppId;
             MeticaAPI.ApiKey = APIKey;
             MeticaAPI.UserId = UserId;
-            MeticaAPI.MeticaOffersEndpoint = OffersEndpoint;
-            MeticaAPI.MeticaIngestionEndpoint = IngestionEndpoint;
+            var config = SdkConfig.Default();
+            config.offersEndpoint = OffersEndpoint;
+            config.ingestionEndpoint = IngestionEndpoint;
 
             if (!MeticaAPI.Initialized)
             {
                 Debug.Log("Initializing In-Editor Metica SDK");
-                MeticaAPI.Initialise(UserId, AppId, APIKey, result =>
+                MeticaAPI.Initialise(UserId, AppId, APIKey, config, result =>
                 {
                     if (result.Error != null)
                     {
