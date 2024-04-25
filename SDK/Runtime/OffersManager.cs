@@ -44,7 +44,7 @@ namespace Metica.Unity
                 return;
             }
 
-            BackendOperations.CallGetOffersAPI(placements, (sdkResult) =>
+            MeticaAPI.BackendOperations.CallGetOffersAPI(placements, (sdkResult) =>
                 {
                     if (sdkResult.Error != null)
                     {

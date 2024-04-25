@@ -14,11 +14,10 @@ namespace Metica.Unity
         public List<Dictionary<string, object>> EventsQueue => _eventsList.ToList();
 
         private Coroutine _logEventsRoutine;
-        public float LogInterval { get; set; } = 60;
 
         void Start()
         {
-            if (Application.isEditor)
+            if (Application.isEditor && !Application.isPlaying) 
             {
                 Debug.LogWarning("EventsLogger is not supported in the editor");
                 return;
@@ -102,7 +101,7 @@ namespace Metica.Unity
         {
             while (isActiveAndEnabled)
             {
-                yield return new WaitForSeconds(LogInterval);
+                yield return new WaitForSeconds(MeticaAPI.Config.eventsLogFlushCadence);
 
                 FlushEvents();
 
@@ -122,7 +121,7 @@ namespace Metica.Unity
 
             var copyList = _eventsList;
             _eventsList = new LinkedList<Dictionary<string, object>>();
-            BackendOperations.CallSubmitEventsAPI(copyList, (result) =>
+            MeticaAPI.BackendOperations.CallSubmitEventsAPI(copyList, (result) =>
             {
                 if (result.Error != null)
                 {
