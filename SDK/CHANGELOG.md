@@ -1,3 +1,9 @@
+# [1.0.4](https://github.com/meticalabs/metica-unity-sdk/compare/v1.0.4...v1.0.3) (2024-04-25)
+
+### Bug Fixes
+
+* fix(events logger): The events flush cadence was not taken by MeticaAPI.Config
+
 # [1.0.3](https://github.com/meticalabs/metica-unity-sdk/compare/v1.0.3...v1.0.2) (2024-04-23)
 
 ### Improvements
