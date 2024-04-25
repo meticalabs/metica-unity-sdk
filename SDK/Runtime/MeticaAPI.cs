@@ -78,8 +78,13 @@ namespace Metica.Unity
 
         public static IOffersManager OffersManager { get; set; }
 
-        public static SdkConfig Config { get; private set; }
+        public static SdkConfig Config { get; internal set; }
 
+        public static IBackendOperations BackendOperations
+        {
+            get; set;
+        }
+        
         /// <summary>
         /// Initializes the Metica API.
         /// </summary>
@@ -108,6 +113,8 @@ namespace Metica.Unity
             DisplayLog = new DisplayLog();
             DisplayLog.Init();
 
+            BackendOperations = new BackendOperationsImpl();
+            
             Initialized = true;
 
             initCallback.Invoke(SdkResultImpl<bool>.WithResult(true));

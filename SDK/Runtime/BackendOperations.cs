@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -138,7 +137,17 @@ namespace Metica.Unity
         }
     }
 
-    internal abstract class BackendOperations
+    public interface IBackendOperations
+    {
+        public void CallGetOffersAPI(string[] placements,
+            MeticaSdkDelegate<OffersByPlacement> offersCallback, Dictionary<string, object> userProperties = null,
+            DeviceInfo deviceInfo = null);
+
+        public void CallSubmitEventsAPI(ICollection<Dictionary<string, object>> events,
+            MeticaSdkDelegate<String> callback);
+    }
+    
+    internal class BackendOperationsImpl : IBackendOperations
     {
         private static readonly LinkedPool<GetOffersOperation> GetOffersPool = new(
             createFunc: () =>
@@ -151,8 +160,8 @@ namespace Metica.Unity
             actionOnDestroy: item => { item.OnDestroyPoolObject(); },
             maxSize: 100
         );
-
-        public static void CallGetOffersAPI(string[] placements,
+        
+        public void CallGetOffersAPI(string[] placements,
             MeticaSdkDelegate<OffersByPlacement> offersCallback, Dictionary<string, object> userProperties = null,
             DeviceInfo deviceInfo = null)
         {
@@ -176,60 +185,13 @@ namespace Metica.Unity
             maxSize: 100
         );
         
-        public static void CallSubmitEventsAPI(ICollection<Dictionary<string, object>> events,
+        public void CallSubmitEventsAPI(ICollection<Dictionary<string, object>> events,
             MeticaSdkDelegate<String> callback)
         {
             var op = CallIngestionPool.Get();
             op.pool = CallIngestionPool;
             op.Events = events;
             op.EventsSubmitCallback = callback;
-        }
-
-        private static StoreTypeEnum MapRuntimePlatformToStoreType(RuntimePlatform runtimePlatform)
-        {
-            switch (runtimePlatform)
-            {
-                case RuntimePlatform.Android:
-                    return StoreTypeEnum.GooglePlayStore;
-                case RuntimePlatform.IPhonePlayer:
-                case RuntimePlatform.OSXEditor:
-                case RuntimePlatform.OSXPlayer:
-                    return StoreTypeEnum.AppStore;
-                default:
-                    throw new Exception($"Got an unsupported application platform: {runtimePlatform}");
-            }
-        }
-
-        internal static object CreateIngestionRequestBody(ICollection<Dictionary<string, object>> events)
-        {
-            return new Dictionary<string, object> { { "events", events } };
-        }
-
-        // ReSharper disable once InconsistentNaming
-        internal static ODSRequest CreateODSRequestBody(Dictionary<string, object> userData,
-            DeviceInfo overrideDeviceInfo = null)
-        {
-            var locale = Thread.CurrentThread.CurrentCulture.Name;
-
-            var systemTz = TimeZoneInfo.Local.BaseUtcOffset;
-            var timezone = systemTz.TotalMinutes == 0
-                ? "+00:00"
-                : $"{systemTz.Hours:D2}:{systemTz.Minutes:D2}";
-            Debug.Log(TimeZoneInfo.Local.BaseUtcOffset.TotalMinutes);
-            var deviceInfo = overrideDeviceInfo ?? new DeviceInfo();
-            deviceInfo.locale = overrideDeviceInfo?.locale ?? locale;
-            deviceInfo.store = overrideDeviceInfo?.store ??
-                               MapRuntimePlatformToStoreType(Application.platform).ToString();
-            deviceInfo.timezone = overrideDeviceInfo?.timezone ?? timezone;
-            deviceInfo.appVersion = overrideDeviceInfo?.appVersion ?? Application.version;
-
-            var request = new ODSRequest
-            {
-                userData = userData,
-                deviceInfo = deviceInfo
-            };
-
-            return request;
         }
     }
 }

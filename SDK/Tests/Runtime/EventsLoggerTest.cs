@@ -1,8 +1,11 @@
+using System.Collections;
 using System.Collections.Generic;
 using Metica.Unity;
 using Moq;
 using NUnit.Framework;
 using UnityEngine;
+// ReSharper disable once RedundantUsingDirective
+using UnityEngine.TestTools;
 using Assert = NUnit.Framework.Assert;
 
 namespace MeticaUnitySDK.SDK.Tests.Runtime
@@ -19,10 +22,57 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         private const string testVariantId = "testVariant";
         private const string testPlacementId = "testPlacement";
 
+        private class TestOps : IBackendOperations
+        {
+            public bool SubmitInvoked { get; private set; }
+            public int NumEvents { get; private set; }
+
+            public void CallGetOffersAPI(string[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback,
+                Dictionary<string, object> userProperties = null,
+                DeviceInfo deviceInfo = null)
+            {
+                throw new AssertionException("Should not be called");
+            }
+
+            public void CallSubmitEventsAPI(ICollection<Dictionary<string, object>> events,
+                MeticaSdkDelegate<string> callback)
+            {
+                SubmitInvoked = true;
+                NumEvents += events.Count;
+                callback.Invoke(SdkResultImpl<string>.WithResult("OK"));
+            }
+        }
+
         [SetUp]
         public void Setup()
         {
             MeticaAPI.Initialise(TestUserId, TestApp, TestKey, result => { Assert.That(result.Result); });
+        }
+
+        [UnityTest]
+        public IEnumerator TestTheEventsSubmission()
+        {
+            var config = MeticaAPI.Config;
+            config.eventsLogFlushCadence = 1;
+            MeticaAPI.Config = config;
+            
+            var logger = new GameObject().AddComponent<EventsLogger>();
+
+            var eventType = "testSubmission";
+            var eventData = new Dictionary<string, object> { { "userId", "testSubmission" } };
+
+            for (int i = 0; i < 10; i++)
+                logger.LogCustomEvent(eventType, eventData);
+            
+
+            TestOps testOps = new TestOps();
+            MeticaAPI.BackendOperations = testOps;
+
+            yield return new WaitForSecondsRealtime(config.eventsLogFlushCadence );
+            
+            Assert.That(testOps.NumEvents == 10);
+            Assert.That(testOps.SubmitInvoked);
+            Assert.That(logger.EventsQueue.Count == 0);
         }
 
         [Test]
@@ -36,8 +86,8 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             logger.LogCustomEvent(eventType, eventData);
 
             var recordedEvent = logger.EventsQueue[0];
-            Assert.That( recordedEvent["eventType"], Is.EqualTo("test"));
-            Assert.That( recordedEvent["key2"], Is.EqualTo("value2"));
+            Assert.That(recordedEvent["eventType"], Is.EqualTo("test"));
+            Assert.That(recordedEvent["key2"], Is.EqualTo("value2"));
             assertCommonAttributes("test", recordedEvent);
         }
 
@@ -45,14 +95,15 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         public void TestTheAttributesOfOfferPurchase()
         {
             var offersManager = new Mock<IOffersManager>();
-            offersManager.Setup(manager => manager.GetCachedOffersByPlacement(testPlacementId)).Returns(createOfferCache());
+            offersManager.Setup(manager => manager.GetCachedOffersByPlacement(testPlacementId))
+                .Returns(createOfferCache());
 
             MeticaAPI.OffersManager = offersManager.Object;
-            
+
             var logger = new GameObject().AddComponent<EventsLogger>();
             logger.LogOfferPurchase(testOfferId, testPlacementId, 1.0, "USD");
             var recordedEvent = logger.EventsQueue[0];
-            
+
             assertCommonAttributes("meticaOfferInAppPurchase", recordedEvent);
 
             var meticaAttributes = (Dictionary<string, object>)recordedEvent["meticaAttributes"];
@@ -63,20 +114,21 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             Assert.That(meticaAttributes["totalAmount"], Is.EqualTo(1.0));
             Assert.That(meticaAttributes["currencyCode"], Is.EqualTo("USD"));
         }
-        
+
         [Test]
         public void TestTheAttributesOfOfferDisplay()
         {
             var offersManager = new Mock<IOffersManager>();
-            offersManager.Setup(manager => manager.GetCachedOffersByPlacement(testPlacementId)).Returns(createOfferCache());
+            offersManager.Setup(manager => manager.GetCachedOffersByPlacement(testPlacementId))
+                .Returns(createOfferCache());
 
             MeticaAPI.OffersManager = offersManager.Object;
-            
+
             var logger = new GameObject().AddComponent<EventsLogger>();
             logger.LogOfferDisplay(testOfferId, testPlacementId);
-            
+
             var recordedEvent = logger.EventsQueue[0];
-            
+
             assertCommonAttributes("meticaOfferImpression", recordedEvent);
 
             var meticaAttributes = (Dictionary<string, object>)recordedEvent["meticaAttributes"];
@@ -86,20 +138,21 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             Assert.That(meticaAttributes["placementId"], Is.EqualTo(testPlacementId));
         }
 
-        
+
         [Test]
         public void TestTheAttributesOfOfferInteraction()
         {
             var offersManager = new Mock<IOffersManager>();
-            offersManager.Setup(manager => manager.GetCachedOffersByPlacement(testPlacementId)).Returns(createOfferCache());
+            offersManager.Setup(manager => manager.GetCachedOffersByPlacement(testPlacementId))
+                .Returns(createOfferCache());
 
             MeticaAPI.OffersManager = offersManager.Object;
-            
+
             var logger = new GameObject().AddComponent<EventsLogger>();
             logger.LogOfferInteraction(testOfferId, testPlacementId, "click");
-            
+
             var recordedEvent = logger.EventsQueue[0];
-            
+
             assertCommonAttributes("meticaOfferInteraction", recordedEvent);
 
             var meticaAttributes = (Dictionary<string, object>)recordedEvent["meticaAttributes"];
@@ -114,27 +167,28 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         public void TestTheAttributesOfUserStateUpdate()
         {
             var offersManager = new Mock<IOffersManager>();
-            offersManager.Setup(manager => manager.GetCachedOffersByPlacement(testPlacementId)).Returns(new List<Offer>());
+            offersManager.Setup(manager => manager.GetCachedOffersByPlacement(testPlacementId))
+                .Returns(new List<Offer>());
 
             MeticaAPI.OffersManager = offersManager.Object;
-            
+
             var logger = new GameObject().AddComponent<EventsLogger>();
             var userAttributes = new Dictionary<string, object>()
             {
-                { "name", "test"},
+                { "name", "test" },
                 { "score", 123 },
             };
             logger.LogUserAttributes(userAttributes);
-            
+
             var recordedEvent = logger.EventsQueue[0];
-            
+
             assertCommonAttributes("meticaUserStateUpdate", recordedEvent);
 
             var stateAttributes = (Dictionary<string, object>)recordedEvent["userStateAttributes"];
             Assert.That(userAttributes, Is.EqualTo(stateAttributes));
         }
 
-        
+
         private static void assertCommonAttributes(string eventType, Dictionary<string, object> recordedEvent)
         {
             Assert.That(recordedEvent["eventType"], Is.EqualTo(eventType));

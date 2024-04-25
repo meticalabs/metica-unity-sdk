@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -26,7 +27,7 @@ namespace Metica.Unity
             return PostRequestOperation.PostRequest<String>($"{MeticaAPI.Config.ingestionEndpoint}/ingest/v1/events",
                 null,
                 MeticaAPI.ApiKey,
-                BackendOperations.CreateIngestionRequestBody(Events),
+                CreateIngestionRequestBody(Events),
                 result =>
                 {
                     if (result.Error != null)
@@ -39,6 +40,12 @@ namespace Metica.Unity
                     }
                 });
         }
+
+        private static object CreateIngestionRequestBody(ICollection<Dictionary<string, object>> events)
+        {
+            return new Dictionary<string, object> { { "events", events } };
+        }
+
     }
 
     [ExecuteAlways]
@@ -66,7 +73,7 @@ namespace Metica.Unity
                     { "placements", Placements },
                 },
                 MeticaAPI.ApiKey,
-                BackendOperations.CreateODSRequestBody(UserProperties, DeviceInfo),
+                CreateODSRequestBody(UserProperties, DeviceInfo),
                 result =>
                 {
                     if (result.Error != null)
@@ -81,6 +88,48 @@ namespace Metica.Unity
                         }));
                     }
                 });
+        }
+        
+        
+        internal static ODSRequest CreateODSRequestBody(Dictionary<string, object> userData,
+            DeviceInfo overrideDeviceInfo = null)
+        {
+            var locale = Thread.CurrentThread.CurrentCulture.Name;
+            var systemTz = TimeZoneInfo.Local.BaseUtcOffset;
+            var timezone = systemTz.TotalMinutes == 0
+                ? "+00:00"
+                : $"{systemTz.Hours:D2}:{systemTz.Minutes:D2}";
+            Debug.Log(TimeZoneInfo.Local.BaseUtcOffset.TotalMinutes);
+            var deviceInfo = overrideDeviceInfo ?? new DeviceInfo();
+            deviceInfo.locale = overrideDeviceInfo?.locale ?? locale;
+            deviceInfo.store = overrideDeviceInfo?.store ??
+                               MapRuntimePlatformToStoreType(Application.platform).ToString();
+            deviceInfo.timezone = overrideDeviceInfo?.timezone ?? timezone;
+            deviceInfo.appVersion = overrideDeviceInfo?.appVersion ?? Application.version;
+
+            var request = new ODSRequest
+            {
+                userData = userData,
+                deviceInfo = deviceInfo
+            };
+
+            return request;
+        }
+        
+        
+        private static StoreTypeEnum MapRuntimePlatformToStoreType(RuntimePlatform runtimePlatform)
+        {
+            switch (runtimePlatform)
+            {
+                case RuntimePlatform.Android:
+                    return StoreTypeEnum.GooglePlayStore;
+                case RuntimePlatform.IPhonePlayer:
+                case RuntimePlatform.OSXEditor:
+                case RuntimePlatform.OSXPlayer:
+                    return StoreTypeEnum.AppStore;
+                default:
+                    throw new Exception($"Got an unsupported application platform: {runtimePlatform}");
+            }
         }
     }
 }
