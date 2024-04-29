@@ -12,11 +12,23 @@ namespace Metica.Unity
     [Serializable]
     public struct DisplayLogEntry : IComparable<DisplayLogEntry>
     {
-        public long displayedOn; // timestamp in epoch millis
+        // timestamp in epoch seconds
+        public long displayedOn;
         public string offerId;
         public string offerVariantId;
         public string placementId;
 
+        public static DisplayLogEntry Create(string offerId, string placementId, string variantId = null)
+        {
+            return new DisplayLogEntry()
+            {
+                displayedOn = DateTimeOffset.Now.ToUnixTimeSeconds(),
+                offerId = offerId,
+                placementId = placementId,
+                offerVariantId = variantId
+            };
+        }
+        
         // Compares instances based on the displayedOn attribute.
         public int CompareTo(DisplayLogEntry other)
         {
@@ -26,20 +38,13 @@ namespace Metica.Unity
 
     public class DisplayLog : MonoBehaviour
     {
-        private const UInt16 MaxEntriesInLog = 256;
-
-        private Dictionary<string, List<DisplayLogEntry>> _displayLogs;
+        internal Dictionary<string, List<DisplayLogEntry>> _displayLogs;
         private Coroutine _saveLogRoutine;
 
-        private string DisplayLogPath => Path.Combine(Application.persistentDataPath, "display_log.json");
-
-        public void Init()
+        internal void Awake()
         {
             _displayLogs = LoadDisplayLog();
-        }
-
-        private void Awake()
-        {
+            _saveLogRoutine = StartCoroutine(SaveDisplayLogRoutine());
             DontDestroyOnLoad(this);
         }
 
@@ -48,10 +53,7 @@ namespace Metica.Unity
             if (Application.isEditor)
             {
                 Debug.LogWarning("The displays log will not run in the editor");
-                return;
             }
-
-            _saveLogRoutine = StartCoroutine(SaveDisplayLogRoutine());
         }
 
         private void OnApplicationQuit()
@@ -63,7 +65,7 @@ namespace Metica.Unity
         {
             while (isActiveAndEnabled)
             {
-                yield return new WaitForSeconds(60);
+                yield return new WaitForSeconds(MeticaAPI.Config.displayLogFlushCadence);
 
                 PersistDisplayLog();
             }
@@ -111,11 +113,13 @@ namespace Metica.Unity
                 }
 
                 var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                
                 var displayLogList = _displayLogs[offer.offerId];
+                
                 var limitExceeded = (from displayLimit in offer.displayLimits
-                    let timeWindowInHours = displayLimit.timeWindowInHours * 3600
+                    let timeWindowInSeconds = displayLimit.timeWindowInHours * 3600
                     let recentDisplayLogs =
-                        displayLogList.Count(log => (currentTime - log.displayedOn) <= (long)timeWindowInHours)
+                        displayLogList.Count(log => (currentTime - log.displayedOn) <= (long)timeWindowInSeconds)
                     where recentDisplayLogs > (int)displayLimit.maxDisplayCount
                     select displayLimit).Any();
 
@@ -136,22 +140,43 @@ namespace Metica.Unity
 
         private void PersistDisplayLog()
         {
-            var result = _displayLogs
+            if (_displayLogs == null || _displayLogs.Count == 0) return;
+            
+            var entries = _displayLogs
                 .SelectMany(pair => pair.Value)
                 .OrderByDescending(entry => entry.displayedOn)
-                .Take(MaxEntriesInLog)
+                .Take((int)MeticaAPI.Config.maxDisplayLogEntries)
                 .ToList();
 
-            var json = JsonConvert.SerializeObject(result);
-            File.WriteAllText(DisplayLogPath, json);
+            var json = JsonConvert.SerializeObject(entries);
+            File.WriteAllText(MeticaAPI.Config.displayLogPath, json);
+
+            _displayLogs = CreateOffersIndex(entries);
         }
 
         private Dictionary<string, List<DisplayLogEntry>> LoadDisplayLog()
         {
-            if (!File.Exists(DisplayLogPath)) return new Dictionary<string, List<DisplayLogEntry>>();
+            if (!File.Exists(MeticaAPI.Config.displayLogPath)) return new Dictionary<string, List<DisplayLogEntry>>();
 
-            var json = File.ReadAllText(DisplayLogPath);
-            var entries = JsonConvert.DeserializeObject<List<DisplayLogEntry>>(json);
+            try
+            {
+                Debug.Log($"Loading log from {MeticaAPI.Config.displayLogPath}");
+                var json = File.ReadAllText(MeticaAPI.Config.displayLogPath);
+                var entries = JsonConvert.DeserializeObject<List<DisplayLogEntry>>(json);
+                return CreateOffersIndex(entries);
+            }
+            catch (JsonSerializationException)
+            {
+                return new Dictionary<string, List<DisplayLogEntry>>();
+            }
+        }
+
+        private Dictionary<string, List<DisplayLogEntry>> CreateOffersIndex(List<DisplayLogEntry> entries)
+        {
+            if (entries == null || entries.Count == 0)
+            {
+                return new Dictionary<string, List<DisplayLogEntry>>();
+            }
             return entries.GroupBy(entry => entry.offerId)
                 .ToDictionary(group => group.Key, group => group.ToList());
         }

@@ -10,6 +10,7 @@
   "includePlatforms": [],
   "excludePlatforms": [],
   "precompiledReferences": [
+    "Newtonsoft.Json.dll",
     "nunit.framework.dll",
     "Moq.dll"
   ]
