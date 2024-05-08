@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -30,6 +31,11 @@ namespace Metica.Unity
         public uint maxDisplayLogEntries;
 
         /// <summary>
+        /// The filesystem path where the display log will be persisted.
+        /// </summary>
+        public string displayLogPath;
+
+        /// <summary>
         /// The cadence, in seconds, by which the displays log will be persisted to the filesystem.
         /// </summary>
         public uint displayLogFlushCadence;
@@ -55,8 +61,9 @@ namespace Metica.Unity
                 ingestionEndpoint = "https://api.prod-eu.metica.com",
                 offersEndpoint = "https://api.prod-eu.metica.com",
                 maxDisplayLogEntries = 256,
-                maxPendingLoggedEvents = 256,
                 displayLogFlushCadence = 60,
+                displayLogPath = Path.Combine(Application.persistentDataPath, "display_log"),
+                maxPendingLoggedEvents = 256,
                 eventsLogFlushCadence = 60
             };
         }
@@ -110,8 +117,7 @@ namespace Metica.Unity
             OffersManager = new OffersManager();
             OffersManager.Init();
 
-            DisplayLog = new DisplayLog();
-            DisplayLog.Init();
+            DisplayLog = ScriptingObjects.GetComponent<DisplayLog>();
 
             BackendOperations = new BackendOperationsImpl();
             
@@ -142,16 +148,10 @@ namespace Metica.Unity
         {
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
             logger.LogOfferDisplay(offerId, placementId);
-
-
+            
             DisplayLog.AppendDisplayLogs(new[]
             {
-                new DisplayLogEntry()
-                {
-                    displayedOn = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
-                    offerId = offerId,
-                    placementId = placementId,
-                }
+                DisplayLogEntry.Create(offerId, placementId)
             });
         }
 

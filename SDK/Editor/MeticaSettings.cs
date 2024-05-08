@@ -418,7 +418,7 @@ namespace MeticaUnitySDK.Assets.Editor
                 bindItem: (item, index) =>
                 {
                     (item as Label).text =
-                        $"Date: {DateTimeOffset.FromUnixTimeMilliseconds(displayLogEntries[index].displayedOn).ToString("F")}";
+                        $"Date: {DateTimeOffset.FromUnixTimeSeconds(displayLogEntries[index].displayedOn).ToString("F")}";
                 })
             {
                 style = { marginBottom = 10 }

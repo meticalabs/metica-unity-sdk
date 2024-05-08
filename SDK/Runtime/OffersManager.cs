@@ -14,9 +14,9 @@ namespace Metica.Unity
         void GetOffers(string[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback,
             Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null);
 
-         List<Offer> GetCachedOffersByPlacement(string placement);
+        List<Offer> GetCachedOffersByPlacement(string placement);
     }
-    
+
     // TODO: add a history of the delivered offers
     public class OffersManager : IOffersManager
     {
@@ -115,13 +115,11 @@ namespace Metica.Unity
             {
                 var newEntries = from offer in entry.Value
                     where !offerIds.Contains(offer.offerId)
-                    let displayLogEntry = new DisplayLogEntry()
-                    {
-                        displayedOn = currentTime,
-                        offerId = offer.offerId,
-                        offerVariantId = offer.metrics.display.meticaAttributes.offer.variantId,
-                        placementId = entry.Key
-                    }
+                    let displayLogEntry = DisplayLogEntry.Create(
+                        offerId: offer.offerId,
+                        placementId: entry.Key,
+                        variantId: offer.metrics.display.meticaAttributes.offer.variantId
+                    )
                     select displayLogEntry;
 
                 MeticaAPI.DisplayLog.AppendDisplayLogs(newEntries);
