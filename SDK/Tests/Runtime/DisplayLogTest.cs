@@ -24,7 +24,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         [Test]
         public void Log_AppendingEntries()
         {
-            ConfigureDisplayLogPath(Path.GetTempFileName());
+            Utils.ConfigureDisplayLogPath(Path.GetTempFileName());
             
             var displayLog = MeticaAPI.DisplayLog;
             displayLog.Awake();
@@ -43,7 +43,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             var json = JsonConvert.SerializeObject(entries);
             File.WriteAllText(tempFileName, json);
             
-            ConfigureDisplayLogPath(tempFileName);
+            Utils.ConfigureDisplayLogPath(tempFileName);
 
             var displayLog = MeticaAPI.DisplayLog;
             displayLog.Awake();
@@ -69,7 +69,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
                 offers.Add(offer);
             }
             
-            ConfigureDisplayLogPath(Path.GetTempFileName());
+            Utils.ConfigureDisplayLogPath(Path.GetTempFileName());
             
             var displayLog = MeticaAPI.DisplayLog;
             displayLog.Awake();
@@ -115,7 +115,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         [UnityTest]
         public IEnumerator Log_Persistence()
         {
-            ConfigureDisplayLogPath(Path.GetTempFileName());
+            Utils.ConfigureDisplayLogPath(Path.GetTempFileName());
 
             var config = MeticaAPI.Config;
             config.displayLogFlushCadence = 1;
@@ -157,13 +157,6 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             return entries;
         }
 
-        private static void ConfigureDisplayLogPath(string logPath)
-        {
-            Debug.Log($"Configuring path at {logPath}");
-            var config = MeticaAPI.Config;
-            config.displayLogPath = logPath;
-            MeticaAPI.Config = config;
-            // Utils.InitSdk();
-        }
+        
     }
 }

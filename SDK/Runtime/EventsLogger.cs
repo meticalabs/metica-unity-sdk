@@ -141,7 +141,7 @@ namespace Metica.Unity
                 { "userId", MeticaAPI.UserId },
                 { "appId", MeticaAPI.AppId },
                 { "eventType", eventType },
-                { "eventTime", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ") },
+                { "eventTime", DateTimeOffset.FromUnixTimeSeconds(MeticaAPI.TimeSource.EpochSeconds()).ToString("yyyy-MM-ddTHH:mm:ssZ") },
                 { "meticaUnitSdk", MeticaAPI.SDKVersion }
             };
         }

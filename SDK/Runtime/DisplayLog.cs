@@ -22,7 +22,7 @@ namespace Metica.Unity
         {
             return new DisplayLogEntry()
             {
-                displayedOn = DateTimeOffset.Now.ToUnixTimeSeconds(),
+                displayedOn = MeticaAPI.TimeSource.EpochSeconds(),
                 offerId = offerId,
                 placementId = placementId,
                 offerVariantId = variantId
@@ -112,7 +112,7 @@ namespace Metica.Unity
                     continue;
                 }
 
-                var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                var currentTime = MeticaAPI.TimeSource.EpochSeconds();
                 
                 var displayLogList = _displayLogs[offer.offerId];
                 

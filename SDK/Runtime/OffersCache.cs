@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -9,35 +9,29 @@ namespace Metica.Unity
     public class CachedOffersByPlacement
     {
         public OffersByPlacement offers;
-        public DateTime cacheTime;
-
-        public static CachedOffersByPlacement Empty()
-        {
-            return new CachedOffersByPlacement()
-            {
-                offers = new OffersByPlacement()
-                {
-                    placements = new Dictionary<string, List<Offer>>()
-                }
-            };
-        }
+        public DateTimeOffset cacheTime;
     }
     
     public class OffersCache
     {
-        private static readonly string FilePath = Application.persistentDataPath + "/metica-offers.json";
+        private CachedOffersByPlacement _cachedOffers;
 
-        public static CachedOffersByPlacement Read()
+        private bool IsOffersCacheValid() => _cachedOffers != null && _cachedOffers.offers != null;
+
+        private bool IsOffersCacheUpToDate() =>
+            IsOffersCacheValid() && (MeticaAPI.TimeSource.EpochSeconds() - _cachedOffers.cacheTime.ToUnixTimeSeconds()) < (60*MeticaAPI.Config.offersCacheTtlMinutes);
+        
+        public OffersCache()
         {
             try
             {
                 // Ensure the file exists
-                if (File.Exists(FilePath))
+                if (File.Exists(MeticaAPI.Config.offersCachePath))
                 {
-                    using (StreamReader reader = new StreamReader(FilePath))
+                    using (StreamReader reader = new StreamReader(MeticaAPI.Config.offersCachePath))
                     {
                         var content = reader.ReadToEnd();
-                        return JsonConvert.DeserializeObject<CachedOffersByPlacement>(content);
+                        _cachedOffers = JsonConvert.DeserializeObject<CachedOffersByPlacement>(content);
                     }
                 }
             }
@@ -45,22 +39,27 @@ namespace Metica.Unity
             {
                 Debug.LogError($"Error while trying to load the offers cache: {e}");
             }
-
-            return CachedOffersByPlacement.Empty();
         }
 
-        public static void Write(OffersByPlacement offers)
+        [CanBeNull]
+        public OffersByPlacement Read()
+        {
+            var upToDate = IsOffersCacheUpToDate();
+            return upToDate ? _cachedOffers.offers : null;
+        }
+        
+        public void Write(OffersByPlacement offers)
         {
             try
             {
-                var cachedOffers = new CachedOffersByPlacement()
+                _cachedOffers = new CachedOffersByPlacement()
                 {
                     offers = offers,
-                    cacheTime = new DateTime()
+                    cacheTime = DateTimeOffset.FromUnixTimeSeconds(MeticaAPI.TimeSource.EpochSeconds())
                 };
-                using (StreamWriter writer = new StreamWriter(FilePath))
+                using (StreamWriter writer = new StreamWriter(MeticaAPI.Config.offersCachePath))
                 {
-                    writer.Write(JsonConvert.SerializeObject(cachedOffers));
+                    writer.Write(JsonConvert.SerializeObject(_cachedOffers));
                 }
             }
             catch (Exception e)
