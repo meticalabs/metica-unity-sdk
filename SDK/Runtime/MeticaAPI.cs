@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 // ReSharper disable all NotAccessedField.Global
 // ReSharper disable file UnusedMember.Local
@@ -54,6 +53,16 @@ namespace Metica.Unity
         /// </remarks>
         public uint maxPendingLoggedEvents;
 
+        /// <summary>
+        /// The time-to-live, in minutes, for the offers cache.
+        /// </summary>
+        public uint offersCacheTtlMinutes;
+
+        /// <summary>
+        /// The filesystem path where the offers cache will be stored.
+        /// </summary>
+        public string offersCachePath;
+
         public static SdkConfig Default()
         {
             return new SdkConfig()
@@ -64,8 +73,23 @@ namespace Metica.Unity
                 displayLogFlushCadence = 60,
                 displayLogPath = Path.Combine(Application.persistentDataPath, "display_log"),
                 maxPendingLoggedEvents = 256,
-                eventsLogFlushCadence = 60
+                eventsLogFlushCadence = 60,
+                offersCacheTtlMinutes = 120,
+                offersCachePath = Path.Combine(Application.persistentDataPath, "metica-offers.json"),
             };
+        }
+    }
+
+    internal interface ITimeSource
+    {
+        long EpochSeconds();
+    }
+
+    internal class SystemDateTimeSource : ITimeSource
+    {
+        public long EpochSeconds()
+        {
+            return DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         }
     }
 
@@ -86,6 +110,8 @@ namespace Metica.Unity
         public static IOffersManager OffersManager { get; set; }
 
         public static SdkConfig Config { get; internal set; }
+        
+        internal static ITimeSource TimeSource { get; set; }
 
         public static IBackendOperations BackendOperations
         {
@@ -111,6 +137,7 @@ namespace Metica.Unity
             AppId = appId;
             ApiKey = apiKey;
             Config = sdkConfig;
+            TimeSource = new SystemDateTimeSource();
 
             ScriptingObjects.Init();
 

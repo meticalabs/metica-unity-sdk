@@ -20,27 +20,23 @@ namespace Metica.Unity
     // TODO: add a history of the delivered offers
     public class OffersManager : IOffersManager
     {
-        private CachedOffersByPlacement _cachedOffers = null;
+        private OffersCache _offersCache;
 
         public void Init()
         {
             // load offers from disk
-            _cachedOffers = OffersCache.Read();
+            _offersCache = new OffersCache();
         }
-
-        private bool IsOffersCacheValid() => _cachedOffers != null && _cachedOffers.offers != null;
-
-        private bool IsOffersCacheUpToDate() =>
-            IsOffersCacheValid() && (DateTime.Now - _cachedOffers.cacheTime).TotalHours < 2;
 
         public void GetOffers(string[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback,
             Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
             // if the cache is recent, and not running inside the editor, return the cached offers
-            if (IsOffersCacheUpToDate() && !Application.isEditor)
+            var cachedResult = _offersCache.Read();
+            if (cachedResult != null && !Application.isEditor)
             {
                 Debug.Log("Returning cached offers");
-                offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(_cachedOffers.offers));
+                offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(cachedResult));
                 return;
             }
 
@@ -49,10 +45,11 @@ namespace Metica.Unity
                     if (sdkResult.Error != null)
                     {
                         Debug.LogError($"Error while fetching offers: {sdkResult.Error}");
-                        if (IsOffersCacheUpToDate())
+                        var cachedResult = _offersCache.Read();
+                        if (cachedResult != null)
                         {
                             Debug.Log("Returning cached offers as fallback");
-                            offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(_cachedOffers.offers));
+                            offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(cachedResult));
                         }
                         else
                         {
@@ -63,19 +60,10 @@ namespace Metica.Unity
                     else
                     {
                         // persist the response and refresh the in-memory cache
-                        OffersCache.Write(new OffersByPlacement()
+                        _offersCache.Write(new OffersByPlacement()
                         {
                             placements = sdkResult.Result.placements
                         });
-
-                        _cachedOffers = new CachedOffersByPlacement()
-                        {
-                            offers = new OffersByPlacement()
-                            {
-                                placements = sdkResult.Result.placements
-                            },
-                            cacheTime = DateTime.Now
-                        };
 
                         // filter out the offers that have exceeded their display limit
                         var filteredDictionary = sdkResult.Result.placements.ToDictionary(
@@ -95,8 +83,10 @@ namespace Metica.Unity
 
         public List<Offer> GetCachedOffersByPlacement(string placement)
         {
-            return _cachedOffers.offers.placements.ContainsKey(placement)
-                ? _cachedOffers.offers.placements[placement]
+            var res = _offersCache.Read();
+
+            return res != null && res.placements.ContainsKey(placement)
+                ? res.placements[placement]
                 : new List<Offer>();
         }
 
@@ -108,7 +98,7 @@ namespace Metica.Unity
         // Returns: void
         private void LogDisplays(Dictionary<string, List<Offer>> offersByPlacement)
         {
-            var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            var currentTime = MeticaAPI.TimeSource.EpochSeconds();
             var offerIds = new HashSet<String>();
 
             foreach (var entry in offersByPlacement)

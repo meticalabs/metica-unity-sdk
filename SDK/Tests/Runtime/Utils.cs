@@ -1,5 +1,6 @@
 using Metica.Unity;
 using NUnit.Framework;
+using UnityEngine;
 
 abstract class Utils
 {
@@ -14,5 +15,19 @@ abstract class Utils
     public static void InitSdk()
     {
         MeticaAPI.Initialise(TestUserId, TestApp, TestKey, result => { Assert.That(result.Result); });
+    }
+    
+    public static void ConfigureDisplayLogPath(string logPath)
+    {
+        var config = MeticaAPI.Config;
+        config.displayLogPath = logPath;
+        MeticaAPI.Config = config;
+    }
+    
+    public static void ConfigureOffersCacheLogPath(string path)
+    {
+        var config = MeticaAPI.Config;
+        config.offersCachePath = path;
+        MeticaAPI.Config = config;
     }
 }
