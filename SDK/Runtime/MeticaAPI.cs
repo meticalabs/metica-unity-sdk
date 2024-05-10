@@ -63,6 +63,11 @@ namespace Metica.Unity
         /// </summary>
         public string offersCachePath;
 
+        /// <summary>
+        /// The network timeout, in seconds, for the calls to any Metica endpoint.
+        /// </summary>
+        public int networkTimeout;
+        
         public static SdkConfig Default()
         {
             return new SdkConfig()
@@ -76,6 +81,7 @@ namespace Metica.Unity
                 eventsLogFlushCadence = 60,
                 offersCacheTtlMinutes = 120,
                 offersCachePath = Path.Combine(Application.persistentDataPath, "metica-offers.json"),
+                networkTimeout = 2
             };
         }
     }

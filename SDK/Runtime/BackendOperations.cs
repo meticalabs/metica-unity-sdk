@@ -83,6 +83,7 @@ namespace Metica.Unity
                     www.SetRequestHeader("Content-Type", "application/json");
                     www.SetRequestHeader("X-API-KEY", apiKey);
                     www.method = "POST";
+                    www.timeout = MeticaAPI.Config.networkTimeout;
 
                     yield return www.SendWebRequest();
 
