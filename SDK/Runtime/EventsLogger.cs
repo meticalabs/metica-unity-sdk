@@ -66,34 +66,34 @@ namespace Metica.Unity
 
         public void LogOfferDisplay(string offerId, string placementId)
         {
-            var eventDict = CreateCommonEventAttributes("meticaOfferImpression");
-            eventDict["meticaAttributes"] = GetOrCreateMeticaAttributes(offerId, placementId);
+            var eventDict = CreateCommonEventAttributes(EventTypes.OfferImpression);
+            eventDict[Constants.MeticaAttributes] = GetOrCreateMeticaAttributes(offerId, placementId);
             LogEvent(eventDict);
         }
 
         public void LogOfferPurchase(string offerId, string placementId, double amount, string currency)
         {
-            var eventDict = CreateCommonEventAttributes("meticaOfferInAppPurchase");
+            var eventDict = CreateCommonEventAttributes(EventTypes.OfferInAppPurchase);
             var meticaAttributes = GetOrCreateMeticaAttributes(offerId, placementId);
-            meticaAttributes["currencyCode"] = currency;
-            meticaAttributes["totalAmount"] = amount;
-            eventDict["meticaAttributes"] = meticaAttributes;
+            meticaAttributes[Constants.CurrencyCode] = currency;
+            meticaAttributes[Constants.TotalAmount] = amount;
+            eventDict[Constants.MeticaAttributes] = meticaAttributes;
             LogEvent(eventDict);
         }
 
         public void LogOfferInteraction(string offerId, string placementId, string interactionType)
         {
-            var eventDict = CreateCommonEventAttributes("meticaOfferInteraction");
+            var eventDict = CreateCommonEventAttributes(EventTypes.OfferInteraction);
             var meticaAttributes = GetOrCreateMeticaAttributes(offerId, placementId);
-            meticaAttributes["interactionType"] = interactionType;
-            eventDict["meticaAttributes"] = meticaAttributes;
+            meticaAttributes[Constants.InteractionType] = interactionType;
+            eventDict[Constants.MeticaAttributes] = meticaAttributes;
             LogEvent(eventDict);
         }
 
         public void LogUserAttributes(Dictionary<string, object> userAttributes)
         {
-            var eventDict = CreateCommonEventAttributes("meticaUserStateUpdate");
-            eventDict["userStateAttributes"] = userAttributes;
+            var eventDict = CreateCommonEventAttributes(EventTypes.UserStateUpdate);
+            eventDict[Constants.UserStateAttributes] = userAttributes;
             LogEvent(eventDict);
         }
 
@@ -138,11 +138,12 @@ namespace Metica.Unity
         {
             return new Dictionary<string, object>()
             {
-                { "userId", MeticaAPI.UserId },
-                { "appId", MeticaAPI.AppId },
-                { "eventType", eventType },
-                { "eventTime", DateTimeOffset.FromUnixTimeSeconds(MeticaAPI.TimeSource.EpochSeconds()).ToString("yyyy-MM-ddTHH:mm:ssZ") },
-                { "meticaUnitSdk", MeticaAPI.SDKVersion }
+                { Constants.UserId, MeticaAPI.UserId },
+                { Constants.AppId, MeticaAPI.AppId },
+                { Constants.EventId, Guid.NewGuid().ToString() },
+                { Constants.EventType, eventType },
+                { Constants.EventTime, DateTimeOffset.FromUnixTimeSeconds(MeticaAPI.TimeSource.EpochSeconds()).ToString("yyyy-MM-ddTHH:mm:ssZ") },
+                { Constants.MeticaUnitySdk, MeticaAPI.SDKVersion }
             };
         }
 
@@ -163,12 +164,12 @@ namespace Metica.Unity
                 {
                     "offer", new Dictionary<string, object>()
                     {
-                        { "offerId", offerDetails.metrics.display.meticaAttributes.offer.offerId },
-                        { "variantId", offerDetails.metrics.display.meticaAttributes.offer.variantId },
-                        { "bundleId", offerDetails.metrics.display.meticaAttributes.offer.bundleId }
+                        { Constants.OfferId, offerDetails.metrics.display.meticaAttributes.offer.offerId },
+                        { Constants.VariantId, offerDetails.metrics.display.meticaAttributes.offer.variantId },
+                        { Constants.BundleId, offerDetails.metrics.display.meticaAttributes.offer.bundleId }
                     }
                 },
-                { "placementId", offerDetails.metrics.display.meticaAttributes.placementId }
+                { Constants.PlacementId, offerDetails.metrics.display.meticaAttributes.placementId }
             };
         }
 
@@ -183,12 +184,12 @@ namespace Metica.Unity
                 {
                     "offer", new Dictionary<string, object>()
                     {
-                        { "offerId", offerId },
-                        { "variantId", variantId },
-                        { "bundleId", bundleId }
+                        { Constants.OfferId, offerId },
+                        { Constants.VariantId, variantId },
+                        { Constants.BundleId, bundleId }
                     }
                 },
-                { "placementId", placementId }
+                { Constants.PlacementId, placementId }
             };
         }
     }
