@@ -9,7 +9,35 @@ using JetBrains.Annotations;
 namespace Metica.Unity
 {
     using Event = List<Dictionary<string, object>>;
-    
+
+    internal abstract class EventTypes
+    {
+        internal static readonly string OfferImpression = "meticaOfferImpression";
+        internal static readonly string OfferInteraction = "meticaOfferInteraction";
+        internal static readonly string OfferInAppPurchase = "meticaOfferInAppPurchase";
+        internal static readonly string UserStateUpdate = "meticaUserStateUpdate";
+    }
+
+    internal abstract class Constants
+    {
+        internal static readonly string MeticaAttributes = "meticaAttributes";
+        internal static readonly string CurrencyCode = "currencyCode";
+        internal static readonly string TotalAmount = "totalAmount";
+        internal static readonly string PlacementId = "placementId";
+        internal static readonly string OfferId = "offerId";
+        internal static readonly string VariantId = "variantId";
+        internal static readonly string BundleId = "bundleId";
+        internal static readonly string UserId = "userId";
+        internal static readonly string AppId = "appId";
+        internal static readonly string EventType = "eventType";
+        internal static readonly string EventId = "eventId";
+        internal static readonly string EventTime = "eventTime";
+        internal static readonly string MeticaUnitySdk = "meticaUnitySdk";
+        internal static readonly string InteractionType = "interactionType";
+        internal static readonly string UserStateAttributes = "userStateAttributes";
+        internal static readonly string Offer = "offer";
+    }
+
     [Serializable]
     public struct MeticaContext
     {
@@ -18,7 +46,7 @@ namespace Metica.Unity
         public string userId;
     }
 
-    
+
     [Serializable]
     public enum StoreTypeEnum
     {
@@ -41,7 +69,7 @@ namespace Metica.Unity
     {
         public Dictionary<string, List<Offer>> placements = new Dictionary<string, List<Offer>>();
     }
-    
+
     [Serializable]
     public class DisplayLimit
     {
@@ -57,42 +85,41 @@ namespace Metica.Unity
         public string bundleId;
         public string variantId;
     }
-    
+
     [Serializable]
     public class MeticaAttributes
     {
         public OfferVariant offer;
         public String placementId;
-
     }
-  
+
     [Serializable]
     public class DisplayMetric
     {
-        public String eventType = "meticaOfferImpression";
+        public String eventType = EventTypes.OfferImpression;
         public String userId;
         public String appId;
         public MeticaAttributes meticaAttributes;
     }
-    
+
     [Serializable]
     public class InteractionMetric
     {
-        public String eventType = "meticaOfferInteraction";
+        public String eventType = EventTypes.OfferInteraction;
         public String userId;
         public String appId;
         public MeticaAttributes meticaAttributes;
     }
-    
+
     [Serializable]
     public class PurchaseMetric
     {
-        public String eventType = "meticaOfferInAppPurchase";
+        public String eventType = EventTypes.OfferInAppPurchase;
         public String userId;
         public String appId;
         public MeticaAttributes meticaAttributes;
     }
-    
+
     [Serializable]
     public class OfferMetrics
     {
@@ -100,7 +127,7 @@ namespace Metica.Unity
         public PurchaseMetric purchase;
         public InteractionMetric interaction;
     }
-    
+
     [Serializable]
     public class Offer
     {

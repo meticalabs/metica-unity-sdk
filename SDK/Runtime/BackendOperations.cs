@@ -54,7 +54,10 @@ namespace Metica.Unity
             string jsonBody = null;
             try
             {
-                jsonBody = JsonConvert.SerializeObject(body);
+                jsonBody = JsonConvert.SerializeObject(body, new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                });
                 Debug.Log($"json body: {jsonBody}");
             }
             catch (Exception e)
@@ -80,6 +83,7 @@ namespace Metica.Unity
                     www.SetRequestHeader("Content-Type", "application/json");
                     www.SetRequestHeader("X-API-KEY", apiKey);
                     www.method = "POST";
+                    www.timeout = MeticaAPI.Config.networkTimeout;
 
                     yield return www.SendWebRequest();
 

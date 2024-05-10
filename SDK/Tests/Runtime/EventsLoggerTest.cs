@@ -77,7 +77,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             logger.LogCustomEvent(eventType, eventData);
 
             var recordedEvent = logger.EventsQueue[0];
-            Assert.That(recordedEvent["eventType"], Is.EqualTo("test"));
+            Assert.That(recordedEvent[Constants.EventType], Is.EqualTo("test"));
             Assert.That(recordedEvent["key2"], Is.EqualTo("value2"));
             assertCommonAttributes("test", recordedEvent);
         }
@@ -95,15 +95,15 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             logger.LogOfferPurchase(Utils.testOfferId, Utils.testPlacementId, 1.0, "USD");
             var recordedEvent = logger.EventsQueue[0];
 
-            assertCommonAttributes("meticaOfferInAppPurchase", recordedEvent);
+            assertCommonAttributes(EventTypes.OfferInAppPurchase, recordedEvent);
 
-            var meticaAttributes = (Dictionary<string, object>)recordedEvent["meticaAttributes"];
-            var offerDetails = (Dictionary<string, object>)meticaAttributes["offer"];
-            Assert.That(offerDetails["bundleId"], Is.EqualTo(Utils.testBundleId));
-            Assert.That(offerDetails["variantId"], Is.EqualTo(Utils.testVariantId));
-            Assert.That(meticaAttributes["placementId"], Is.EqualTo(Utils.testPlacementId));
-            Assert.That(meticaAttributes["totalAmount"], Is.EqualTo(1.0));
-            Assert.That(meticaAttributes["currencyCode"], Is.EqualTo("USD"));
+            var meticaAttributes = (Dictionary<string, object>)recordedEvent[Constants.MeticaAttributes];
+            var offerDetails = (Dictionary<string, object>)meticaAttributes[Constants.Offer];
+            Assert.That(offerDetails[Constants.BundleId], Is.EqualTo(Utils.testBundleId));
+            Assert.That(offerDetails[Constants.VariantId], Is.EqualTo(Utils.testVariantId));
+            Assert.That(meticaAttributes[Constants.PlacementId], Is.EqualTo(Utils.testPlacementId));
+            Assert.That(meticaAttributes[Constants.TotalAmount], Is.EqualTo(1.0));
+            Assert.That(meticaAttributes[Constants.CurrencyCode], Is.EqualTo("USD"));
         }
 
         [Test]
@@ -120,13 +120,13 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
 
             var recordedEvent = logger.EventsQueue[0];
 
-            assertCommonAttributes("meticaOfferImpression", recordedEvent);
+            assertCommonAttributes(EventTypes.OfferImpression, recordedEvent);
 
-            var meticaAttributes = (Dictionary<string, object>)recordedEvent["meticaAttributes"];
-            var offerDetails = (Dictionary<string, object>)meticaAttributes["offer"];
-            Assert.That(offerDetails["bundleId"], Is.EqualTo(Utils.testBundleId));
-            Assert.That(offerDetails["variantId"], Is.EqualTo(Utils.testVariantId));
-            Assert.That(meticaAttributes["placementId"], Is.EqualTo(Utils.testPlacementId));
+            var meticaAttributes = (Dictionary<string, object>)recordedEvent[Constants.MeticaAttributes];
+            var offerDetails = (Dictionary<string, object>)meticaAttributes[Constants.Offer];
+            Assert.That(offerDetails[Constants.BundleId], Is.EqualTo(Utils.testBundleId));
+            Assert.That(offerDetails[Constants.VariantId], Is.EqualTo(Utils.testVariantId));
+            Assert.That(meticaAttributes[Constants.PlacementId], Is.EqualTo(Utils.testPlacementId));
         }
 
 
@@ -144,14 +144,14 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
 
             var recordedEvent = logger.EventsQueue[0];
 
-            assertCommonAttributes("meticaOfferInteraction", recordedEvent);
+            assertCommonAttributes(EventTypes.OfferInteraction, recordedEvent);
 
-            var meticaAttributes = (Dictionary<string, object>)recordedEvent["meticaAttributes"];
-            var offerDetails = (Dictionary<string, object>)meticaAttributes["offer"];
-            Assert.That(offerDetails["bundleId"], Is.EqualTo(Utils.testBundleId));
-            Assert.That(offerDetails["variantId"], Is.EqualTo(Utils.testVariantId));
-            Assert.That(meticaAttributes["placementId"], Is.EqualTo(Utils.testPlacementId));
-            Assert.That(meticaAttributes["interactionType"], Is.EqualTo("click"));
+            var meticaAttributes = (Dictionary<string, object>)recordedEvent[Constants.MeticaAttributes];
+            var offerDetails = (Dictionary<string, object>)meticaAttributes[Constants.Offer];
+            Assert.That(offerDetails[Constants.BundleId], Is.EqualTo(Utils.testBundleId));
+            Assert.That(offerDetails[Constants.VariantId], Is.EqualTo(Utils.testVariantId));
+            Assert.That(meticaAttributes[Constants.PlacementId], Is.EqualTo(Utils.testPlacementId));
+            Assert.That(meticaAttributes[Constants.InteractionType], Is.EqualTo("click"));
         }
 
         [Test]
@@ -173,20 +173,21 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
 
             var recordedEvent = logger.EventsQueue[0];
 
-            assertCommonAttributes("meticaUserStateUpdate", recordedEvent);
+            assertCommonAttributes(EventTypes.UserStateUpdate, recordedEvent);
 
-            var stateAttributes = (Dictionary<string, object>)recordedEvent["userStateAttributes"];
+            var stateAttributes = (Dictionary<string, object>)recordedEvent[Constants.UserStateAttributes];
             Assert.That(userAttributes, Is.EqualTo(stateAttributes));
         }
 
 
         private static void assertCommonAttributes(string eventType, Dictionary<string, object> recordedEvent)
         {
-            Assert.That(recordedEvent["eventType"], Is.EqualTo(eventType));
-            Assert.That(recordedEvent["userId"], Is.EqualTo(Utils.TestUserId));
-            Assert.That(recordedEvent["appId"], Is.EqualTo(Utils.TestApp));
-            Assert.That(recordedEvent["meticaUnitSdk"], Is.EqualTo(MeticaAPI.SDKVersion));
-            Assert.That(recordedEvent["eventTime"] != null);
+            Assert.That(recordedEvent[Constants.EventId], Is.Not.Null);
+            Assert.That(recordedEvent[Constants.EventType], Is.EqualTo(eventType));
+            Assert.That(recordedEvent[Constants.UserId], Is.EqualTo(Utils.TestUserId));
+            Assert.That(recordedEvent[Constants.AppId], Is.EqualTo(Utils.TestApp));
+            Assert.That(recordedEvent[Constants.MeticaUnitySdk], Is.EqualTo(MeticaAPI.SDKVersion));
+            Assert.That(recordedEvent[Constants.EventTime] != null);
         }
 
         [Test]
