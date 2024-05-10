@@ -54,7 +54,10 @@ namespace Metica.Unity
             string jsonBody = null;
             try
             {
-                jsonBody = JsonConvert.SerializeObject(body);
+                jsonBody = JsonConvert.SerializeObject(body, new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                });
                 Debug.Log($"json body: {jsonBody}");
             }
             catch (Exception e)
