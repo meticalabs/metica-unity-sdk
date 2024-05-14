@@ -28,7 +28,7 @@ namespace Metica.Unity
                 offerVariantId = variantId
             };
         }
-        
+
         // Compares instances based on the displayedOn attribute.
         public int CompareTo(DisplayLogEntry other)
         {
@@ -43,18 +43,17 @@ namespace Metica.Unity
 
         internal void Awake()
         {
+            if (Application.isEditor && !Application.isPlaying)
+            {
+                Debug.LogWarning("The displays log will not run in the editor");
+                return;
+            }
+
             _displayLogs = LoadDisplayLog();
             _saveLogRoutine = StartCoroutine(SaveDisplayLogRoutine());
             DontDestroyOnLoad(this);
         }
 
-        private void Start()
-        {
-            if (Application.isEditor)
-            {
-                Debug.LogWarning("The displays log will not run in the editor");
-            }
-        }
 
         private void OnApplicationQuit()
         {
@@ -113,9 +112,9 @@ namespace Metica.Unity
                 }
 
                 var currentTime = MeticaAPI.TimeSource.EpochSeconds();
-                
+
                 var displayLogList = _displayLogs[offer.offerId];
-                
+
                 var limitExceeded = (from displayLimit in offer.displayLimits
                     let timeWindowInSeconds = displayLimit.timeWindowInHours * 3600
                     let recentDisplayLogs =
@@ -141,7 +140,7 @@ namespace Metica.Unity
         private void PersistDisplayLog()
         {
             if (_displayLogs == null || _displayLogs.Count == 0) return;
-            
+
             var entries = _displayLogs
                 .SelectMany(pair => pair.Value)
                 .OrderByDescending(entry => entry.displayedOn)
@@ -177,6 +176,7 @@ namespace Metica.Unity
             {
                 return new Dictionary<string, List<DisplayLogEntry>>();
             }
+
             return entries.GroupBy(entry => entry.offerId)
                 .ToDictionary(group => group.Key, group => group.ToList());
         }
