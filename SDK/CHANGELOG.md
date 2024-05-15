@@ -1,3 +1,14 @@
+# [1.0.5](https://github.com/meticalabs/metica-unity-sdk/compare/v1.0.5...v1.0.4) (2024-05-15)
+
+### Bug Fixes
+
+* fix: Moves the warning message to Awake
+* fix(ingestion): Adds a configuration option to control the network timeout for calls to the Metica backend
+* fix(ingestion): Null properties are ignored
+
+### Improvements
+* feat(Display Log): Improvements to the display log functionality
+
 # [1.0.4](https://github.com/meticalabs/metica-unity-sdk/compare/v1.0.4...v1.0.3) (2024-04-25)
 
 ### Bug Fixes
