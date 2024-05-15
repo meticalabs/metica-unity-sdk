@@ -32,7 +32,7 @@ This is more static information about the user, and is used to personalize the o
 ## Installation
 The installation can be done simply through the Package Manager in Unity. Select Window > Package Manager and click on the '+' button in the top left corner. Select "Add package from git URL" and enter the following URL:
 
-```https://github.com/meticalabs/metica-unity-sdk.git```
+```https://github.com/meticalabs/metica-unity-sdk.git?path=SDK```
 
 ## Available SDK Operations
 
@@ -47,6 +47,20 @@ MeticaAPI.Initialise("userId", "appId", "apiKey", result => {
     else { Debug.Log("Failed to Initialize Metica API: " + result.Error); } 
 });
 ```
+
+You can optionally pass an instance of SdkConfig as well, if you want to have greater control over the SDK's operations.
+The SdkConfig provides the following configuration parameters
+
+
+| Property | Description |
+| --- | --- |
+| `offersEndpoint` | The full endpoint to the Metica offers endpoint. |
+| `ingestionEndpoint` | The full endpoint to the Metica ingestion service. |
+| `maxDisplayLogEntries` | The maximum number of entries stored in the displays log. This limit is shared by all offers and once reached, oldest entries will be removed and replaced by newly incoming ones. |
+| `displayLogFlushCadence` | The cadence, in seconds, by which the displays log will be persisted to the filesystem. |
+| `eventsLogFlushCadence` | The cadence, in seconds, by which the logged events will be sent to the ingestion service. |
+| `maxPendingLoggedEvents` | The maximum number of pending logged events before they are sent to the ingestion service. When this value is reached, oldest accumulated events will be dropped to accommodate most recent ones. |
+
 
 ### 2. Get Offers
 
@@ -89,7 +103,7 @@ Logs updates to user attributes and custom user events.
 
 
 ```csharp
-Dictionary<string, object> userAttributes = new Dictionary<string, object> { { "age", 25 }, { "gender", "male" } };
+Dictionary<string, object> userAttributes = new Dictionary<string, object> { { "level", 25 }, { "favoriteItem", "shield" } };
 MeticaAPI.LogUserAttributes(userAttributes); 
 ```
 
@@ -122,3 +136,7 @@ In this panel you can fetch offers for the defined placements.
 In this panel you can log events.
 
 ![EventsPanel](images/EventsPanel.png "Events Panel")
+
+## Privacy Manifest
+For iOS, iPadOS, tvOS and watchOS apps, we provide a [privacy manifest](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files) at [Assets/Plugins/PrivacyInfo.xcprivacy](Assets/Plugins/PrivacyInfo.xcprivacy)
+that describes the data collected by the Metica SDK. 

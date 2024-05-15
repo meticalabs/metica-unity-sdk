@@ -1,0 +1,14 @@
+{
+  "name": "Metica.Unity.Editor",
+  "rootNamespace": "Metica.Unity",
+  "references": [
+    "Metica.Unity"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "precompiledReferences": [
+    "Newtonsoft.Json.dll"
+  ]
+}
