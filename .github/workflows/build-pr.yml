@@ -33,7 +33,7 @@ jobs:
 
       # Test
       - name: Run tests
-        uses: meticalabs/unity-test-runner/action.yml@main
+        uses: meticalabs/unity-test-runner@main
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
