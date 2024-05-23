@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Metica.Unity;
 using NUnit.Framework;
-using UnityEngine;
 
 abstract class Utils
 {
@@ -15,6 +15,7 @@ abstract class Utils
     public static void InitSdk()
     {
         MeticaAPI.Initialise(TestUserId, TestApp, TestKey, result => { Assert.That(result.Result); });
+        MeticaAPI.BackendOperations = new NoopBackendOps();
     }
     
     public static void ConfigureDisplayLogPath(string logPath)
@@ -29,5 +30,21 @@ abstract class Utils
         var config = MeticaAPI.Config;
         config.offersCachePath = path;
         MeticaAPI.Config = config;
+    }
+}
+
+class NoopBackendOps : IBackendOperations
+{
+    public void CallGetOffersAPI(string[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback,
+        Dictionary<string, object> userProperties = null,
+        DeviceInfo deviceInfo = null)
+    {
+
+    }
+
+    public void CallSubmitEventsAPI(ICollection<Dictionary<string, object>> events,
+        MeticaSdkDelegate<string> callback)
+    {
+
     }
 }

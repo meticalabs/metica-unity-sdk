@@ -37,7 +37,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         [SetUp]
         public void Setup()
         {
-            MeticaAPI.Initialise(Utils.TestUserId, Utils.TestApp, Utils.TestKey, result => { Assert.That(result.Result); });
+            Utils.InitSdk();
         }
 
         [UnityTest]
