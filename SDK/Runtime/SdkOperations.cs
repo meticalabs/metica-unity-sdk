@@ -51,6 +51,9 @@ namespace Metica.Unity
     [ExecuteAlways]
     internal class GetOffersOperation : MonoBehaviour
     {
+        public const string DefaultLocale = "en-US";
+        public const string DefaultAppVersion = "1.0.0";
+        
         public IObjectPool<GetOffersOperation> pool;
         public string[] Placements { get; set; }
         public Dictionary<string, object> UserProperties { get; set; }
@@ -94,18 +97,21 @@ namespace Metica.Unity
         internal static ODSRequest CreateODSRequestBody(Dictionary<string, object> userData,
             DeviceInfo overrideDeviceInfo = null)
         {
-            var locale = Thread.CurrentThread.CurrentCulture.Name;
+            string locale = Thread.CurrentThread.CurrentCulture.Name;
+            if (string.IsNullOrEmpty(locale))
+            {
+                locale = DefaultLocale;
+            }
+            
             var systemTz = TimeZoneInfo.Local.BaseUtcOffset;
-            var timezone = systemTz.TotalMinutes == 0
-                ? "+00:00"
-                : $"{systemTz.Hours:D2}:{systemTz.Minutes:D2}";
-            Debug.Log(TimeZoneInfo.Local.BaseUtcOffset.TotalMinutes);
+            var timezone = ((systemTz >= TimeSpan.Zero) ? "+" : "-") +  systemTz.ToString(@"hh\:mm");
+            
             var deviceInfo = overrideDeviceInfo ?? new DeviceInfo();
-            deviceInfo.locale = overrideDeviceInfo?.locale ?? locale;
+            deviceInfo.locale = string.IsNullOrEmpty(overrideDeviceInfo?.locale) ? locale : overrideDeviceInfo.locale;
             deviceInfo.store = overrideDeviceInfo?.store ??
                                MapRuntimePlatformToStoreType(Application.platform).ToString();
             deviceInfo.timezone = overrideDeviceInfo?.timezone ?? timezone;
-            deviceInfo.appVersion = overrideDeviceInfo?.appVersion ?? Application.version;
+            deviceInfo.appVersion = overrideDeviceInfo?.appVersion ?? Application.version ?? DefaultAppVersion;
 
             var request = new ODSRequest
             {
