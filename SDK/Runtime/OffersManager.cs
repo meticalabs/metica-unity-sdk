@@ -53,7 +53,6 @@ namespace Metica.Unity
                         }
                         else
                         {
-                            Debug.LogError("Failed to fetch offers from the server");
                             offersCallback(SdkResultImpl<OffersByPlacement>.WithError(sdkResult.Error));
                         }
                     }
