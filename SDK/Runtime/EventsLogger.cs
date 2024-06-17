@@ -26,7 +26,7 @@ namespace Metica.Unity
             _logEventsRoutine = StartCoroutine(LogEventsRoutine());
         }
 
-        ~EventsLogger()
+        private void OnDestroy()
         {
             if (_logEventsRoutine != null)
                 StopCoroutine(_logEventsRoutine);
