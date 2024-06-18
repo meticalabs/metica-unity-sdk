@@ -1,3 +1,15 @@
+# [1.0.6](https://github.com/meticalabs/metica-unity-sdk/compare/v1.0.6...v1.0.5) (2024-06-18)
+
+### Bug Fixes
+- fix: Error handling during the server's response decoding
+- fix: Uses a different user ID on every run to avoid influencing the ODS response from the previously submitted offer events
+- fix: Corrects the format of the timezone (MET-1354)
+- fix: Corrects the default value for the locale (MET-1354)
+- fix: EventsLogger uses the Unity API outside the main thread (MET-1353)
+
+### Improvements
+- docs: Description for DeviceInfo and the new SdkConfig options
+
 # [1.0.5](https://github.com/meticalabs/metica-unity-sdk/compare/v1.0.5...v1.0.4) (2024-05-15)
 
 ### Bug Fixes
