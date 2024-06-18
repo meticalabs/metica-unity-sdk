@@ -7,7 +7,7 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:   
+  workflow_dispatch:
 
 permissions:
   id-token: write
@@ -15,6 +15,8 @@ permissions:
 jobs:
   build:
     name: Build & test
+    permissions: 
+      checks: write
     runs-on: ubuntu-latest
     steps:
       # Checkout
@@ -31,9 +33,15 @@ jobs:
           restore-keys: |
             Library-
 
-      # Test
+      - name: Check out action
+        uses: actions/checkout@v4
+        with:
+          repository: meticalabs/unity-test-runner
+          token: ${{ secrets.CI_GITHUB_TOKEN }}
+          path: ./.github/actions/unity-test-runner
+          
       - name: Run tests
-        uses: game-ci/unity-test-runner@v4
+        uses: ./.github/actions/unity-test-runner
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}

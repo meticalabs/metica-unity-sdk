@@ -30,7 +30,7 @@ namespace Metica.Unity
             [CanBeNull] Dictionary<string, object> queryParams,
             string apiKey,
             object body,
-            MeticaSdkDelegate<T> callback)
+            MeticaSdkDelegate<T> callback) where T : class
         {
             // if there is no internet connection, return the cached offers
             if (Application.internetReachability == NetworkReachability.NotReachable)
@@ -97,8 +97,20 @@ namespace Metica.Unity
                     else
                     {
                         Debug.Log($"Response: {www.downloadHandler.text}");
-                        var result = JsonConvert.DeserializeObject<T>(www.downloadHandler.text);
-                        callback(SdkResultImpl<T>.WithResult(result));
+                        T result = null;
+                        try
+                        {
+                            result = JsonConvert.DeserializeObject<T>(www.downloadHandler.text);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError($"Error while decoding the ODS response: {e.Message}");
+                            Debug.LogException(e);
+                        }
+
+                        callback(result != null
+                            ? SdkResultImpl<T>.WithResult(result)
+                            : SdkResultImpl<T>.WithError("Failed to decode the server response"));
                     }
                 }
             }
@@ -150,7 +162,7 @@ namespace Metica.Unity
         public void CallSubmitEventsAPI(ICollection<Dictionary<string, object>> events,
             MeticaSdkDelegate<String> callback);
     }
-    
+
     internal class BackendOperationsImpl : IBackendOperations
     {
         private static readonly LinkedPool<GetOffersOperation> GetOffersPool = new(
@@ -164,7 +176,7 @@ namespace Metica.Unity
             actionOnDestroy: item => { item.OnDestroyPoolObject(); },
             maxSize: 100
         );
-        
+
         public void CallGetOffersAPI(string[] placements,
             MeticaSdkDelegate<OffersByPlacement> offersCallback, Dictionary<string, object> userProperties = null,
             DeviceInfo deviceInfo = null)
@@ -188,7 +200,7 @@ namespace Metica.Unity
             actionOnDestroy: item => { item.OnDestroyPoolObject(); },
             maxSize: 100
         );
-        
+
         public void CallSubmitEventsAPI(ICollection<Dictionary<string, object>> events,
             MeticaSdkDelegate<String> callback)
         {

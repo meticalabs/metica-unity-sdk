@@ -26,7 +26,7 @@ namespace Metica.Unity
             _logEventsRoutine = StartCoroutine(LogEventsRoutine());
         }
 
-        ~EventsLogger()
+        private void OnDestroy()
         {
             if (_logEventsRoutine != null)
                 StopCoroutine(_logEventsRoutine);
@@ -121,6 +121,12 @@ namespace Metica.Unity
 
             var copyList = _eventsList;
             _eventsList = new LinkedList<Dictionary<string, object>>();
+
+            if (copyList.Count == 0)
+            {
+                return;
+            }
+            
             MeticaAPI.BackendOperations.CallSubmitEventsAPI(copyList, (result) =>
             {
                 if (result.Error != null)
