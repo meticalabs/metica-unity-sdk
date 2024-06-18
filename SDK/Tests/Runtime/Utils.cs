@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Metica.Unity;
 using NUnit.Framework;
@@ -16,6 +17,11 @@ abstract class Utils
     {
         MeticaAPI.Initialise(TestUserId, TestApp, TestKey, result => { Assert.That(result.Result); });
         MeticaAPI.BackendOperations = new NoopBackendOps();
+    }
+
+    public static string RandomUserId()
+    {
+        return Guid.NewGuid().ToString();
     }
     
     public static void ConfigureDisplayLogPath(string logPath)

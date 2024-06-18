@@ -26,7 +26,9 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             config.offersEndpoint = endpoint;
             config.networkTimeout = 5;
 
-            MeticaAPI.Initialise(Utils.TestUserId, appId, apiKey, config, result => Assert.That(result.Result));
+            string userId = Utils.RandomUserId();
+            
+            MeticaAPI.Initialise(userId, appId, apiKey, config, result => Assert.That(result.Result));
 
             var displayLog = MeticaAPI.DisplayLog;
             displayLog.Awake();
@@ -94,7 +96,8 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             // force a new cache
             config.offersCachePath = Path.GetTempFileName();
 
-            MeticaAPI.Initialise(Utils.TestUserId, appId, apiKey, config, result => Assert.That(result.Result));
+            string userId = Utils.RandomUserId();
+            MeticaAPI.Initialise(userId, appId, apiKey, config, result => Assert.That(result.Result));
 
             var displayLog = MeticaAPI.DisplayLog;
             displayLog.Awake();
