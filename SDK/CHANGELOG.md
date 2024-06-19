@@ -1,3 +1,8 @@
+# [1.0.7](https://github.com/meticalabs/metica-unity-sdk/compare/v1.0.7...v1.0.6) (2024-06-19)
+
+### Bug Fixes
+- fix: Decoding empty server response (MET-1358)
+
 # [1.0.6](https://github.com/meticalabs/metica-unity-sdk/compare/v1.0.6...v1.0.5) (2024-06-18)
 
 ### Bug Fixes

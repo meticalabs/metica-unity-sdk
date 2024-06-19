@@ -1,0 +1,51 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Metica.Unity;
+using Newtonsoft.Json;
+using NUnit.Framework;
+using UnityEngine;
+// ReSharper disable once RedundantUsingDirective
+using UnityEngine.TestTools;
+
+
+namespace MeticaUnitySDK.SDK.Tests.Runtime
+{
+    [TestFixture]
+    public class IngestionE2eTest
+    {
+        [UnityTest]
+        public IEnumerator Send_Events()
+        {
+            var endpoint = System.Environment.GetEnvironmentVariable("INGESTION_ENDPOINT");
+            var apiKey = System.Environment.GetEnvironmentVariable("E2E_TESTSAPP_API_KEY");
+
+            var appId = "e2eTestsApp";
+
+            var config = SdkConfig.Default();
+            config.ingestionEndpoint = endpoint;
+            config.networkTimeout = 5;
+
+            string userId = Utils.RandomUserId();
+
+            MeticaAPI.Initialise(userId, appId, apiKey, config, result => Assert.That(result.Result));
+
+            var displayLog = MeticaAPI.DisplayLog;
+            displayLog.Awake();
+
+            yield return new WaitForSeconds(3);
+
+            MeticaAPI.LogUserAttributes(new Dictionary<string, object>()
+            {
+                { "name", "test" }
+            });
+            
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.FlushEvents();
+
+            yield return new WaitForSeconds(3);
+        }
+    }
+}
