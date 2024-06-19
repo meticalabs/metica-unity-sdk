@@ -96,21 +96,30 @@ namespace Metica.Unity
                     }
                     else
                     {
-                        Debug.Log($"Response: {www.downloadHandler.text}");
-                        T result = null;
-                        try
-                        {
-                            result = JsonConvert.DeserializeObject<T>(www.downloadHandler.text);
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.LogError($"Error while decoding the ODS response: {e.Message}");
-                            Debug.LogException(e);
-                        }
+                        var responseText = www.downloadHandler.text;
+                        Debug.Log($"Response: {responseText}");
 
-                        callback(result != null
-                            ? SdkResultImpl<T>.WithResult(result)
-                            : SdkResultImpl<T>.WithError("Failed to decode the server response"));
+                        if (string.IsNullOrEmpty(responseText) && www.responseCode >= 200 || www.responseCode <= 204)
+                        {
+                            callback(SdkResultImpl<T>.WithResult(null));
+                        }
+                        else
+                        {
+                            T result = null;
+                            try
+                            {
+                                result = JsonConvert.DeserializeObject<T>(responseText);
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.LogError($"Error while decoding the ODS response: {e.Message}");
+                                Debug.LogException(e);
+                            }
+
+                            callback(result != null
+                                ? SdkResultImpl<T>.WithResult(result)
+                                : SdkResultImpl<T>.WithError("Failed to decode the server response"));
+                        }
                     }
                 }
             }
