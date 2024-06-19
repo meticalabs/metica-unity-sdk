@@ -48,6 +48,7 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           E2E_TESTSAPP_API_KEY: ${{ secrets.E2E_TESTSAPP_API_KEY }}
           ODS_ENDPOINT: ${{ secrets.ODS_ENDPOINT }}
+          INGESTION_ENDPOINT: ${{ secrets.INGESTION_ENDPOINT }}
           
         with:
           projectPath: TestProject
