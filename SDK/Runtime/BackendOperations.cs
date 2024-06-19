@@ -99,7 +99,7 @@ namespace Metica.Unity
                         var responseText = www.downloadHandler.text;
                         Debug.Log($"Response: {responseText}");
 
-                        if (string.IsNullOrEmpty(responseText) && www.responseCode >= 200 || www.responseCode <= 204)
+                        if (string.IsNullOrEmpty(responseText) && (www.responseCode >= 200 || www.responseCode <= 204))
                         {
                             callback(SdkResultImpl<T>.WithResult(null));
                         }
