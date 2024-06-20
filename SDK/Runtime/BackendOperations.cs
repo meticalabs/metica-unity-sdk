@@ -58,7 +58,11 @@ namespace Metica.Unity
                 {
                     NullValueHandling = NullValueHandling.Ignore
                 });
-                Debug.Log($"json body: {jsonBody}");
+
+                if (MeticaAPI.Config.logLevel == LogLevel.Debug)
+                {
+                    Debug.Log($"json body: {jsonBody}");
+                }
             }
             catch (Exception e)
             {
@@ -73,7 +77,10 @@ namespace Metica.Unity
             else
             {
                 var fullUrl = queryParams is { Count: > 0 } ? $"{url}?{BuildUrlWithParameters(queryParams)}" : url;
-                Debug.Log($"sending request to {fullUrl} with body: {jsonBody}");
+                if (MeticaAPI.Config.logLevel == LogLevel.Debug)
+                {
+                    Debug.Log($"sending request to {fullUrl} with body: {jsonBody}");
+                }
 
                 using (var www = new UnityWebRequest(fullUrl, "PUT"))
                 {
@@ -87,7 +94,11 @@ namespace Metica.Unity
 
                     yield return www.SendWebRequest();
 
-                    Debug.Log("result: " + www.result);
+                    if (MeticaAPI.Config.logLevel == LogLevel.Debug)
+                    {
+                        Debug.Log("result: " + www.result);
+                    }
+
                     if (www.result != UnityWebRequest.Result.Success)
                     {
                         var error = $"Error: {www.error}, status: {www.responseCode}";
@@ -97,7 +108,10 @@ namespace Metica.Unity
                     else
                     {
                         var responseText = www.downloadHandler.text;
-                        Debug.Log($"Response: {responseText}");
+                        if (MeticaAPI.Config.logLevel == LogLevel.Debug)
+                        {
+                            Debug.Log($"Response: {responseText}");
+                        }
 
                         if (string.IsNullOrEmpty(responseText) && (www.responseCode >= 200 || www.responseCode <= 204))
                         {
