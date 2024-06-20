@@ -159,7 +159,11 @@ namespace Metica.Unity
 
             try
             {
-                Debug.Log($"Loading log from {MeticaAPI.Config.displayLogPath}");
+                if (MeticaAPI.Config.logLevel == LogLevel.Debug)
+                {
+                    Debug.Log($"Loading log from {MeticaAPI.Config.displayLogPath}");
+                }
+
                 var json = File.ReadAllText(MeticaAPI.Config.displayLogPath);
                 var entries = JsonConvert.DeserializeObject<List<DisplayLogEntry>>(json);
                 return CreateOffersIndex(entries);

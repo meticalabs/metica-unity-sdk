@@ -8,6 +8,11 @@ using UnityEngine;
 
 namespace Metica.Unity
 {
+    public enum LogLevel
+    {
+        Error, Debug, Warning
+    }
+    
     public struct SdkConfig
     {
         /// <summary>
@@ -67,6 +72,8 @@ namespace Metica.Unity
         /// The network timeout, in seconds, for the calls to any Metica endpoint.
         /// </summary>
         public int networkTimeout;
+
+        public LogLevel logLevel;
         
         public static SdkConfig Default()
         {
@@ -81,7 +88,8 @@ namespace Metica.Unity
                 eventsLogFlushCadence = 60,
                 offersCacheTtlMinutes = 120,
                 offersCachePath = Path.Combine(Application.persistentDataPath, "metica-offers.json"),
-                networkTimeout = 2
+                networkTimeout = 2,
+                logLevel = LogLevel.Error
             };
         }
     }
@@ -104,7 +112,7 @@ namespace Metica.Unity
     /// </summary>
     public class MeticaAPI : ScriptableObject
     {
-        public static string SDKVersion = "1.0.0";
+        public static string SDKVersion = "1.0.8";
         public static string UserId { get; set; }
         public static string AppId { get; set; }
         public static string ApiKey { get; set; }

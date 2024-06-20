@@ -1,3 +1,8 @@
+# [1.0.8](https://github.com/meticalabs/metica-unity-sdk/compare/v1.0.8...v1.0.7) (2024-06-20)
+
+### Improvements
+- feat: Adds an SDK option to control the log level
+
 # [1.0.7](https://github.com/meticalabs/metica-unity-sdk/compare/v1.0.7...v1.0.6) (2024-06-19)
 
 ### Bug Fixes
