@@ -133,7 +133,7 @@ namespace Metica.Unity
                 {
                     Debug.LogError($"Error while submitting events: {result.Error}");
                 }
-                else
+                else if (MeticaAPI.Config.logLevel == LogLevel.Debug)
                 {
                     Debug.Log("Events submitted successfully");
                 }
