@@ -134,13 +134,22 @@ MeticaAPI.LogUserAttributes(userAttributes);
 
 ### 5. Custom Event Logging
 
-Logs custom application events. The only required field is `eventType` which is used by Metica to distinguish the
+Logs custom application events. The only required field in the Dictionary is `eventType` which is used by Metica to distinguish the
 different types of events.
 
 ```csharp
 Dictionary<string, object> customUserEvent = new Dictionary<string, object> { { "eventType", "completed_level" }, { "eventDetails", "level 5" } };
 MeticaAPI.LogUserEvent(userEvent);
 ```
+
+**Note:** The final event that is submitted to the Metica backend is enriched with additional information, so an additional Dictionary instance is allocated internally and the application event attributes are copied into that. 
+It's possible to avoid the extra allocation by passing `true` to the `reuseDictionary` argument.
+
+```csharp
+// this will avoid the extra allocation but will mutate the passed userEvent
+MeticaAPI.LogUserEvent(userEvent, true);
+```
+
 
 ### Code Sample
 
@@ -155,7 +164,7 @@ Select Window > Metica to open the Metica window. Here you can initialize the AP
 
 ### Settings Panel
 
-In this panel you can setup the API and defined the available placements.
+In this panel you can set up the API and defined the available placements.
 ![SettingsPanel](images/SettingsPanel.png "Settings Panel")
 
 ### Offers Panel

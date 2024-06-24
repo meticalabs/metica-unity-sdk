@@ -17,7 +17,7 @@ namespace Metica.Unity
 
         void Start()
         {
-            if (Application.isEditor && !Application.isPlaying) 
+            if (Application.isEditor && !Application.isPlaying)
             {
                 Debug.LogWarning("EventsLogger is not supported in the editor");
                 return;
@@ -31,7 +31,7 @@ namespace Metica.Unity
             if (_logEventsRoutine != null)
                 StopCoroutine(_logEventsRoutine);
         }
-        
+
         private void OnApplicationQuit()
         {
             FlushEvents();
@@ -46,7 +46,7 @@ namespace Metica.Unity
             }
         }
 
-        public void LogCustomEvent(string eventType, Dictionary<string, object> eventDetails)
+        public void LogCustomEvent(string eventType, Dictionary<string, object> eventDetails, bool reuseDictionary)
         {
             if (eventType == null)
             {
@@ -54,47 +54,46 @@ namespace Metica.Unity
                 return;
             }
 
-            var commonDict = CreateCommonEventAttributes(eventType);
-            var merged = commonDict
-                .Concat(
-                    eventDetails.Where(it => !commonDict.ContainsKey(it.Key))
-                )
-                .ToDictionary(it => it.Key, it => it.Value);
-
-            LogEvent(merged);
+            var attributes = reuseDictionary ? eventDetails : new Dictionary<string, object>(eventDetails);
+            AddCommonEventAttributes(attributes, eventType);
+            LogEvent(attributes);
         }
 
         public void LogOfferDisplay(string offerId, string placementId)
         {
-            var eventDict = CreateCommonEventAttributes(EventTypes.OfferImpression);
-            eventDict[Constants.MeticaAttributes] = GetOrCreateMeticaAttributes(offerId, placementId);
-            LogEvent(eventDict);
+            var attributes = new Dictionary<string, object>();
+            AddCommonEventAttributes(attributes, EventTypes.OfferImpression);
+            attributes[Constants.MeticaAttributes] = GetOrCreateMeticaAttributes(offerId, placementId);
+            LogEvent(attributes);
         }
 
         public void LogOfferPurchase(string offerId, string placementId, double amount, string currency)
         {
-            var eventDict = CreateCommonEventAttributes(EventTypes.OfferInAppPurchase);
+            var attributes = new Dictionary<string, object>();
+            AddCommonEventAttributes(attributes, EventTypes.OfferInAppPurchase);
             var meticaAttributes = GetOrCreateMeticaAttributes(offerId, placementId);
             meticaAttributes[Constants.CurrencyCode] = currency;
             meticaAttributes[Constants.TotalAmount] = amount;
-            eventDict[Constants.MeticaAttributes] = meticaAttributes;
-            LogEvent(eventDict);
+            attributes[Constants.MeticaAttributes] = meticaAttributes;
+            LogEvent(attributes);
         }
 
         public void LogOfferInteraction(string offerId, string placementId, string interactionType)
         {
-            var eventDict = CreateCommonEventAttributes(EventTypes.OfferInteraction);
+            var attributes = new Dictionary<string, object>();
+            AddCommonEventAttributes(attributes, EventTypes.OfferInteraction);
             var meticaAttributes = GetOrCreateMeticaAttributes(offerId, placementId);
             meticaAttributes[Constants.InteractionType] = interactionType;
-            eventDict[Constants.MeticaAttributes] = meticaAttributes;
-            LogEvent(eventDict);
+            attributes[Constants.MeticaAttributes] = meticaAttributes;
+            LogEvent(attributes);
         }
 
         public void LogUserAttributes(Dictionary<string, object> userAttributes)
         {
-            var eventDict = CreateCommonEventAttributes(EventTypes.UserStateUpdate);
-            eventDict[Constants.UserStateAttributes] = userAttributes;
-            LogEvent(eventDict);
+            var attributes = new Dictionary<string, object>();
+            AddCommonEventAttributes(attributes, EventTypes.UserStateUpdate);
+            attributes[Constants.UserStateAttributes] = userAttributes;
+            LogEvent(attributes);
         }
 
         private IEnumerator LogEventsRoutine()
@@ -126,7 +125,7 @@ namespace Metica.Unity
             {
                 return;
             }
-            
+
             MeticaAPI.BackendOperations.CallSubmitEventsAPI(copyList, (result) =>
             {
                 if (result.Error != null)
@@ -140,17 +139,15 @@ namespace Metica.Unity
             });
         }
 
-        private static Dictionary<string, object> CreateCommonEventAttributes(string eventType)
+        private static void AddCommonEventAttributes(Dictionary<string, object> attributes, string eventType)
         {
-            return new Dictionary<string, object>()
-            {
-                { Constants.UserId, MeticaAPI.UserId },
-                { Constants.AppId, MeticaAPI.AppId },
-                { Constants.EventId, Guid.NewGuid().ToString() },
-                { Constants.EventType, eventType },
-                { Constants.EventTime, DateTimeOffset.FromUnixTimeSeconds(MeticaAPI.TimeSource.EpochSeconds()).ToString("yyyy-MM-ddTHH:mm:ssZ") },
-                { Constants.MeticaUnitySdk, MeticaAPI.SDKVersion }
-            };
+            attributes[Constants.UserId] = MeticaAPI.UserId;
+            attributes.Add(Constants.AppId, MeticaAPI.AppId);
+            // attributes.Add(Constants.EventId, Ulid.NewUlid().ToString());
+            attributes[Constants.EventId] = Guid.NewGuid().ToString();
+            attributes[Constants.EventType] = eventType;
+            attributes[Constants.EventTime] = MeticaAPI.TimeSource.EpochSeconds() * 1000;
+            attributes[Constants.MeticaUnitySdk] = MeticaAPI.SDKVersion;
         }
 
 
@@ -160,27 +157,14 @@ namespace Metica.Unity
             var offerDetails = cachedOffers.Find(offer => offer.offerId == offerId);
             return (offerDetails == null)
                 ? CreateMeticaAttributes(offerId, placementId)
-                : CopyMetricsFromOfferDetails(offerDetails);
+                : CreateMeticaAttributes(offerDetails.metrics.display.meticaAttributes.offer.offerId,
+                    offerDetails.metrics.display.meticaAttributes.placementId,
+                    offerDetails.metrics.display.meticaAttributes.offer.variantId,
+                    offerDetails.metrics.display.meticaAttributes.offer.bundleId
+                );
         }
 
-        private static Dictionary<string, object> CopyMetricsFromOfferDetails(Offer offerDetails)
-        {
-            return new Dictionary<string, object>()
-            {
-                {
-                    "offer", new Dictionary<string, object>()
-                    {
-                        { Constants.OfferId, offerDetails.metrics.display.meticaAttributes.offer.offerId },
-                        { Constants.VariantId, offerDetails.metrics.display.meticaAttributes.offer.variantId },
-                        { Constants.BundleId, offerDetails.metrics.display.meticaAttributes.offer.bundleId }
-                    }
-                },
-                { Constants.PlacementId, offerDetails.metrics.display.meticaAttributes.placementId }
-            };
-        }
-
-        private static Dictionary<string, object> CreateMeticaAttributes(
-            string offerId,
+        private static Dictionary<string, object> CreateMeticaAttributes(string offerId,
             string placementId,
             string variantId = null,
             string bundleId = null)
