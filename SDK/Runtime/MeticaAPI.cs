@@ -10,9 +10,11 @@ namespace Metica.Unity
 {
     public enum LogLevel
     {
-        Error, Debug, Warning
+        Error,
+        Debug,
+        Warning
     }
-    
+
     public struct SdkConfig
     {
         /// <summary>
@@ -74,7 +76,7 @@ namespace Metica.Unity
         public int networkTimeout;
 
         public LogLevel logLevel;
-        
+
         public static SdkConfig Default()
         {
             return new SdkConfig()
@@ -124,14 +126,11 @@ namespace Metica.Unity
         public static IOffersManager OffersManager { get; set; }
 
         public static SdkConfig Config { get; internal set; }
-        
+
         internal static ITimeSource TimeSource { get; set; }
 
-        public static IBackendOperations BackendOperations
-        {
-            get; set;
-        }
-        
+        public static IBackendOperations BackendOperations { get; set; }
+
         /// <summary>
         /// Initializes the Metica API.
         /// </summary>
@@ -161,7 +160,7 @@ namespace Metica.Unity
             DisplayLog = ScriptingObjects.GetComponent<DisplayLog>();
 
             BackendOperations = new BackendOperationsImpl();
-            
+
             Initialized = true;
 
             initCallback.Invoke(SdkResultImpl<bool>.WithResult(true));
@@ -177,7 +176,14 @@ namespace Metica.Unity
         public static void GetOffers(String[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback,
             Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
-            OffersManager.GetOffers(placements, offersCallback, userProperties, deviceInfo);
+            if (!checkPreconditions())
+            {
+                offersCallback.Invoke(SdkResultImpl<OffersByPlacement>.WithResult(new OffersByPlacement()));
+            }
+            else
+            {
+                OffersManager.GetOffers(placements, offersCallback, userProperties, deviceInfo);
+            }
         }
 
         /// <summary>
@@ -187,9 +193,14 @@ namespace Metica.Unity
         /// <param name="placementId">The ID of the placement where the offer is displayed.</param>
         public static void LogOfferDisplay(string offerId, string placementId)
         {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
             logger.LogOfferDisplay(offerId, placementId);
-            
+
             DisplayLog.AppendDisplayLogs(new[]
             {
                 DisplayLogEntry.Create(offerId, placementId)
@@ -205,6 +216,11 @@ namespace Metica.Unity
         /// <param name="currency">The currency of the purchase.</param>
         public static void LogOfferPurchase(string offerId, string placementId, double amount, string currency)
         {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
             logger.LogOfferPurchase(offerId, placementId, amount, currency);
         }
@@ -217,6 +233,11 @@ namespace Metica.Unity
         /// <param name="interactionType">The type of interaction.</param>
         public static void LogOfferInteraction(string offerId, string placementId, string interactionType)
         {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
             logger.LogOfferInteraction(offerId, placementId, interactionType);
         }
@@ -224,9 +245,14 @@ namespace Metica.Unity
         /// <summary>
         /// Log an update of the user attributes.
         /// </summary>
-        /// <param name="userAttributes">A dictionary of user attributes. The keys represent attribute names and the values represent attribute values.</param>
+        /// <param name="userAttributes">A mutable dictionary of user attributes. The keys represent attribute names and the values represent attribute values.</param>
         public static void LogUserAttributes(Dictionary<string, object> userAttributes)
         {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
             logger.LogUserAttributes(userAttributes);
         }
@@ -236,10 +262,21 @@ namespace Metica.Unity
         /// </summary>
         /// <param name="eventType">The name/type of the event</param>
         /// <param name="userEvent">A dictionary containing the details of the user event. The dictionary should have string keys and object values.</param>
-        public static void LogUserEvent(string eventType, Dictionary<string, object> userEvent)
+        /// <param name="reuseDictionary">Indicates if the passed dictionary can be modified to add additional Metica-specific attribute. Re-using the dictionary instance in this way can potentially save an allocation.</param>
+        public static void LogUserEvent(string eventType, Dictionary<string, object> userEvent, bool reuseDictionary = false)
         {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogCustomEvent(eventType, userEvent);
+            logger.LogCustomEvent(eventType, userEvent, reuseDictionary);
+        }
+
+        private static bool checkPreconditions()
+        {
+            return UserId != null && AppId != null && ApiKey != null;
         }
     }
 }

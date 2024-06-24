@@ -46,21 +46,21 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             var config = MeticaAPI.Config;
             config.eventsLogFlushCadence = 1;
             MeticaAPI.Config = config;
-            
+
             var logger = new GameObject().AddComponent<EventsLogger>();
 
             var eventType = "testSubmission";
             var eventData = new Dictionary<string, object> { { "userId", "testSubmission" } };
 
             for (int i = 0; i < 10; i++)
-                logger.LogCustomEvent(eventType, eventData);
-            
+                logger.LogCustomEvent(eventType, eventData, false);
+
 
             TestOps testOps = new TestOps();
             MeticaAPI.BackendOperations = testOps;
 
-            yield return new WaitForSecondsRealtime(config.eventsLogFlushCadence );
-            
+            yield return new WaitForSecondsRealtime(config.eventsLogFlushCadence);
+
             Assert.That(testOps.NumEvents == 10);
             Assert.That(testOps.SubmitInvoked);
             Assert.That(logger.EventsQueue.Count == 0);
@@ -74,10 +74,10 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             var eventType = "test";
             var eventData = new Dictionary<string, object> { { "userId", "rejected" }, { "key2", "value2" } };
 
-            logger.LogCustomEvent(eventType, eventData);
+            logger.LogCustomEvent(eventType, eventData, false);
 
             var recordedEvent = logger.EventsQueue[0];
-            Assert.That(recordedEvent[Constants.EventType], Is.EqualTo("test"));
+            Assert.That(recordedEvent[Constants.EventType], Is.EqualTo(eventType));
             Assert.That(recordedEvent["key2"], Is.EqualTo("value2"));
             assertCommonAttributes("test", recordedEvent);
         }
@@ -179,6 +179,38 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             Assert.That(userAttributes, Is.EqualTo(stateAttributes));
         }
 
+        [Test]
+        public void TestTheLimitOfTheEnqueuedEventsBuffer()
+        {
+            var logger = new GameObject().AddComponent<EventsLogger>();
+
+            for (int i = 0; i < 1000; i++)
+            {
+                var eventType = "test";
+                var eventData = new Dictionary<string, object> { { "userId", "rejected" }, { "key2", "value2" } };
+
+                logger.LogCustomEvent(eventType, eventData, false);
+            }
+
+            Assert.That(logger.EventsQueue.Count, Is.EqualTo(256));
+        }
+
+        [Test]
+        public void TestTheReuseOfTheDictionaryInstance()
+        {
+            var logger = new GameObject().AddComponent<EventsLogger>();
+
+            var eventType = "test";
+            var eventData = new Dictionary<string, object> { { "userId", "rejected" }, { "key2", "value2" } };
+            var copyDict = new Dictionary<string, object>(eventData);
+
+            logger.LogCustomEvent(eventType, eventData, false);
+            
+            Assert.That(copyDict, Is.EqualTo(eventData));
+            
+            logger.LogCustomEvent(eventType, eventData, true);
+            Assert.That(copyDict, Is.Not.EqualTo(eventData));
+        }
 
         private static void assertCommonAttributes(string eventType, Dictionary<string, object> recordedEvent)
         {
@@ -190,21 +222,6 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             Assert.That(recordedEvent[Constants.EventTime] != null);
         }
 
-        [Test]
-        public void TestTheLimitOfTheEnqueuedEventsBuffer()
-        {
-            var logger = new GameObject().AddComponent<EventsLogger>();
-
-            for (int i = 0; i < 1000; i++)
-            {
-                var eventType = "test";
-                var eventData = new Dictionary<string, object> { { "userId", "rejected" }, { "key2", "value2" } };
-
-                logger.LogCustomEvent(eventType, eventData);
-            }
-
-            Assert.That(logger.EventsQueue.Count, Is.EqualTo(256));
-        }
 
         private List<Offer> createOfferCache()
         {
