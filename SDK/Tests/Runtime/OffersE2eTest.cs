@@ -25,6 +25,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             var config = SdkConfig.Default();
             config.offersEndpoint = endpoint;
             config.networkTimeout = 5;
+            config.logLevel = LogLevel.Debug;
 
             string userId = Utils.RandomUserId();
             

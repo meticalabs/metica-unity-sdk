@@ -1,3 +1,10 @@
+# [1.0.9](https://github.com/meticalabs/metica-unity-sdk/compare/v1.0.9...v1.0.8) (2024-06-24)
+
+### Improvements
+- perf: Performance enhancements (MET-1370)
+  - reduce the Dictionary instances allocations when logging custom events by re-using the passed dictionary and avoid creating a new temporary dictionary for the common event attributes
+  - use the epoch millis for of eventTime instead of allocating memory for a new iso 8601 string
+
 # [1.0.8](https://github.com/meticalabs/metica-unity-sdk/compare/v1.0.8...v1.0.7) (2024-06-20)
 
 ### Improvements
