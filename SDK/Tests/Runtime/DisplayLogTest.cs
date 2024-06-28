@@ -48,8 +48,6 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             var displayLog = MeticaAPI.DisplayLog;
             displayLog.Awake();
 
-            Debug.Log(MeticaAPI.Config.displayLogPath);
-            
             Assert.That(displayLog._displayLogs.ContainsKey(Utils.testOfferId));
             Assert.That(displayLog._displayLogs[Utils.testOfferId].Count == 10);
         }
@@ -133,7 +131,6 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             var json = File.ReadAllText(MeticaAPI.Config.displayLogPath);
             var entries = JsonConvert.DeserializeObject<List<DisplayLogEntry>>(json);
 
-            Debug.Log($"got {entries.Count}");
             Assert.That(entries.Count == MeticaAPI.Config.maxDisplayLogEntries);
         }
 

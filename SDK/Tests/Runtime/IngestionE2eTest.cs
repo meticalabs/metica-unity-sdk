@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -16,14 +17,13 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
     [TestFixture]
     public class IngestionE2eTest
     {
+        String endpoint = System.Environment.GetEnvironmentVariable("INGESTION_ENDPOINT");
+        String apiKey = System.Environment.GetEnvironmentVariable("E2E_TESTSAPP_API_KEY");
+        String appId = "e2eTestsApp";
+
         [UnityTest]
         public IEnumerator Send_Events()
         {
-            var endpoint = System.Environment.GetEnvironmentVariable("INGESTION_ENDPOINT");
-            var apiKey = System.Environment.GetEnvironmentVariable("E2E_TESTSAPP_API_KEY");
-
-            var appId = "e2eTestsApp";
-
             var config = SdkConfig.Default();
             config.ingestionEndpoint = endpoint;
             config.networkTimeout = 5;
@@ -41,7 +41,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             {
                 { "name", "test" }
             });
-            
+
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
             logger.FlushEvents();
 

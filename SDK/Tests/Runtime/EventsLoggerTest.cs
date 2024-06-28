@@ -1,11 +1,12 @@
+// ReSharper disable once RedundantUsingDirective
+
+using UnityEngine.TestTools;
 using System.Collections;
 using System.Collections.Generic;
 using Metica.Unity;
 using Moq;
 using NUnit.Framework;
 using UnityEngine;
-// ReSharper disable once RedundantUsingDirective
-using UnityEngine.TestTools;
 using Assert = NUnit.Framework.Assert;
 
 namespace MeticaUnitySDK.SDK.Tests.Runtime
@@ -17,6 +18,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         {
             public bool SubmitInvoked { get; private set; }
             public int NumEvents { get; private set; }
+            public bool FailOp { get; set; }
 
             public void CallGetOffersAPI(string[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback,
                 Dictionary<string, object> userProperties = null,
@@ -30,7 +32,10 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             {
                 SubmitInvoked = true;
                 NumEvents += events.Count;
-                callback.Invoke(SdkResultImpl<string>.WithResult("OK"));
+
+                callback.Invoke(!FailOp
+                    ? SdkResultImpl<string>.WithResult("OK")
+                    : SdkResultImpl<string>.WithError("Test error"));
             }
         }
 
@@ -43,9 +48,14 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         [UnityTest]
         public IEnumerator TestTheEventsSubmission()
         {
+            var errorCallbackCalled = false;
             var config = MeticaAPI.Config;
             config.eventsLogFlushCadence = 1;
+            config.eventsSubmissionDelegate = result => errorCallbackCalled = true;
             MeticaAPI.Config = config;
+
+            TestOps testOps = new TestOps();
+            MeticaAPI.BackendOperations = testOps;
 
             var logger = new GameObject().AddComponent<EventsLogger>();
 
@@ -55,15 +65,22 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             for (int i = 0; i < 10; i++)
                 logger.LogCustomEvent(eventType, eventData, false);
 
-
-            TestOps testOps = new TestOps();
-            MeticaAPI.BackendOperations = testOps;
-
             yield return new WaitForSecondsRealtime(config.eventsLogFlushCadence);
-
+            Debug.Log("num events " + testOps.NumEvents);
             Assert.That(testOps.NumEvents == 10);
             Assert.That(testOps.SubmitInvoked);
             Assert.That(logger.EventsQueue.Count == 0);
+            
+            testOps = new TestOps
+            {
+                FailOp = true
+            };
+            MeticaAPI.BackendOperations = testOps;
+
+            logger.LogCustomEvent(eventType, eventData, false);
+            yield return new WaitForSecondsRealtime(config.eventsLogFlushCadence);
+
+            Assert.That(errorCallbackCalled);
         }
 
         [Test]
@@ -205,9 +222,9 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             var copyDict = new Dictionary<string, object>(eventData);
 
             logger.LogCustomEvent(eventType, eventData, false);
-            
+
             Assert.That(copyDict, Is.EqualTo(eventData));
-            
+
             logger.LogCustomEvent(eventType, eventData, true);
             Assert.That(copyDict, Is.Not.EqualTo(eventData));
         }

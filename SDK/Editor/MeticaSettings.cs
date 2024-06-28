@@ -169,7 +169,7 @@ namespace MeticaUnitySDK.Assets.Editor
                 {
                     if (result.Error != null)
                     {
-                        Debug.LogError("Error while fetching offers: " + result.Error);
+                        MeticaLogger.LogError("Error while fetching offers: " + result.Error);
                     }
                     else
                     {
@@ -177,7 +177,7 @@ namespace MeticaUnitySDK.Assets.Editor
                         {
                             var offers = result.Result.placements[p];
                             _offers = offers;
-                            Debug.Log($"Placement {p} offers: {JsonConvert.SerializeObject(offers)}");
+                            MeticaLogger.LogDebug($"Placement {p} offers: {JsonConvert.SerializeObject(offers)}");
                         }
                     }
 
@@ -396,7 +396,7 @@ namespace MeticaUnitySDK.Assets.Editor
             currencyId.value = _selectedOffer.currencyId;
             iap.value = _selectedOffer.iap ?? "";
 
-            var updateButton = new Button(() => Debug.Log("updating...")) { text = "Update" };
+            // var updateButton = new Button(() => Debug.Log("updating...")) { text = "Update" };
             // _detailsView.Add(updateButton);
 
             _deleteButton = new Button(() => DeleteSelectedOffer()) { text = "Delete" };
@@ -714,7 +714,7 @@ namespace MeticaUnitySDK.Assets.Editor
                         }
                         catch (Exception e)
                         {
-                            Debug.LogError("Error while submitting event: " + e);
+                            MeticaLogger.LogError("Error while submitting event: " + e);
                         }
                     });
                     break;

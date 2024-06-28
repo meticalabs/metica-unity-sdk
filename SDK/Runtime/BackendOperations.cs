@@ -59,15 +59,11 @@ namespace Metica.Unity
                     NullValueHandling = NullValueHandling.Ignore
                 });
 
-                if (MeticaAPI.Config.logLevel == LogLevel.Debug)
-                {
-                    Debug.Log($"json body: {jsonBody}");
-                }
+                MeticaLogger.LogDebug($"json body: {jsonBody}");
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error while fetching offers: {e.Message}");
-                Debug.LogException(e);
+                MeticaLogger.LogError($"Error while fetching offers: {e.Message}", e);
             }
 
             if (jsonBody == null)
@@ -77,10 +73,7 @@ namespace Metica.Unity
             else
             {
                 var fullUrl = queryParams is { Count: > 0 } ? $"{url}?{BuildUrlWithParameters(queryParams)}" : url;
-                if (MeticaAPI.Config.logLevel == LogLevel.Debug)
-                {
-                    Debug.Log($"sending request to {fullUrl} with body: {jsonBody}");
-                }
+                MeticaLogger.LogDebug($"sending request to {fullUrl} with body: {jsonBody}");
 
                 using (var www = new UnityWebRequest(fullUrl, "PUT"))
                 {
@@ -94,24 +87,18 @@ namespace Metica.Unity
 
                     yield return www.SendWebRequest();
 
-                    if (MeticaAPI.Config.logLevel == LogLevel.Debug)
-                    {
-                        Debug.Log("result: " + www.result);
-                    }
+                    MeticaLogger.LogDebug("result: " + www.result);
 
                     if (www.result != UnityWebRequest.Result.Success)
                     {
                         var error = $"Error: {www.error}, status: {www.responseCode}";
-                        Debug.LogError(error);
+                        MeticaLogger.LogError(error);
                         callback(SdkResultImpl<T>.WithError($"API Error: {error}"));
                     }
                     else
                     {
                         var responseText = www.downloadHandler.text;
-                        if (MeticaAPI.Config.logLevel == LogLevel.Debug)
-                        {
-                            Debug.Log($"Response: {responseText}");
-                        }
+                        MeticaLogger.LogDebug($"Response: {responseText}");
 
                         if (string.IsNullOrEmpty(responseText) && (www.responseCode >= 200 || www.responseCode <= 204))
                         {
@@ -126,8 +113,7 @@ namespace Metica.Unity
                             }
                             catch (Exception e)
                             {
-                                Debug.LogError($"Error while decoding the ODS response: {e.Message}");
-                                Debug.LogException(e);
+                                MeticaLogger.LogError($"Error while decoding the ODS response: {e.Message}", e);
                             }
 
                             callback(result != null

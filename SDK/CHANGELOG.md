@@ -1,3 +1,9 @@
+# [1.1.0](https://github.com/meticalabs/metica-unity-sdk/compare/v1.1.0...v1.0.9) (2024-06-28)
+### Features
+- feat: Events submission error delegate
+Adds a new delegate in the SdkConfig which is invoked whenever the events submission is completed.
+- feat: Adds a custom logger component to control the SDK's log level
+
 # [1.0.9](https://github.com/meticalabs/metica-unity-sdk/compare/v1.0.9...v1.0.8) (2024-06-24)
 
 ### Improvements

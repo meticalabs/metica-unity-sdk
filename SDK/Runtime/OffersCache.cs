@@ -37,7 +37,7 @@ namespace Metica.Unity
             }
             catch (IOException e)
             {
-                Debug.LogError($"Error while trying to load the offers cache: {e}");
+                MeticaLogger.LogError($"Error while trying to load the offers cache", e);
             }
         }
 
@@ -64,7 +64,7 @@ namespace Metica.Unity
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error while trying to save the offers cache: {e}");
+                MeticaLogger.LogError($"Error while trying to save the offers cache", e);
                 throw;
             }
         }
