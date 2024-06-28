@@ -15,10 +15,8 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
     [TestFixture]
     public class OffersE2eTest
     {
-        // var endpoint = Environment.GetEnvironmentVariable("ODS_ENDPOINT");
-        // var apiKey = Environment.GetEnvironmentVariable("E2E_TESTSAPP_API_KEY");
-        String endpoint = "https://services-alb.dev.metica.com";
-        String apiKey = "01HRW4KNEMYGS9FCEPW4ZVFX88";
+        String endpoint = Environment.GetEnvironmentVariable("ODS_ENDPOINT");
+        String apiKey = Environment.GetEnvironmentVariable("E2E_TESTSAPP_API_KEY");
         String appId = "e2eTestsApp";
 
         [UnityTest]
