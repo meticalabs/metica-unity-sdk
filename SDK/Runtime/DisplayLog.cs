@@ -45,7 +45,7 @@ namespace Metica.Unity
         {
             if (Application.isEditor && !Application.isPlaying)
             {
-                Debug.LogWarning("The displays log will not run in the editor");
+                MeticaLogger.LogWarning("The displays log will not run in the editor");
                 return;
             }
 
@@ -159,10 +159,7 @@ namespace Metica.Unity
 
             try
             {
-                if (MeticaAPI.Config.logLevel == LogLevel.Debug)
-                {
-                    Debug.Log($"Loading log from {MeticaAPI.Config.displayLogPath}");
-                }
+                MeticaLogger.LogDebug($"Loading log from {MeticaAPI.Config.displayLogPath}");
 
                 var json = File.ReadAllText(MeticaAPI.Config.displayLogPath);
                 var entries = JsonConvert.DeserializeObject<List<DisplayLogEntry>>(json);

@@ -1,6 +1,6 @@
 {
   "name": "com.metica.unity",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "displayName": "Metica Unity SDK",
   "description": "Unity components to interface with the Metica offers platform.",
   "unity": "2020.3",

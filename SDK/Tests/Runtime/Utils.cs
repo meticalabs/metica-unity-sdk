@@ -17,6 +17,7 @@ abstract class Utils
     {
         MeticaAPI.Initialise(TestUserId, TestApp, TestKey, result => { Assert.That(result.Result); });
         MeticaAPI.BackendOperations = new NoopBackendOps();
+        MeticaLogger.CurrentLogLevel = LogLevel.Off;
     }
 
     public static string RandomUserId()

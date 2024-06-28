@@ -1,8 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Metica.Unity;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -15,21 +15,21 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
     [TestFixture]
     public class OffersE2eTest
     {
+        String endpoint = Environment.GetEnvironmentVariable("ODS_ENDPOINT");
+        String apiKey = Environment.GetEnvironmentVariable("E2E_TESTSAPP_API_KEY");
+        String appId = "e2eTestsApp";
+
         [UnityTest]
         public IEnumerator Get_Offers()
         {
-            var endpoint = System.Environment.GetEnvironmentVariable("ODS_ENDPOINT");
-            var apiKey = System.Environment.GetEnvironmentVariable("E2E_TESTSAPP_API_KEY");
-            var appId = "e2eTestsApp";
-
             var config = SdkConfig.Default();
             config.offersEndpoint = endpoint;
             config.networkTimeout = 5;
-            config.logLevel = LogLevel.Debug;
 
             string userId = Utils.RandomUserId();
-            
+
             MeticaAPI.Initialise(userId, appId, apiKey, config, result => Assert.That(result.Result));
+            MeticaLogger.CurrentLogLevel = LogLevel.Off;
 
             var displayLog = MeticaAPI.DisplayLog;
             displayLog.Awake();
@@ -87,10 +87,6 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         [UnityTest]
         public IEnumerator Test_Error_Response()
         {
-            var endpoint = System.Environment.GetEnvironmentVariable("ODS_ENDPOINT");
-            var apiKey = System.Environment.GetEnvironmentVariable("E2E_TESTSAPP_API_KEY");
-            var appId = "e2eTestsApp";
-
             var config = SdkConfig.Default();
             config.offersEndpoint = endpoint;
             config.networkTimeout = 5;
@@ -99,13 +95,12 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
 
             string userId = Utils.RandomUserId();
             MeticaAPI.Initialise(userId, appId, apiKey, config, result => Assert.That(result.Result));
-
+            MeticaLogger.CurrentLogLevel = LogLevel.Off;
+            
             var displayLog = MeticaAPI.DisplayLog;
             displayLog.Awake();
 
             yield return new WaitForSeconds(3);
-
-            LogAssert.Expect(LogType.Error, new Regex(".+"));
 
             MeticaAPI.GetOffers(new[] { "mainMulti" }, result =>
             {
@@ -120,7 +115,6 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
                 locale = "en_US",
                 store = "AppStore"
             });
-            LogAssert.Expect(LogType.Error, new Regex(".+"));
 
             yield return new WaitForSeconds(3);
         }
