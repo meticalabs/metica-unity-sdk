@@ -17,10 +17,8 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
     [TestFixture]
     public class IngestionE2eTest
     {
-        // String endpoint = System.Environment.GetEnvironmentVariable("INGESTION_ENDPOINT");
-        // String apiKey = System.Environment.GetEnvironmentVariable("E2E_TESTSAPP_API_KEY");
-        String endpoint = "https://services-alb.dev.metica.com";
-        String apiKey = "01HRW4KNEMYGS9FCEPW4ZVFX88";
+        String endpoint = System.Environment.GetEnvironmentVariable("INGESTION_ENDPOINT");
+        String apiKey = System.Environment.GetEnvironmentVariable("E2E_TESTSAPP_API_KEY");
         String appId = "e2eTestsApp";
 
         [UnityTest]
