@@ -8,6 +8,8 @@ using UnityEngine;
 
 namespace Metica.Unity
 {
+    public delegate void EventsSubmissionResultDelegate(ISdkResult<Int32> result);
+    
     public struct SdkConfig
     {
         /// <summary>
@@ -72,6 +74,8 @@ namespace Metica.Unity
         /// The log level for the SDK.
         /// </summary>
         public LogLevel logLevel;
+
+        public EventsSubmissionResultDelegate eventsSubmissionDelegate;
 
         public static SdkConfig Default()
         {

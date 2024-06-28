@@ -115,6 +115,7 @@ namespace Metica.Unity
             {
                 // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
                 MeticaLogger.LogWarning("No internet connection, events will be submitted later");
+                MeticaAPI.Config.eventsSubmissionDelegate?.Invoke(SdkResultImpl<Int32>.WithError("No internet connect"));
                 return;
             }
 
@@ -130,7 +131,9 @@ namespace Metica.Unity
             {
                 if (result.Error != null)
                 {
-                    MeticaLogger.LogError($"Error while submitting events: {result.Error}");
+                    var message = $"Error while submitting events: {result.Error}";
+                    MeticaLogger.LogError(message);
+                    MeticaAPI.Config.eventsSubmissionDelegate?.Invoke(SdkResultImpl<Int32>.WithError(message));
                 }
                 else
                 {

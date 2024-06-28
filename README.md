@@ -71,19 +71,28 @@ MeticaAPI.Initialise("userId", "appId", "apiKey", config, result => {
 
 The SdkConfig provides the following configuration parameters
 
-| Property                 | Description                                                                                                                                                                                       |
-|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `offersEndpoint`         | The full endpoint to the Metica offers endpoint.                                                                                                                                                  |
-| `ingestionEndpoint`      | The full endpoint to the Metica ingestion service.                                                                                                                                                |
-| `maxDisplayLogEntries`   | The maximum number of entries stored in the displays log. This limit is shared by all offers and once reached, oldest entries will be removed and replaced by newly incoming ones.                |
-| `displayLogFlushCadence` | The cadence, in seconds, by which the displays log will be persisted to the filesystem.                                                                                                           |
-| `displayLogPath`         | The filesystem path where the display log will be persisted.                                                                                                                                      |
-| `eventsLogFlushCadence`  | The cadence, in seconds, by which the logged events will be sent to the ingestion service.                                                                                                        |
-| `maxPendingLoggedEvents` | The maximum number of pending logged events before they are sent to the ingestion service. When this value is reached, oldest accumulated events will be dropped to accommodate most recent ones. |
-| `offersCacheTtlMinutes`  | The time-to-live, in minutes, for the offers cache.                                                                                                                                               |
-| `offersCachePath`        | The filesystem path where the offers cache will be stored.                                                                                                                                        |
-| `networkTimeout`         | The network timeout, in seconds, for the calls to any Metica endpoint.                                                                                                                            |
-| `logLevel`               | The level of the SDK's logs. The valid values are provided by the enumeration `Metica.Unity.LogLevel`                                                                                               |
+| Property                   | Description                                                                                                                                                                                       |
+|----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `offersEndpoint`           | The full endpoint to the Metica offers endpoint.                                                                                                                                                  |
+| `ingestionEndpoint`        | The full endpoint to the Metica ingestion service.                                                                                                                                                |
+| `maxDisplayLogEntries`     | The maximum number of entries stored in the displays log. This limit is shared by all offers and once reached, oldest entries will be removed and replaced by newly incoming ones.                |
+| `displayLogFlushCadence`   | The cadence, in seconds, by which the displays log will be persisted to the filesystem.                                                                                                           |
+| `displayLogPath`           | The filesystem path where the display log will be persisted.                                                                                                                                      |
+| `eventsLogFlushCadence`    | The cadence, in seconds, by which the logged events will be sent to the ingestion service.                                                                                                        |
+| `maxPendingLoggedEvents`   | The maximum number of pending logged events before they are sent to the ingestion service. When this value is reached, oldest accumulated events will be dropped to accommodate most recent ones. |
+| `offersCacheTtlMinutes`    | The time-to-live, in minutes, for the offers cache.                                                                                                                                               |
+| `offersCachePath`          | The filesystem path where the offers cache will be stored.                                                                                                                                        |
+| `networkTimeout`           | The network timeout, in seconds, for the calls to any Metica endpoint.                                                                                                                            |
+| `logLevel`                 | The level of the SDK's logs. The valid values are provided by the enumeration `Metica.Unity.LogLevel`                                                                                             |
+| `eventsSubmissionDelegate` | A delegate that is invoked whenever the asynchronous events submission process is completed.                                                                                                      |
+
+The `eventsSubmissionDelegate` delegate's type is 
+```c#
+delegate void EventsSubmissionResultDelegate(ISdkResult<Int32> result);
+```
+
+If the events' submission was successful, then the reported `Int32` result is the number of events submitted.
+Otherwise, in case of error, the field `result.Error` will be non-empty and provide some description of the error.
 
 ### 2. Get Offers
 
@@ -145,7 +154,8 @@ MeticaAPI.LogUserAttributes(userAttributes);
 
 ### 5. Custom Event Logging
 
-Logs custom application events. The only required field in the Dictionary is `eventType` which is used by Metica to distinguish the
+Logs custom application events. The only required field in the Dictionary is `eventType` which is used by Metica to
+distinguish the
 different types of events.
 
 ```csharp
@@ -153,14 +163,14 @@ Dictionary<string, object> customUserEvent = new Dictionary<string, object> { { 
 MeticaAPI.LogUserEvent(userEvent);
 ```
 
-**Note:** The final event that is submitted to the Metica backend is enriched with additional information, so an additional Dictionary instance is allocated internally and the application event attributes are copied into that. 
+**Note:** The final event that is submitted to the Metica backend is enriched with additional information, so an
+additional Dictionary instance is allocated internally and the application event attributes are copied into that.
 It's possible to avoid the extra allocation by passing `true` to the `reuseDictionary` argument.
 
 ```csharp
 // this will avoid the extra allocation but will mutate the passed userEvent
 MeticaAPI.LogUserEvent(userEvent, true);
 ```
-
 
 ### Code Sample
 
