@@ -8,13 +8,6 @@ using UnityEngine;
 
 namespace Metica.Unity
 {
-    public enum LogLevel
-    {
-        Error,
-        Debug,
-        Warning
-    }
-
     public struct SdkConfig
     {
         /// <summary>
@@ -75,6 +68,9 @@ namespace Metica.Unity
         /// </summary>
         public int networkTimeout;
 
+        /// <summary>
+        /// The log level for the SDK.
+        /// </summary>
         public LogLevel logLevel;
 
         public static SdkConfig Default()
@@ -150,6 +146,7 @@ namespace Metica.Unity
             AppId = appId;
             ApiKey = apiKey;
             Config = sdkConfig;
+            MeticaLogger.CurrentLogLevel = sdkConfig.logLevel;
             TimeSource = new SystemDateTimeSource();
 
             ScriptingObjects.Init();

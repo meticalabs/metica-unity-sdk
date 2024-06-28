@@ -19,7 +19,7 @@ namespace Metica.Unity
         {
             if (Application.isEditor && !Application.isPlaying)
             {
-                Debug.LogWarning("EventsLogger is not supported in the editor");
+                MeticaLogger.LogWarning("EventsLogger is not supported in the editor");
                 return;
             }
 
@@ -50,7 +50,7 @@ namespace Metica.Unity
         {
             if (eventType == null)
             {
-                Debug.LogError("The event type must be specified");
+                MeticaLogger.LogError("The event type must be specified");
                 return;
             }
 
@@ -114,7 +114,7 @@ namespace Metica.Unity
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {
                 // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
-                Debug.LogWarning("No internet connection, events will be submitted later");
+                MeticaLogger.LogWarning("No internet connection, events will be submitted later");
                 return;
             }
 
@@ -130,11 +130,11 @@ namespace Metica.Unity
             {
                 if (result.Error != null)
                 {
-                    Debug.LogError($"Error while submitting events: {result.Error}");
+                    MeticaLogger.LogError($"Error while submitting events: {result.Error}");
                 }
-                else if (MeticaAPI.Config.logLevel == LogLevel.Debug)
+                else
                 {
-                    Debug.Log("Events submitted successfully");
+                    MeticaLogger.LogDebug("Events submitted successfully");
                 }
             });
         }

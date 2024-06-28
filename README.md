@@ -59,6 +59,16 @@ MeticaAPI.Initialise("userId", "appId", "apiKey", result => {
 ```
 
 You can optionally pass an instance of SdkConfig as well, if you want to have greater control over the SDK's operations.
+
+```csharp
+var config = SdkConfig.Default();
+config.logLevel = LogLevel.Off;
+config.networkTimeout = 5;
+MeticaAPI.Initialise("userId", "appId", "apiKey", config, result => { 
+    ... 
+});
+```
+
 The SdkConfig provides the following configuration parameters
 
 | Property                 | Description                                                                                                                                                                                       |
@@ -73,6 +83,7 @@ The SdkConfig provides the following configuration parameters
 | `offersCacheTtlMinutes`  | The time-to-live, in minutes, for the offers cache.                                                                                                                                               |
 | `offersCachePath`        | The filesystem path where the offers cache will be stored.                                                                                                                                        |
 | `networkTimeout`         | The network timeout, in seconds, for the calls to any Metica endpoint.                                                                                                                            |
+| `logLevel`               | The level of the SDK's logs. The valid values are provided by the enumeration `Metica.Unity.LogLevel`                                                                                               |
 
 ### 2. Get Offers
 

@@ -35,10 +35,7 @@ namespace Metica.Unity
             var cachedResult = _offersCache.Read();
             if (cachedResult != null && !Application.isEditor)
             {
-                if (MeticaAPI.Config.logLevel == LogLevel.Debug)
-                {
-                    Debug.Log("Returning cached offers");
-                }
+                MeticaLogger.LogDebug("Returning cached offers");
 
                 offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(cachedResult));
                 return;
@@ -48,14 +45,11 @@ namespace Metica.Unity
                 {
                     if (sdkResult.Error != null)
                     {
-                        Debug.LogError($"Error while fetching offers: {sdkResult.Error}");
+                        MeticaLogger.LogError($"Error while fetching offers: {sdkResult.Error}");
                         var cachedResult = _offersCache.Read();
                         if (cachedResult != null)
                         {
-                            if (MeticaAPI.Config.logLevel == LogLevel.Debug)
-                            {
-                                Debug.Log("Returning cached offers as fallback");
-                            }
+                            MeticaLogger.LogDebug("Returning cached offers as fallback");
 
                             offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(cachedResult));
                         }
