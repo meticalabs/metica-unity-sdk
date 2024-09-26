@@ -17,7 +17,7 @@ abstract class Utils
     {
         MeticaAPI.Initialise(TestUserId, TestApp, TestKey, result => { Assert.That(result.Result); });
         MeticaAPI.BackendOperations = new NoopBackendOps();
-        MeticaLogger.CurrentLogLevel = LogLevel.Off;
+        MeticaLogger.CurrentLogLevel = LogLevel.Info;
     }
 
     public static string RandomUserId()
@@ -53,5 +53,11 @@ class NoopBackendOps : IBackendOperations
         MeticaSdkDelegate<string> callback)
     {
 
+    }
+
+    public void CallRemoteConfigAPI(string[] configKeys, MeticaSdkDelegate<Dictionary<string, object>> responseCallback, Dictionary<string, object> userProperties = null,
+        DeviceInfo deviceInfo = null)
+    {
+        
     }
 }

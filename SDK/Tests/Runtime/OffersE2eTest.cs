@@ -84,6 +84,9 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             Assert.That(highP!.creativeId != null);
         }
 
+        /// <summary>
+        /// Forces a 4xx response by sending a wrongly formatted timezone in the request
+        /// </summary>
         [UnityTest]
         public IEnumerator Test_Error_Response()
         {
@@ -96,7 +99,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             string userId = Utils.RandomUserId();
             MeticaAPI.Initialise(userId, appId, apiKey, config, result => Assert.That(result.Result));
             MeticaLogger.CurrentLogLevel = LogLevel.Off;
-            
+
             var displayLog = MeticaAPI.DisplayLog;
             displayLog.Awake();
 

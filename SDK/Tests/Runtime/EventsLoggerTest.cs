@@ -37,6 +37,12 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
                     ? SdkResultImpl<string>.WithResult("OK")
                     : SdkResultImpl<string>.WithError("Test error"));
             }
+
+            public void CallRemoteConfigAPI(string[] configKeys, MeticaSdkDelegate<Dictionary<string, object>> responseCallback, Dictionary<string, object> userProperties = null,
+                DeviceInfo deviceInfo = null)
+            {
+                throw new AssertionException("Should not be called");
+            }
         }
 
         [SetUp]
@@ -76,6 +82,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
                 FailOp = true
             };
             MeticaAPI.BackendOperations = testOps;
+            MeticaLogger.CurrentLogLevel = LogLevel.Off;
 
             logger.LogCustomEvent(eventType, eventData, false);
             yield return new WaitForSecondsRealtime(config.eventsLogFlushCadence);

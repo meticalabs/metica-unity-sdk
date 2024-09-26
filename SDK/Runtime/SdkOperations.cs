@@ -7,11 +7,19 @@ using UnityEngine.Pool;
 
 namespace Metica.Unity
 {
+    [Serializable]
+    internal class RequestWithUserDataAndDeviceInfo
+    {
+        public string userId;
+        public Dictionary<string, object> userData;
+        public DeviceInfo deviceInfo;
+    }
+
     [ExecuteAlways]
     internal class CallEventsIngestionOperation : MonoBehaviour
     {
         public IObjectPool<CallEventsIngestionOperation> pool;
-        
+
         public ICollection<Dictionary<string, object>> Events { get; set; }
 
         public MeticaSdkDelegate<String> EventsSubmitCallback { get; set; }
@@ -21,7 +29,7 @@ namespace Metica.Unity
             pool.Release(this);
             Destroy(this);
         }
-        
+
         internal IEnumerator Start()
         {
             return PostRequestOperation.PostRequest<String>($"{MeticaAPI.Config.ingestionEndpoint}/ingest/v1/events",
@@ -45,15 +53,22 @@ namespace Metica.Unity
         {
             return new Dictionary<string, object> { { "events", events } };
         }
-
     }
 
     [ExecuteAlways]
     internal class GetOffersOperation : MonoBehaviour
     {
-        public const string DefaultLocale = "en-US";
-        public const string DefaultAppVersion = "1.0.0";
-        
+        [Serializable]
+        internal class ODSRequest : RequestWithUserDataAndDeviceInfo
+        {
+        }
+
+        [Serializable]
+        internal class ODSResponse
+        {
+            public Dictionary<string, List<Offer>> placements;
+        }
+
         public IObjectPool<GetOffersOperation> pool;
         public string[] Placements { get; set; }
         public Dictionary<string, object> UserProperties { get; set; }
@@ -92,37 +107,102 @@ namespace Metica.Unity
                     }
                 });
         }
+
+
+        static ODSRequest CreateODSRequestBody(Dictionary<string, object> userData,
+            DeviceInfo overrideDeviceInfo = null)
+        {
+            var requestWithUserDataAndDeviceInfo =
+                RequestUtils.CreateRequestWithUserDataAndDeviceInfo(userData, overrideDeviceInfo);
+            var request = new ODSRequest
+            {
+                userId = MeticaAPI.UserId,
+                userData = requestWithUserDataAndDeviceInfo.userData,
+                deviceInfo = requestWithUserDataAndDeviceInfo.deviceInfo
+            };
+
+            return request;
+        }
+    }
+
+    [ExecuteAlways]
+    internal class CallRemoteConfigOperation : MonoBehaviour
+    {
+        [Serializable]
+        internal class RemoteConfigRequest : RequestWithUserDataAndDeviceInfo
+        {
+        }
         
-        
-        internal static ODSRequest CreateODSRequestBody(Dictionary<string, object> userData,
+        public IObjectPool<CallRemoteConfigOperation> pool;
+        public ICollection<string> ConfigKeys { get; set; }
+        public Dictionary<string, object> UserProperties { get; set; }
+        public DeviceInfo DeviceInfo { get; set; }
+        public MeticaSdkDelegate<Dictionary<string, object>> ResponseCallback { get; set; }
+
+        public void OnDestroyPoolObject()
+        {
+            pool.Release(this);
+            Destroy(this);
+        }
+
+        internal IEnumerator Start()
+        {
+            return PostRequestOperation.PostRequest<Dictionary<string, object>>(
+                $"{MeticaAPI.Config.remoteConfigEndpoint}/config/v1/apps/{MeticaAPI.AppId}",
+                new Dictionary<string, object>
+                {
+                    { "keys", ConfigKeys },
+                },
+                MeticaAPI.ApiKey,
+                RequestUtils.CreateRequestWithUserDataAndDeviceInfo(UserProperties, DeviceInfo),
+                result =>
+                {
+                    if (result.Error != null)
+                    {
+                        ResponseCallback(SdkResultImpl<Dictionary<string, object>>.WithError(result.Error));
+                    }
+                    else
+                    {
+                        ResponseCallback(SdkResultImpl<Dictionary<string, object>>.WithResult(result.Result));
+                    }
+                });
+        }
+    }
+    
+    internal abstract class RequestUtils
+    {
+        internal static RequestWithUserDataAndDeviceInfo CreateRequestWithUserDataAndDeviceInfo(
+            Dictionary<string, object> userData,
             DeviceInfo overrideDeviceInfo = null)
         {
             string locale = Thread.CurrentThread.CurrentCulture.Name;
             if (string.IsNullOrEmpty(locale))
             {
-                locale = DefaultLocale;
+                locale = Constants.DefaultLocale;
             }
-            
+
             var systemTz = TimeZoneInfo.Local.BaseUtcOffset;
-            var timezone = ((systemTz >= TimeSpan.Zero) ? "+" : "-") +  systemTz.ToString(@"hh\:mm");
-            
+            var timezone = ((systemTz >= TimeSpan.Zero) ? "+" : "-") + systemTz.ToString(@"hh\:mm");
+
             var deviceInfo = overrideDeviceInfo ?? new DeviceInfo();
             deviceInfo.locale = string.IsNullOrEmpty(overrideDeviceInfo?.locale) ? locale : overrideDeviceInfo.locale;
             deviceInfo.store = overrideDeviceInfo?.store ??
                                MapRuntimePlatformToStoreType(Application.platform).ToString();
             deviceInfo.timezone = overrideDeviceInfo?.timezone ?? timezone;
-            deviceInfo.appVersion = overrideDeviceInfo?.appVersion ?? Application.version ?? DefaultAppVersion;
+            deviceInfo.appVersion =
+                overrideDeviceInfo?.appVersion ?? Application.version ?? Constants.DefaultAppVersion;
 
-            var request = new ODSRequest
+            var request = new RequestWithUserDataAndDeviceInfo
             {
+                userId = MeticaAPI.UserId,
                 userData = userData,
                 deviceInfo = deviceInfo
             };
 
             return request;
         }
-        
-        
+
+
         private static StoreTypeEnum MapRuntimePlatformToStoreType(RuntimePlatform runtimePlatform)
         {
             switch (runtimePlatform)

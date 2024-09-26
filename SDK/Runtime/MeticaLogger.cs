@@ -6,10 +6,10 @@ namespace Metica.Unity
     public enum LogLevel
     {
         Off,
-        Info,
         Error,
+        Warning,
+        Info,
         Debug,
-        Warning
     }
 
     public class MeticaLogger

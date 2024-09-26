@@ -26,6 +26,7 @@ namespace Metica.Unity
         {
             // load offers from disk
             _offersCache = new OffersCache();
+            _offersCache.Prepare();
         }
 
         public void GetOffers(string[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback,
@@ -46,17 +47,7 @@ namespace Metica.Unity
                     if (sdkResult.Error != null)
                     {
                         MeticaLogger.LogError($"Error while fetching offers: {sdkResult.Error}");
-                        var cachedResult = _offersCache.Read();
-                        if (cachedResult != null)
-                        {
-                            MeticaLogger.LogDebug("Returning cached offers as fallback");
-
-                            offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(cachedResult));
-                        }
-                        else
-                        {
-                            offersCallback(SdkResultImpl<OffersByPlacement>.WithError(sdkResult.Error));
-                        }
+                        offersCallback(SdkResultImpl<OffersByPlacement>.WithError(sdkResult.Error));
                     }
                     else
                     {

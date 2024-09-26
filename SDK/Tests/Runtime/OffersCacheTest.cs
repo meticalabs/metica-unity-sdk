@@ -26,6 +26,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             Utils.ConfigureOffersCacheLogPath(tempFileName);
 
             var cache = new OffersCache();
+            cache.Prepare();
             cache.Write(new OffersByPlacement()
             {
                 placements = new Dictionary<string, List<Offer>>()
@@ -35,6 +36,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             });
             
             var newCache = new OffersCache();
+            newCache.Prepare();
             Assert.That(newCache.Read() != null);
             Assert.That(newCache.Read()!.placements!["abc"]!.SequenceEqual(cache.Read()!.placements!["abc"]));
         }

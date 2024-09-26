@@ -10,19 +10,6 @@ using UnityEngine.Pool;
 
 namespace Metica.Unity
 {
-    [Serializable]
-    internal class ODSRequest
-    {
-        public Dictionary<string, object> userData;
-        public DeviceInfo deviceInfo;
-    }
-
-    [Serializable]
-    internal class ODSResponse
-    {
-        public Dictionary<string, List<Offer>> placements;
-    }
-
     internal abstract class PostRequestOperation
     {
         public static IEnumerator PostRequest<T>(
@@ -170,6 +157,9 @@ namespace Metica.Unity
 
         public void CallSubmitEventsAPI(ICollection<Dictionary<string, object>> events,
             MeticaSdkDelegate<String> callback);
+        
+        public void CallRemoteConfigAPI(string[] configKeys, MeticaSdkDelegate<Dictionary<string, object>> responseCallback, Dictionary<string, object> userProperties = null,
+            DeviceInfo deviceInfo = null);
     }
 
     internal class BackendOperationsImpl : IBackendOperations
@@ -217,6 +207,29 @@ namespace Metica.Unity
             op.pool = CallIngestionPool;
             op.Events = events;
             op.EventsSubmitCallback = callback;
+        }
+        
+        private static readonly LinkedPool<CallRemoteConfigOperation> CallRemoteConfigPool = new(
+            createFunc: () =>
+            {
+                var item = ScriptingObjects.AddComponent<CallRemoteConfigOperation>();
+                return item;
+            },
+            actionOnGet: item => item.gameObject.SetActive(true),
+            actionOnRelease: item => item.gameObject.SetActive(false),
+            actionOnDestroy: item => { item.OnDestroyPoolObject(); },
+            maxSize: 100
+        );
+        
+        public void CallRemoteConfigAPI(string[] configKeys, MeticaSdkDelegate<Dictionary<string, object>> responseCallback, Dictionary<string, object> userProperties = null,
+            DeviceInfo deviceInfo = null)
+        {
+            var op = CallRemoteConfigPool.Get();
+            op.pool = CallRemoteConfigPool;
+            op.ConfigKeys = configKeys;
+            op.UserProperties = userProperties;
+            op.DeviceInfo = deviceInfo;
+            op.ResponseCallback = responseCallback;
         }
     }
 }

@@ -8,8 +8,6 @@ using JetBrains.Annotations;
 
 namespace Metica.Unity
 {
-    using Event = List<Dictionary<string, object>>;
-
     internal abstract class EventTypes
     {
         internal static readonly string OfferImpression = "meticaOfferImpression";
@@ -36,6 +34,8 @@ namespace Metica.Unity
         internal static readonly string InteractionType = "interactionType";
         internal static readonly string UserStateAttributes = "userStateAttributes";
         internal static readonly string Offer = "offer";
+        internal static readonly string DefaultLocale = "en-US";
+        internal static readonly string DefaultAppVersion = "1.0.0";
     }
 
     [Serializable]
