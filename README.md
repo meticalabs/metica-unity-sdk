@@ -150,17 +150,20 @@ An overview of the role of each DeviceInfo property:
 
 ### 3. Remote Configuration
 
-The `GetConfig` method can be used to obtain the remote configuration.
+The `GetConfig` method can be used to obtain the remote configuration. The configuration is returnekey
 
 Similar to the `GetOffers` method, the operation is performed asynchronously and the result is delivered through a callback.
-Because the result is specific to each application, the SDK represents it very generically through a `Dictionary<string, object>` instance.
+Because the result is specific to each application, the SDK represents it in a generic manner, through a `Dictionary<string, object>` instance.
+Each entry in the dictionary represents a configuration key and its value. The latter is expected to be valid json.
 
 Also, again similar to the `GetOffers` method, the operation can be passed a dictionary of user properties and the device details, as a `DeviceInfo` instance, in order to personalise the returned configuration. The personalisation happens on the server side, based on the configured variations and experimentation setup.
 
 Example usage:
 
 ```csharp
-MeticaAPI.GetConfig(new string[] { "key1", "key2" }, result => { 
+MeticaAPI.GetConfig(
+    configKeys: new string[] { "key1", "key2" },
+    responseCallback: result => { 
         if (result.Error == null) 
         {             
             Debug.Log(result.Result["key1"]);             
@@ -181,6 +184,10 @@ MeticaAPI.GetConfig(new string[] { "key1", "key2" }, result => {
             store = "AppStore"
         });
 ```
+
+If the `configKeys` argument is `null` or empty, then all the configured keys will be returned.
+
+Note that the server side response for this call is going to be cached according to the cache control directives returned by the server.
 
 For more details regarding the DeviceInfo properties, check the section on [Get Offers](#2-get-offers)
 

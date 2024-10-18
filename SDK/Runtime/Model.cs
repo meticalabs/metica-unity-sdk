@@ -1,6 +1,6 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 // ReSharper disable all NotAccessedField.Global
 // ReSharper disable file UnusedMember.Local
@@ -135,13 +135,13 @@ namespace Metica.Unity
         public double? price;
         public OfferMetrics metrics;
         public List<Item> items;
-        [CanBeNull] public string expirationTime;
-        [CanBeNull] public Dictionary<string, object> customPayload;
-        [CanBeNull] public string creativeId;
-        [CanBeNull] public Dictionary<string, object> creativeOverride;
-        [CanBeNull] public string iap;
-        [CanBeNull] public string currencyId;
-        [CanBeNull] public List<DisplayLimit> displayLimits;
+        public string? expirationTime;
+        public Dictionary<string, object>? customPayload;
+        public string? creativeId;
+        public Dictionary<string, object>? creativeOverride;
+        public string? iap;
+        public string? currencyId;
+        public List<DisplayLimit>? displayLimits;
     }
 
     [Serializable]
@@ -155,5 +155,19 @@ namespace Metica.Unity
     public class OffersList
     {
         public Offer[] offers;
+    }
+
+
+    [Serializable]
+    internal class RemoteConfig
+    {
+        public Dictionary<string, object> Config;
+        public long CacheDurationSecs;
+
+        public RemoteConfig(Dictionary<string, object> config, long cacheDurationSecs)
+        {
+            Config = config;
+            CacheDurationSecs = cacheDurationSecs;
+        }
     }
 }

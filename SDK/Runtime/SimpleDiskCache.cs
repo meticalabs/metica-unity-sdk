@@ -1,83 +1,102 @@
+#nullable enable
 using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 
 namespace Metica.Unity
 {
     internal class CachedValue<T>
     {
-        public T Data;
-        public DateTimeOffset CacheTime;   
+        public T? Data;
+        public long ExpiresOn;
     }
-    
-    internal abstract class SimpleDiskCache<T> where T : class
+
+    internal class SimpleDiskCache<T> where T : class
     {
-        private string _name;
+        private readonly string _name;
+        private readonly string _cacheFilePath;
 
-        private CachedValue<T> _cachedData;
+        private readonly OrderedDictionary _cachedData;
 
-        protected abstract long TtlInMinutes { get; }
-        
-        private bool IsCacheValid => _cachedData != null && _cachedData.Data != null;
-
-        private bool IsCacheUpToDate =>
-            IsCacheValid && (MeticaAPI.TimeSource.EpochSeconds() - _cachedData.CacheTime.ToUnixTimeSeconds()) <
-            (60 * TtlInMinutes);
-
-        protected abstract string CacheFilePath { get; }
-
-        protected SimpleDiskCache(string name)
+        public SimpleDiskCache(string name, string cacheFilePath, int maxEntries = 100)
         {
             _name = name;
+            _cacheFilePath = cacheFilePath;
+            _cachedData = new OrderedDictionary(maxEntries);
         }
-        
+
         internal void Prepare()
         {
             try
             {
                 // Ensure the file exists
-                if (File.Exists(CacheFilePath))
+                if (File.Exists(_cacheFilePath))
                 {
-                    using StreamReader reader = new StreamReader(CacheFilePath);
+                    using StreamReader reader = new StreamReader(_cacheFilePath);
                     var content = reader.ReadToEnd();
-                    _cachedData = JsonConvert.DeserializeObject<CachedValue<T>>(content);
+                    var savedDict = JsonConvert.DeserializeObject<Dictionary<string, CachedValue<T>>>(content) ?? new Dictionary<string, CachedValue<T>>();
+
+                    foreach (var pair in savedDict)
+                    {
+                        _cachedData[pair.Key] = pair.Value;
+                    }
                 }
             }
             catch (Exception e)
             {
-                MeticaLogger.LogError($"Error while trying to load the cache", e);
+                try
+                {
+                    File.Delete(_cacheFilePath);
+                }
+                catch (Exception)
+                {
+                    MeticaLogger.LogError(() => $"Error while removing the existing cache file", e);
+                }
             }
         }
 
-        [CanBeNull]
-        public T Read()
+        internal void Clear()
         {
-            return IsCacheUpToDate ? _cachedData.Data : null;
+            _cachedData.Clear();
+        }
+        
+        internal void Save()
+        {
+            using StreamWriter writer = new StreamWriter(_cacheFilePath);
+            writer.Write(JsonConvert.SerializeObject(_cachedData));
         }
 
-        public void Write(T data)
+        public T? Read(string key)
+        {
+            var result = (CachedValue<T>?)_cachedData[key];
+            return result?.ExpiresOn > MeticaAPI.TimeSource.EpochSeconds() ? result.Data : null;
+        }
+
+        public void Write(string key, T data, long ttlSeconds)
         {
             try
             {
-                _cachedData = new CachedValue<T>
+                var cachedValue =  new CachedValue<T>
                 {
                     Data = data,
-                    CacheTime = DateTimeOffset.FromUnixTimeSeconds(MeticaAPI.TimeSource.EpochSeconds())
+                    ExpiresOn = MeticaAPI.TimeSource.EpochSeconds() + ttlSeconds
                 };
-                
-                MeticaLogger.LogInfo($"Writing {JsonConvert.SerializeObject(_cachedData)} at {CacheFilePath}");
 
-
-                using StreamWriter writer = new StreamWriter(CacheFilePath);
-                writer.Write(JsonConvert.SerializeObject(_cachedData));
+                if (_cachedData.Contains(key))
+                {
+                    _cachedData[key] = cachedValue;
+                }
+                else
+                {
+                    _cachedData.Add(key, cachedValue);
+                }
             }
             catch (Exception e)
             {
-                MeticaLogger.LogError($"Error while trying to save the cache {_name}", e);
-                throw;
+                MeticaLogger.LogError(() => $"Error while trying to save the cache {_name}", e);
             }
         }
-
     }
 }

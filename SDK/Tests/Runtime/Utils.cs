@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Metica.Unity;
 using NUnit.Framework;
+using UnityEngine.TestTools;
 
 abstract class Utils
 {
@@ -15,9 +16,13 @@ abstract class Utils
 
     public static void InitSdk()
     {
+        LogAssert.ignoreFailingMessages = true;
         MeticaAPI.Initialise(TestUserId, TestApp, TestKey, result => { Assert.That(result.Result); });
         MeticaAPI.BackendOperations = new NoopBackendOps();
         MeticaLogger.CurrentLogLevel = LogLevel.Info;
+        MeticaAPI.OffersCache.Clear();
+        MeticaAPI.RemoteConfigCache.Clear();
+        MeticaAPI.DisplayLog.Clear();
     }
 
     public static string RandomUserId()
@@ -53,6 +58,11 @@ class NoopBackendOps : IBackendOperations
         MeticaSdkDelegate<string> callback)
     {
 
+    }
+
+    public void CallRemoteConfigAPI(string[] configKeys, MeticaSdkDelegate<RemoteConfig> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+    {
+        
     }
 
     public void CallRemoteConfigAPI(string[] configKeys, MeticaSdkDelegate<Dictionary<string, object>> responseCallback, Dictionary<string, object> userProperties = null,

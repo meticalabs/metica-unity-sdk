@@ -13,15 +13,16 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
     [TestFixture]
     public class RemoteConfigE2eTest
     {
-        private String endpoint = Environment.GetEnvironmentVariable("RC_ENDPOINT");
+        private String endpoint = "https://api-gateway.dev.metica.com";// Environment.GetEnvironmentVariable("RC_ENDPOINT");
 
-        private String apiKey = Environment.GetEnvironmentVariable("E2E_TESTSAPP_API_KEY");
+        private String apiKey = "01HRW4KNEMYGS9FCEPW4ZVFX88"; //Environment.GetEnvironmentVariable("E2E_TESTSAPP_API_KEY");
 
         String appId = "e2eTestsApp";
 
         [UnityTest]
         public IEnumerator Get_RemoteConfig()
         {
+            LogAssert.ignoreFailingMessages = true;
             var config = SdkConfig.Default();
             config.remoteConfigEndpoint = endpoint;
             config.networkTimeout = 5;
@@ -29,13 +30,12 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             string userId = Utils.RandomUserId();
 
             MeticaAPI.Initialise(userId, appId, apiKey, config, result => Assert.That(result.Result));
-            MeticaLogger.CurrentLogLevel = LogLevel.Off;
+            MeticaLogger.CurrentLogLevel = LogLevel.Info;
 
             Dictionary<string, object> remoteConfig = null;
             MeticaAPI.GetConfig(result =>
             {
                 Assert.That(result.Error == null);
-                MeticaLogger.LogInfo($"The response is  {JsonConvert.SerializeObject(result.Result)}");
                 remoteConfig = result.Result;
             }, new List<string>(), new Dictionary<string, object>()
             {

@@ -88,12 +88,6 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
                         displayedOn = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromHours(1)).ToUnixTimeSeconds(),
                         offerId = $"offer{i}",
                         placementId = Utils.testPlacementId,
-                    },
-                    new DisplayLogEntry
-                    {
-                        displayedOn = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromMinutes(1)).ToUnixTimeSeconds(),
-                        offerId = $"offer{i}",
-                        placementId = Utils.testPlacementId,
                     }
                 });
             }

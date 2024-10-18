@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -38,14 +40,9 @@ namespace Metica.Unity
                 CreateIngestionRequestBody(Events),
                 result =>
                 {
-                    if (result.Error != null)
-                    {
-                        EventsSubmitCallback(SdkResultImpl<String>.WithError(result.Error));
-                    }
-                    else
-                    {
-                        EventsSubmitCallback(SdkResultImpl<String>.WithResult(result.Result));
-                    }
+                    EventsSubmitCallback(result.Error != null
+                        ? SdkResultImpl<string>.WithError(result.Error)
+                        : SdkResultImpl<string>.WithResult(result.Result?.Data ?? string.Empty));
                 });
         }
 
@@ -85,7 +82,7 @@ namespace Metica.Unity
         internal IEnumerator Start()
         {
             yield return PostRequestOperation.PostRequest<ODSResponse>(
-                $"{MeticaAPI.Config.offersEndpoint}/offers/v1/apps/{MeticaAPI.AppId}/users/{MeticaAPI.UserId}",
+                $"{MeticaAPI.Config.offersEndpoint}/offers/v1/apps/{MeticaAPI.AppId}",
                 new Dictionary<string, object>
                 {
                     { "placements", Placements },
@@ -102,7 +99,7 @@ namespace Metica.Unity
                     {
                         OffersCallback(SdkResultImpl<OffersByPlacement>.WithResult(new OffersByPlacement
                         {
-                            placements = result.Result.placements
+                            placements = result.Result.Data.placements
                         }));
                     }
                 });
@@ -112,8 +109,7 @@ namespace Metica.Unity
         static ODSRequest CreateODSRequestBody(Dictionary<string, object> userData,
             DeviceInfo overrideDeviceInfo = null)
         {
-            var requestWithUserDataAndDeviceInfo =
-                RequestUtils.CreateRequestWithUserDataAndDeviceInfo(userData, overrideDeviceInfo);
+            var requestWithUserDataAndDeviceInfo = RequestUtils.CreateRequestWithUserDataAndDeviceInfo(userData, overrideDeviceInfo);
             var request = new ODSRequest
             {
                 userId = MeticaAPI.UserId,
@@ -132,12 +128,13 @@ namespace Metica.Unity
         internal class RemoteConfigRequest : RequestWithUserDataAndDeviceInfo
         {
         }
-        
+
+
         public IObjectPool<CallRemoteConfigOperation> pool;
         public ICollection<string> ConfigKeys { get; set; }
         public Dictionary<string, object> UserProperties { get; set; }
         public DeviceInfo DeviceInfo { get; set; }
-        public MeticaSdkDelegate<Dictionary<string, object>> ResponseCallback { get; set; }
+        public MeticaSdkDelegate<RemoteConfig> ResponseCallback { get; set; }
 
         public void OnDestroyPoolObject()
         {
@@ -149,26 +146,50 @@ namespace Metica.Unity
         {
             return PostRequestOperation.PostRequest<Dictionary<string, object>>(
                 $"{MeticaAPI.Config.remoteConfigEndpoint}/config/v1/apps/{MeticaAPI.AppId}",
+                ConfigKeys != null && ConfigKeys.Any() ? 
                 new Dictionary<string, object>
                 {
                     { "keys", ConfigKeys },
-                },
+                } : null,
                 MeticaAPI.ApiKey,
                 RequestUtils.CreateRequestWithUserDataAndDeviceInfo(UserProperties, DeviceInfo),
                 result =>
                 {
                     if (result.Error != null)
                     {
-                        ResponseCallback(SdkResultImpl<Dictionary<string, object>>.WithError(result.Error));
+                        ResponseCallback(SdkResultImpl<RemoteConfig>.WithError(result.Error));
                     }
                     else
                     {
-                        ResponseCallback(SdkResultImpl<Dictionary<string, object>>.WithResult(result.Result));
+                        var remoteConfig = new RemoteConfig(
+                            config: result.Result.Data,
+                            cacheDurationSecs: ParseCacheExpirationFromHeaders(result.Result.Headers));
+                        ResponseCallback(SdkResultImpl<RemoteConfig>.WithResult(remoteConfig));
                     }
                 });
         }
+
+        private static readonly char[] ChEquals = { '=' };
+        private static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromHours(3);
+
+        private static long ParseCacheExpirationFromHeaders(Dictionary<string, string> headers)
+        {
+            var seconds = DefaultCacheDuration.Seconds;
+            var cacheControl = headers["Cache-Control"];
+            if (cacheControl == null) return seconds;
+            try
+            {
+                seconds = int.Parse(cacheControl.Split(ChEquals)[1]);
+            }
+            catch (Exception e)
+            {
+                MeticaLogger.LogError(() => $"Failed to parse the cache control directive from the header value {cacheControl}");
+            }
+
+            return seconds;
+        }
     }
-    
+
     internal abstract class RequestUtils
     {
         internal static RequestWithUserDataAndDeviceInfo CreateRequestWithUserDataAndDeviceInfo(
@@ -198,6 +219,8 @@ namespace Metica.Unity
                 userData = userData,
                 deviceInfo = deviceInfo
             };
+            
+            MeticaLogger.LogInfo(() => $"The request is {JsonConvert.SerializeObject(userData)}");
 
             return request;
         }

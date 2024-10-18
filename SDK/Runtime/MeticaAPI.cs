@@ -133,17 +133,22 @@ namespace Metica.Unity
 
         public static bool Initialized { get; private set; }
 
-        public static DisplayLog DisplayLog { get; internal set; }
+        public static SdkConfig Config { get; internal set; }
+        
+        internal static DisplayLog DisplayLog { get; set; }
 
-        public static IOffersManager OffersManager { get; internal set; }
+        internal static IOffersManager OffersManager { get; set; }
 
         internal static IRemoteConfigManager RemoteConfigManager { get; set; }
 
-        public static SdkConfig Config { get; internal set; }
 
         internal static ITimeSource TimeSource { get; set; }
 
-        public static IBackendOperations BackendOperations { get; internal set; }
+        internal static IBackendOperations BackendOperations { get; set; }
+        
+        internal static OffersCache OffersCache { get; set; }
+        
+        internal static RemoteConfigCache RemoteConfigCache { get; set; }
 
         /// <summary>
         /// Initializes the Metica API.
@@ -170,12 +175,11 @@ namespace Metica.Unity
             ScriptingObjects.Init();
 
             OffersManager = new OffersManager();
-            OffersManager.Init();
-
             RemoteConfigManager = new RemoteConfigManager();
-            RemoteConfigManager.Init();
 
             DisplayLog = ScriptingObjects.GetComponent<DisplayLog>();
+            OffersCache = ScriptingObjects.GetComponent<OffersCache>();
+            RemoteConfigCache = ScriptingObjects.GetComponent<RemoteConfigCache>();
 
             BackendOperations = new BackendOperationsImpl();
 
@@ -189,8 +193,8 @@ namespace Metica.Unity
         /// The configuration is specific to each application so it's represented very generically as
         /// a simple Dictionary with string keys.
         /// </summary>
-        /// <param name="responseCallback">A callback function to handle the returned configuration.</param>
         /// <param name="userProperties">Optional. A dictionary of user properties to be included in the request.</param>
+        /// <param name="responseCallback">A callback function to handle the returned configuration.</param>
         /// <param name="deviceInfo">Optional. A DeviceInfo object containing device information to be included in the request.</param>
         /// <param name="configKeys">Optional. A list of configuration keys whose values' are going to be queried.
         /// If missing or empty, then the entire configuration is retrieved.</param>
@@ -207,7 +211,7 @@ namespace Metica.Unity
             }
             else
             {
-                RemoteConfigManager.GetConfig(responseCallback, configKeys, userProperties, deviceInfo);
+                RemoteConfigManager.GetConfig(configKeys, responseCallback, userProperties, deviceInfo);
             }
         }
 

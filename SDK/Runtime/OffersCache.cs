@@ -1,12 +1,50 @@
+#nullable enable
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace Metica.Unity
 {
-    internal class OffersCache : SimpleDiskCache<OffersByPlacement>
+    
+    internal class OffersCache : MonoBehaviour
     {
-        public OffersCache() : base("OffersCache")
+        private SimpleDiskCache<List<Offer>>? _cache;
+            
+        internal void Awake()
         {
+            if (Application.isEditor && !Application.isPlaying)
+            {
+                MeticaLogger.LogWarning(() => "The offers cache will not be available in the editor");
+                return;
+            }
+
+            _cache = new SimpleDiskCache<List<Offer>>("OffersCache", MeticaAPI.Config.offersCachePath);
+            _cache.Prepare();
+            DontDestroyOnLoad(this);
         }
 
-        protected override long TtlInMinutes => MeticaAPI.Config.offersCacheTtlMinutes;
-        protected override string CacheFilePath => MeticaAPI.Config.offersCachePath;
+        private void OnApplicationQuit()
+        {
+            _cache?.Save();
+        }
+
+        public void Clear()
+        {
+            _cache?.Clear();
+        }
+        
+        public List<Offer>? Read(string placement)
+        {
+            return _cache?.Read(CacheKeyForPlacement(placement));
+        }
+
+        public void Write(string placement, List<Offer> offers)
+        {
+            _cache?.Write(CacheKeyForPlacement(placement), offers, MeticaAPI.Config.offersCacheTtlMinutes * 60);
+        }
+
+        private static string CacheKeyForPlacement(string placement)
+        {
+            return $"offers-{MeticaAPI.AppId}-{MeticaAPI.UserId}-{placement}";
+        }
     }
 }

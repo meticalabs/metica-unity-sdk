@@ -29,7 +29,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             string userId = Utils.RandomUserId();
 
             MeticaAPI.Initialise(userId, appId, apiKey, config, result => Assert.That(result.Result));
-            MeticaLogger.CurrentLogLevel = LogLevel.Off;
+            MeticaLogger.CurrentLogLevel = LogLevel.Info;
 
             var displayLog = MeticaAPI.DisplayLog;
             displayLog.Awake();
@@ -98,16 +98,16 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
 
             string userId = Utils.RandomUserId();
             MeticaAPI.Initialise(userId, appId, apiKey, config, result => Assert.That(result.Result));
-            MeticaLogger.CurrentLogLevel = LogLevel.Off;
+            MeticaLogger.CurrentLogLevel = LogLevel.Info;
+            LogAssert.ignoreFailingMessages = true;
 
             var displayLog = MeticaAPI.DisplayLog;
             displayLog.Awake();
 
             yield return new WaitForSeconds(3);
 
-            MeticaAPI.GetOffers(new[] { "mainMulti" }, result =>
+            MeticaAPI.GetOffers(new[] { "main" }, result =>
             {
-                Debug.Log(JsonConvert.SerializeObject(result));
                 Assert.That(result.Error != null);
             }, new Dictionary<string, object>()
             {
