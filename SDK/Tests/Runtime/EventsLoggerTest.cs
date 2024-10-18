@@ -37,6 +37,17 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
                     ? SdkResultImpl<string>.WithResult("OK")
                     : SdkResultImpl<string>.WithError("Test error"));
             }
+
+            public void CallRemoteConfigAPI(string[] configKeys, MeticaSdkDelegate<RemoteConfig> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+            {
+                throw new AssertionException("Should not be called");
+            }
+
+            public void CallRemoteConfigAPI(string[] configKeys, MeticaSdkDelegate<Dictionary<string, object>> responseCallback, Dictionary<string, object> userProperties = null,
+                DeviceInfo deviceInfo = null)
+            {
+                throw new AssertionException("Should not be called");
+            }
         }
 
         [SetUp]
@@ -66,7 +77,6 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
                 logger.LogCustomEvent(eventType, eventData, false);
 
             yield return new WaitForSecondsRealtime(config.eventsLogFlushCadence);
-            Debug.Log("num events " + testOps.NumEvents);
             Assert.That(testOps.NumEvents == 10);
             Assert.That(testOps.SubmitInvoked);
             Assert.That(logger.EventsQueue.Count == 0);
@@ -76,6 +86,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
                 FailOp = true
             };
             MeticaAPI.BackendOperations = testOps;
+            MeticaLogger.CurrentLogLevel = LogLevel.Off;
 
             logger.LogCustomEvent(eventType, eventData, false);
             yield return new WaitForSecondsRealtime(config.eventsLogFlushCadence);
@@ -102,11 +113,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         [Test]
         public void TestTheAttributesOfOfferPurchase()
         {
-            var offersManager = new Mock<IOffersManager>();
-            offersManager.Setup(manager => manager.GetCachedOffersByPlacement(Utils.testPlacementId))
-                .Returns(createOfferCache());
-
-            MeticaAPI.OffersManager = offersManager.Object;
+            MeticaAPI.OffersCache.Write(Utils.testPlacementId, createOfferCache());
 
             var logger = new GameObject().AddComponent<EventsLogger>();
             logger.LogOfferPurchase(Utils.testOfferId, Utils.testPlacementId, 1.0, "USD");
@@ -126,11 +133,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         [Test]
         public void TestTheAttributesOfOfferDisplay()
         {
-            var offersManager = new Mock<IOffersManager>();
-            offersManager.Setup(manager => manager.GetCachedOffersByPlacement(Utils.testPlacementId))
-                .Returns(createOfferCache());
-
-            MeticaAPI.OffersManager = offersManager.Object;
+            MeticaAPI.OffersCache.Write(Utils.testPlacementId, createOfferCache());
 
             var logger = new GameObject().AddComponent<EventsLogger>();
             logger.LogOfferDisplay(Utils.testOfferId, Utils.testPlacementId);
@@ -150,11 +153,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         [Test]
         public void TestTheAttributesOfOfferInteraction()
         {
-            var offersManager = new Mock<IOffersManager>();
-            offersManager.Setup(manager => manager.GetCachedOffersByPlacement(Utils.testPlacementId))
-                .Returns(createOfferCache());
-
-            MeticaAPI.OffersManager = offersManager.Object;
+            MeticaAPI.OffersCache.Write(Utils.testPlacementId, createOfferCache());
 
             var logger = new GameObject().AddComponent<EventsLogger>();
             logger.LogOfferInteraction(Utils.testOfferId, Utils.testPlacementId, "click");
@@ -174,11 +173,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         [Test]
         public void TestTheAttributesOfUserStateUpdate()
         {
-            var offersManager = new Mock<IOffersManager>();
-            offersManager.Setup(manager => manager.GetCachedOffersByPlacement(Utils.testPlacementId))
-                .Returns(new List<Offer>());
-
-            MeticaAPI.OffersManager = offersManager.Object;
+            MeticaAPI.OffersCache.Write(Utils.testPlacementId, new List<Offer>());
 
             var logger = new GameObject().AddComponent<EventsLogger>();
             var userAttributes = new Dictionary<string, object>()

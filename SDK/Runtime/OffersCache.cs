@@ -1,72 +1,50 @@
-using System;
-using System.IO;
-using JetBrains.Annotations;
-using Newtonsoft.Json;
+#nullable enable
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Metica.Unity
 {
-    public class CachedOffersByPlacement
-    {
-        public OffersByPlacement offers;
-        public DateTimeOffset cacheTime;
-    }
     
-    public class OffersCache
+    internal class OffersCache : MonoBehaviour
     {
-        private CachedOffersByPlacement _cachedOffers;
-
-        private bool IsOffersCacheValid() => _cachedOffers != null && _cachedOffers.offers != null;
-
-        private bool IsOffersCacheUpToDate() =>
-            IsOffersCacheValid() && (MeticaAPI.TimeSource.EpochSeconds() - _cachedOffers.cacheTime.ToUnixTimeSeconds()) < (60*MeticaAPI.Config.offersCacheTtlMinutes);
-        
-        public OffersCache()
+        private SimpleDiskCache<List<Offer>>? _cache;
+            
+        internal void Awake()
         {
-            try
+            if (Application.isEditor && !Application.isPlaying)
             {
-                // Ensure the file exists
-                if (File.Exists(MeticaAPI.Config.offersCachePath))
-                {
-                    using (StreamReader reader = new StreamReader(MeticaAPI.Config.offersCachePath))
-                    {
-                        var content = reader.ReadToEnd();
-                        _cachedOffers = JsonConvert.DeserializeObject<CachedOffersByPlacement>(content);
-                    }
-                }
+                MeticaLogger.LogWarning(() => "The offers cache will not be available in the editor");
+                return;
             }
-            catch (IOException e)
-            {
-                MeticaLogger.LogError($"Error while trying to load the offers cache", e);
-            }
+
+            _cache = new SimpleDiskCache<List<Offer>>("OffersCache", MeticaAPI.Config.offersCachePath);
+            _cache.Prepare();
+            DontDestroyOnLoad(this);
         }
 
-        [CanBeNull]
-        public OffersByPlacement Read()
+        private void OnApplicationQuit()
         {
-            var upToDate = IsOffersCacheUpToDate();
-            return upToDate ? _cachedOffers.offers : null;
+            _cache?.Save();
+        }
+
+        public void Clear()
+        {
+            _cache?.Clear();
         }
         
-        public void Write(OffersByPlacement offers)
+        public List<Offer>? Read(string placement)
         {
-            try
-            {
-                _cachedOffers = new CachedOffersByPlacement()
-                {
-                    offers = offers,
-                    cacheTime = DateTimeOffset.FromUnixTimeSeconds(MeticaAPI.TimeSource.EpochSeconds())
-                };
-                using (StreamWriter writer = new StreamWriter(MeticaAPI.Config.offersCachePath))
-                {
-                    writer.Write(JsonConvert.SerializeObject(_cachedOffers));
-                }
-            }
-            catch (Exception e)
-            {
-                MeticaLogger.LogError($"Error while trying to save the offers cache", e);
-                throw;
-            }
+            return _cache?.Read(CacheKeyForPlacement(placement));
+        }
+
+        public void Write(string placement, List<Offer> offers)
+        {
+            _cache?.Write(CacheKeyForPlacement(placement), offers, MeticaAPI.Config.offersCacheTtlMinutes * 60);
+        }
+
+        private static string CacheKeyForPlacement(string placement)
+        {
+            return $"offers-{MeticaAPI.AppId}-{MeticaAPI.UserId}-{placement}";
         }
     }
 }

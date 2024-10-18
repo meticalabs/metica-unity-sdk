@@ -10,7 +10,7 @@ namespace Metica.Unity
 {
     // Represents the impressions or displays of offers.
     [Serializable]
-    public struct DisplayLogEntry : IComparable<DisplayLogEntry>
+    internal struct DisplayLogEntry : IComparable<DisplayLogEntry>
     {
         // timestamp in epoch seconds
         public long displayedOn;
@@ -36,7 +36,7 @@ namespace Metica.Unity
         }
     }
 
-    public class DisplayLog : MonoBehaviour
+    internal class DisplayLog : MonoBehaviour
     {
         internal Dictionary<string, List<DisplayLogEntry>> _displayLogs;
         private Coroutine _saveLogRoutine;
@@ -45,7 +45,7 @@ namespace Metica.Unity
         {
             if (Application.isEditor && !Application.isPlaying)
             {
-                MeticaLogger.LogWarning("The displays log will not run in the editor");
+                MeticaLogger.LogWarning(() => "The displays log will not run in the editor");
                 return;
             }
 
@@ -77,6 +77,11 @@ namespace Metica.Unity
         }
 
 
+        internal void Clear()
+        {
+            _displayLogs.Clear();
+        }
+        
         public void AppendDisplayLogs(IEnumerable<DisplayLogEntry> displayLogEntries)
         {
             var perOffer = displayLogEntries.GroupBy(entry => entry.offerId)
@@ -119,7 +124,7 @@ namespace Metica.Unity
                     let timeWindowInSeconds = displayLimit.timeWindowInHours * 3600
                     let recentDisplayLogs =
                         displayLogList.Count(log => (currentTime - log.displayedOn) <= (long)timeWindowInSeconds)
-                    where recentDisplayLogs > (int)displayLimit.maxDisplayCount
+                    where (1 + recentDisplayLogs) > (int)displayLimit.maxDisplayCount
                     select displayLimit).Any();
 
                 if (!limitExceeded)
@@ -159,8 +164,6 @@ namespace Metica.Unity
 
             try
             {
-                MeticaLogger.LogDebug($"Loading log from {MeticaAPI.Config.displayLogPath}");
-
                 var json = File.ReadAllText(MeticaAPI.Config.displayLogPath);
                 var entries = JsonConvert.DeserializeObject<List<DisplayLogEntry>>(json);
                 return CreateOffersIndex(entries);

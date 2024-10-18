@@ -72,12 +72,12 @@ namespace Metica.Unity
 
             if (!MeticaAPI.Initialized)
             {
-                MeticaLogger.LogDebug("Initializing In-Editor Metica SDK");
+                MeticaLogger.LogDebug(() => "Initializing In-Editor Metica SDK");
                 MeticaAPI.Initialise(UserId, AppId, APIKey, config, result =>
                 {
                     if (result.Error != null)
                     {
-                        MeticaLogger.LogError(result);
+                        MeticaLogger.LogError(() => result.Error);
                     }
                 });
             }
