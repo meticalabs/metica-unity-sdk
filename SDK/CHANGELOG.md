@@ -1,3 +1,13 @@
+# [1.2.0](https://github.com/meticalabs/metica-unity-sdk/compare/v1.1.0...v1.0.9) (2024-10-22)
+### Features
+- feat(remote config): Adds an SDK operation for invoking the remote config service (MET-1604)
+### Improvements
+- caching: Introduces a simple, persisted cache for more granular caching of the offers per placement and the remote config keys.
+- refactor: Internalised many components that shouldn't be publicly visible
+- refactor(MeticaLogger): The logged message is now provided by a closure.
+
+### Bug Fixes
+- fix: The offers cache should be aware of the requested placements.
 # [1.1.0](https://github.com/meticalabs/metica-unity-sdk/compare/v1.1.0...v1.0.9) (2024-06-28)
 ### Features
 - feat: Events submission error delegate
