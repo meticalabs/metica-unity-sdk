@@ -19,7 +19,7 @@ namespace Metica.Unity
         {
             if (Application.isEditor && !Application.isPlaying)
             {
-                MeticaLogger.LogWarning("EventsLogger is not supported in the editor");
+                MeticaLogger.LogWarning(() => "EventsLogger is not supported in the editor");
                 return;
             }
 
@@ -50,7 +50,7 @@ namespace Metica.Unity
         {
             if (eventType == null)
             {
-                MeticaLogger.LogError("The event type must be specified");
+                MeticaLogger.LogError(() => "The event type must be specified");
                 return;
             }
 
@@ -114,7 +114,7 @@ namespace Metica.Unity
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {
                 // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
-                MeticaLogger.LogWarning("No internet connection, events will be submitted later");
+                MeticaLogger.LogWarning(() => "No internet connection, events will be submitted later");
                 MeticaAPI.Config.eventsSubmissionDelegate?.Invoke(SdkResultImpl<Int32>.WithError("No internet connect"));
                 return;
             }
@@ -132,12 +132,8 @@ namespace Metica.Unity
                 if (result.Error != null)
                 {
                     var message = $"Error while submitting events: {result.Error}";
-                    MeticaLogger.LogError(message);
+                    MeticaLogger.LogError(() => message);
                     MeticaAPI.Config.eventsSubmissionDelegate?.Invoke(SdkResultImpl<Int32>.WithError(message));
-                }
-                else
-                {
-                    MeticaLogger.LogDebug("Events submitted successfully");
                 }
             });
         }
@@ -156,8 +152,8 @@ namespace Metica.Unity
 
         private static Dictionary<string, object> GetOrCreateMeticaAttributes(string offerId, string placementId)
         {
-            var cachedOffers = MeticaAPI.OffersManager.GetCachedOffersByPlacement(placementId);
-            var offerDetails = cachedOffers.Find(offer => offer.offerId == offerId);
+            var cachedOffers = MeticaAPI.OffersCache.Read(placementId);
+            var offerDetails = cachedOffers?.Find(offer => offer.offerId == offerId);
             return (offerDetails == null)
                 ? CreateMeticaAttributes(offerId, placementId)
                 : CreateMeticaAttributes(offerDetails.metrics.display.meticaAttributes.offer.offerId,

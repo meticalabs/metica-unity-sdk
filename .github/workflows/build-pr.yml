@@ -49,6 +49,7 @@ jobs:
           E2E_TESTSAPP_API_KEY: ${{ secrets.E2E_TESTSAPP_API_KEY }}
           ODS_ENDPOINT: ${{ secrets.ODS_ENDPOINT }}
           INGESTION_ENDPOINT: ${{ secrets.INGESTION_ENDPOINT }}
+          RC_ENDPOINT: ${{ secrets.RC_ENDPOINT }}
           
         with:
           projectPath: TestProject

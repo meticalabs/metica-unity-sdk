@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Metica.Unity
 {
     public delegate void EventsSubmissionResultDelegate(ISdkResult<Int32> result);
-    
+
     public struct SdkConfig
     {
         /// <summary>
@@ -21,6 +21,11 @@ namespace Metica.Unity
         /// The full endpoint to the Metica ingestion service.
         /// </summary>
         public string ingestionEndpoint;
+
+        /// <summary>
+        /// The full endpoint to the Metica remote-config service.
+        /// </summary>
+        public string remoteConfigEndpoint;
 
         /// <summary>
         /// The maximum number of entries stored in the displays log. 
@@ -66,6 +71,11 @@ namespace Metica.Unity
         public string offersCachePath;
 
         /// <summary>
+        /// The filesystem path where the remote config cache will be stored.
+        /// </summary>
+        public string remoteConfigCachePath;
+
+        /// <summary>
         /// The network timeout, in seconds, for the calls to any Metica endpoint.
         /// </summary>
         public int networkTimeout;
@@ -83,6 +93,7 @@ namespace Metica.Unity
             {
                 ingestionEndpoint = "https://api.prod-eu.metica.com",
                 offersEndpoint = "https://api.prod-eu.metica.com",
+                remoteConfigEndpoint = "https://api.prod-eu.metica.com",
                 maxDisplayLogEntries = 256,
                 displayLogFlushCadence = 60,
                 displayLogPath = Path.Combine(Application.persistentDataPath, "display_log"),
@@ -90,6 +101,7 @@ namespace Metica.Unity
                 eventsLogFlushCadence = 60,
                 offersCacheTtlMinutes = 120,
                 offersCachePath = Path.Combine(Application.persistentDataPath, "metica-offers.json"),
+                remoteConfigCachePath = Path.Combine(Application.persistentDataPath, "metica-rc.json"),
                 networkTimeout = 2,
                 logLevel = LogLevel.Error
             };
@@ -114,22 +126,29 @@ namespace Metica.Unity
     /// </summary>
     public class MeticaAPI : ScriptableObject
     {
-        public static string SDKVersion = "1.0.8";
-        public static string UserId { get; set; }
-        public static string AppId { get; set; }
-        public static string ApiKey { get; set; }
+        public static string SDKVersion = "1.2.0";
+        public static string UserId { get; internal set; }
+        public static string AppId { get; internal set; }
+        public static string ApiKey { get; internal set; }
 
-        public static bool Initialized { get; set; }
-
-        public static DisplayLog DisplayLog { get; set; }
-
-        public static IOffersManager OffersManager { get; set; }
+        public static bool Initialized { get; private set; }
 
         public static SdkConfig Config { get; internal set; }
+        
+        internal static DisplayLog DisplayLog { get; set; }
+
+        internal static IOffersManager OffersManager { get; set; }
+
+        internal static IRemoteConfigManager RemoteConfigManager { get; set; }
+
 
         internal static ITimeSource TimeSource { get; set; }
 
-        public static IBackendOperations BackendOperations { get; set; }
+        internal static IBackendOperations BackendOperations { get; set; }
+        
+        internal static OffersCache OffersCache { get; set; }
+        
+        internal static RemoteConfigCache RemoteConfigCache { get; set; }
 
         /// <summary>
         /// Initializes the Metica API.
@@ -156,15 +175,44 @@ namespace Metica.Unity
             ScriptingObjects.Init();
 
             OffersManager = new OffersManager();
-            OffersManager.Init();
+            RemoteConfigManager = new RemoteConfigManager();
 
             DisplayLog = ScriptingObjects.GetComponent<DisplayLog>();
+            OffersCache = ScriptingObjects.GetComponent<OffersCache>();
+            RemoteConfigCache = ScriptingObjects.GetComponent<RemoteConfigCache>();
 
             BackendOperations = new BackendOperationsImpl();
 
             Initialized = true;
 
             initCallback.Invoke(SdkResultImpl<bool>.WithResult(true));
+        }
+
+        /// <summary>
+        /// Retrieves the application's remote config after personalising it for the current user.
+        /// The configuration is specific to each application so it's represented very generically as
+        /// a simple Dictionary with string keys.
+        /// </summary>
+        /// <param name="userProperties">Optional. A dictionary of user properties to be included in the request.</param>
+        /// <param name="responseCallback">A callback function to handle the returned configuration.</param>
+        /// <param name="deviceInfo">Optional. A DeviceInfo object containing device information to be included in the request.</param>
+        /// <param name="configKeys">Optional. A list of configuration keys whose values' are going to be queried.
+        /// If missing or empty, then the entire configuration is retrieved.</param>
+        public static void GetConfig(MeticaSdkDelegate<Dictionary<string, object>> responseCallback,
+            List<string> configKeys = null,
+            Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null
+        )
+        {
+            if (!checkPreconditions())
+            {
+                responseCallback.Invoke(
+                    SdkResultImpl<Dictionary<string, object>>.WithError(
+                        "Required information missing. Please initialise the SDK first"));
+            }
+            else
+            {
+                RemoteConfigManager.GetConfig(configKeys, responseCallback, userProperties, deviceInfo);
+            }
         }
 
         /// <summary>
@@ -264,7 +312,8 @@ namespace Metica.Unity
         /// <param name="eventType">The name/type of the event</param>
         /// <param name="userEvent">A dictionary containing the details of the user event. The dictionary should have string keys and object values.</param>
         /// <param name="reuseDictionary">Indicates if the passed dictionary can be modified to add additional Metica-specific attribute. Re-using the dictionary instance in this way can potentially save an allocation.</param>
-        public static void LogUserEvent(string eventType, Dictionary<string, object> userEvent, bool reuseDictionary = false)
+        public static void LogUserEvent(string eventType, Dictionary<string, object> userEvent,
+            bool reuseDictionary = false)
         {
             if (!checkPreconditions())
             {

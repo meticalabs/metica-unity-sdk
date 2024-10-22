@@ -71,12 +71,12 @@ namespace Metica.Unity
         {
             if (!MeticaAPI.Initialized)
             {
-                MeticaLogger.LogDebug("Initializing In-Editor Metica SDK");
+                MeticaLogger.LogDebug(() => "Initializing In-Editor Metica SDK");
                 MeticaAPI.Initialise(userId, appId, apiKey, result =>
                 {
                     if (result.Error != null)
                     {
-                        MeticaLogger.LogError(result.Error);
+                        MeticaLogger.LogError(() => result.Error);
                     }
                 });
             }
@@ -86,13 +86,12 @@ namespace Metica.Unity
         public void GetOffersInEditor(MeticaSdkDelegate<OffersByPlacement> callback)
         {
             var offersManager = new OffersManager();
-            offersManager.Init();
              
             var resDelegate = new MeticaSdkDelegate<OffersByPlacement>(result =>
             {
                 if (result.Error != null)
                 {
-                    MeticaLogger.LogError("Error while fetching offers: " + result.Error);
+                    MeticaLogger.LogError(() => "Error while fetching offers: " + result.Error);
                 }
                 else
                 {
@@ -101,7 +100,6 @@ namespace Metica.Unity
                         var offers = result.Result.placements.ContainsKey(p)
                             ? result.Result.placements[p]
                             : new List<Offer>();
-                        MeticaLogger.LogDebug($"Placement {p} offers: {JsonConvert.SerializeObject(offers)}");
                     }
                     callback.Invoke(result);
                 }

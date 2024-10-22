@@ -6,46 +6,46 @@ namespace Metica.Unity
     public enum LogLevel
     {
         Off,
-        Info,
         Error,
+        Warning,
+        Info,
         Debug,
-        Warning
     }
 
-    public class MeticaLogger
+    public abstract class MeticaLogger
     {
         public static LogLevel CurrentLogLevel { get; set; } = LogLevel.Error;
 
-        public static void LogInfo(object message)
+        public static void LogInfo(Func<string> messageSupplier)
         {
             if (CurrentLogLevel >= LogLevel.Info)
             {
-                Debug.Log(message);
+                Debug.Log(messageSupplier());
             }
         }
 
-        public static void LogError(object message, Exception error = null)
+        public static void LogError(Func<string> messageSupplier, Exception error = null)
         {
             if (CurrentLogLevel >= LogLevel.Error)
             {
-                Debug.LogError(message);
+                Debug.LogError(messageSupplier());
                 if (error != null) Debug.LogException(error);
             }
         }
 
-        public static void LogWarning(object message)
+        public static void LogWarning(Func<string> messageSupplier)
         {
             if (CurrentLogLevel >= LogLevel.Warning)
             {
-                Debug.LogWarning(message);
+                Debug.LogWarning(messageSupplier());
             }
         }
 
-        public static void LogDebug(object message)
+        public static void LogDebug(Func<string> messageSupplier)
         {
             if (CurrentLogLevel >= LogLevel.Debug)
             {
-                Debug.Log(message);
+                Debug.Log(messageSupplier());
             }
         }
     }

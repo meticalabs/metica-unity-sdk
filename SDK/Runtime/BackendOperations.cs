@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -10,44 +9,45 @@ using UnityEngine.Pool;
 
 namespace Metica.Unity
 {
-    [Serializable]
-    internal class ODSRequest
+    internal class RequestResponse<T>
     {
-        public Dictionary<string, object> userData;
-        public DeviceInfo deviceInfo;
-    }
+        public T Data;
+        public Dictionary<string, string> Headers;
+        public long ResponseCode;
 
-    [Serializable]
-    internal class ODSResponse
-    {
-        public Dictionary<string, List<Offer>> placements;
+        public RequestResponse(T data, Dictionary<string, string> headers, long responseCode)
+        {
+            Data = data;
+            Headers = headers;
+            ResponseCode = responseCode;
+        }
     }
-
+    
     internal abstract class PostRequestOperation
     {
         public static IEnumerator PostRequest<T>(
             string url,
-            [CanBeNull] Dictionary<string, object> queryParams,
+            Dictionary<string, object>? queryParams,
             string apiKey,
             object body,
-            MeticaSdkDelegate<T> callback) where T : class
+            MeticaSdkDelegate<RequestResponse<T>> callback) where T : class
         {
             // if there is no internet connection, return the cached offers
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {
-                callback(SdkResultImpl<T>.WithError("No internet connection"));
+                callback(SdkResultImpl<RequestResponse<T>>.WithError("No internet connection"));
                 yield break;
             }
 
             if (apiKey == null)
             {
-                callback(SdkResultImpl<T>.WithError("API Key is not set"));
+                callback(SdkResultImpl<RequestResponse<T>>.WithError("API Key is not set"));
                 yield break;
             }
 
             if (body == null)
             {
-                callback(SdkResultImpl<T>.WithError("Body is null"));
+                callback(SdkResultImpl<RequestResponse<T>>.WithError("Body is null"));
                 yield break;
             }
 
@@ -58,22 +58,19 @@ namespace Metica.Unity
                 {
                     NullValueHandling = NullValueHandling.Ignore
                 });
-
-                MeticaLogger.LogDebug($"json body: {jsonBody}");
             }
             catch (Exception e)
             {
-                MeticaLogger.LogError($"Error while fetching offers: {e.Message}", e);
+                MeticaLogger.LogError(() => $"Error while fetching offers: {e.Message}", e);
             }
 
             if (jsonBody == null)
             {
-                yield return SdkResultImpl<T>.WithError("Failed to serialize body");
+                yield return SdkResultImpl<RequestResponse<T>>.WithError("Failed to serialize body");
             }
             else
             {
                 var fullUrl = queryParams is { Count: > 0 } ? $"{url}?{BuildUrlWithParameters(queryParams)}" : url;
-                MeticaLogger.LogDebug($"sending request to {fullUrl} with body: {jsonBody}");
 
                 using (var www = new UnityWebRequest(fullUrl, "PUT"))
                 {
@@ -87,38 +84,36 @@ namespace Metica.Unity
 
                     yield return www.SendWebRequest();
 
-                    MeticaLogger.LogDebug("result: " + www.result);
-
                     if (www.result != UnityWebRequest.Result.Success)
                     {
                         var error = $"Error: {www.error}, status: {www.responseCode}";
-                        MeticaLogger.LogError(error);
-                        callback(SdkResultImpl<T>.WithError($"API Error: {error}"));
+                        MeticaLogger.LogError(() => error);
+                        callback(SdkResultImpl<RequestResponse<T>>.WithError($"API Error: {error}"));
                     }
                     else
                     {
                         var responseText = www.downloadHandler.text;
-                        MeticaLogger.LogDebug($"Response: {responseText}");
 
                         if (string.IsNullOrEmpty(responseText) && (www.responseCode >= 200 || www.responseCode <= 204))
                         {
-                            callback(SdkResultImpl<T>.WithResult(null));
+                            callback(SdkResultImpl<RequestResponse<T>>.WithResult(null));
                         }
                         else
                         {
-                            T result = null;
+                            RequestResponse<T> response = null;
                             try
                             {
-                                result = JsonConvert.DeserializeObject<T>(responseText);
+                                var result = JsonConvert.DeserializeObject<T>(responseText);
+                                response = new RequestResponse<T>(data: result, headers: www.GetResponseHeaders(), responseCode: www.responseCode);
                             }
                             catch (Exception e)
                             {
-                                MeticaLogger.LogError($"Error while decoding the ODS response: {e.Message}", e);
+                                MeticaLogger.LogError(() => $"Error while decoding the ODS response: {e.Message}", e);
                             }
 
-                            callback(result != null
-                                ? SdkResultImpl<T>.WithResult(result)
-                                : SdkResultImpl<T>.WithError("Failed to decode the server response"));
+                            callback(response != null
+                                ? SdkResultImpl<RequestResponse<T>>.WithResult(response)
+                                : SdkResultImpl<RequestResponse<T>>.WithError("Failed to decode the server response"));
                         }
                     }
                 }
@@ -162,14 +157,17 @@ namespace Metica.Unity
         }
     }
 
-    public interface IBackendOperations
+    internal interface IBackendOperations
     {
         public void CallGetOffersAPI(string[] placements,
             MeticaSdkDelegate<OffersByPlacement> offersCallback, Dictionary<string, object> userProperties = null,
             DeviceInfo deviceInfo = null);
 
         public void CallSubmitEventsAPI(ICollection<Dictionary<string, object>> events,
-            MeticaSdkDelegate<String> callback);
+            MeticaSdkDelegate<string> callback);
+        
+        public void CallRemoteConfigAPI(string[] configKeys, MeticaSdkDelegate<RemoteConfig> responseCallback, Dictionary<string, object> userProperties = null,
+            DeviceInfo deviceInfo = null);
     }
 
     internal class BackendOperationsImpl : IBackendOperations
@@ -211,12 +209,35 @@ namespace Metica.Unity
         );
 
         public void CallSubmitEventsAPI(ICollection<Dictionary<string, object>> events,
-            MeticaSdkDelegate<String> callback)
+            MeticaSdkDelegate<string> callback)
         {
             var op = CallIngestionPool.Get();
             op.pool = CallIngestionPool;
             op.Events = events;
             op.EventsSubmitCallback = callback;
+        }
+        
+        private static readonly LinkedPool<CallRemoteConfigOperation> CallRemoteConfigPool = new(
+            createFunc: () =>
+            {
+                var item = ScriptingObjects.AddComponent<CallRemoteConfigOperation>();
+                return item;
+            },
+            actionOnGet: item => item.gameObject.SetActive(true),
+            actionOnRelease: item => item.gameObject.SetActive(false),
+            actionOnDestroy: item => { item.OnDestroyPoolObject(); },
+            maxSize: 100
+        );
+        
+        public void CallRemoteConfigAPI(string[] configKeys, MeticaSdkDelegate<RemoteConfig> responseCallback, Dictionary<string, object> userProperties = null,
+            DeviceInfo deviceInfo = null)
+        {
+            var op = CallRemoteConfigPool.Get();
+            op.pool = CallRemoteConfigPool;
+            op.ConfigKeys = configKeys;
+            op.UserProperties = userProperties;
+            op.DeviceInfo = deviceInfo;
+            op.ResponseCallback = responseCallback;
         }
     }
 }
