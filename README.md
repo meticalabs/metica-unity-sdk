@@ -235,28 +235,6 @@ MeticaAPI.LogUserEvent(userEvent, true);
 An example usage of the above operations can be found in a small code sample can be found
 at [Samples/MeticaSample.cs](Samples/MeticaSample.cs).
 
-## Editor Components
-
-Besides the programmatic integration, you can also test the Metica integration directly from the Unity Editor.
-
-Select Window > Metica to open the Metica window. Here you can initialize the API, fetch offers, and log events.
-
-### Settings Panel
-
-In this panel you can set up the API and defined the available placements.
-![SettingsPanel](images/SettingsPanel.png "Settings Panel")
-
-### Offers Panel
-
-In this panel you can fetch offers for the defined placements.
-![OffersPanel](images/OffersPanel.png "Offers Panel")
-
-### Events Panel
-
-In this panel you can log events.
-
-![EventsPanel](images/EventsPanel.png "Events Panel")
-
 ## Privacy Manifest
 
 For iOS, iPadOS, tvOS and watchOS apps, we provide
