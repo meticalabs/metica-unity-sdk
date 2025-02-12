@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Metica.Unity
 {
+    [System.Serializable]
     public struct SdkConfig
     {
         /// <summary>
