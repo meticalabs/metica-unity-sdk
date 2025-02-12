@@ -234,6 +234,10 @@ namespace Metica.Unity
                     return StoreTypeEnum.GooglePlayStore;
                 case RuntimePlatform.IPhonePlayer:
                 case RuntimePlatform.OSXEditor:
+#if UNITY_EDITOR
+                case RuntimePlatform.WindowsEditor:
+                case RuntimePlatform.LinuxEditor:
+#endif
                 case RuntimePlatform.OSXPlayer:
                     return StoreTypeEnum.AppStore;
                 default:

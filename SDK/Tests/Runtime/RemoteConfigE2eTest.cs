@@ -13,9 +13,9 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
     [TestFixture]
     public class RemoteConfigE2eTest
     {
-        private String endpoint = "https://api-gateway.dev.metica.com";// Environment.GetEnvironmentVariable("RC_ENDPOINT");
+        private String endpoint = Environment.GetEnvironmentVariable("RC_ENDPOINT");
 
-        private String apiKey = "01HRW4KNEMYGS9FCEPW4ZVFX88"; //Environment.GetEnvironmentVariable("E2E_TESTSAPP_API_KEY");
+        private String apiKey = Environment.GetEnvironmentVariable("E2E_TESTSAPP_API_KEY");
 
         String appId = "e2eTestsApp";
 
