@@ -59,6 +59,7 @@ namespace Metica.Unity
         /// <param name="appId">The application's ID. It must match the ID with which it was registered in the Metica platform</param>
         /// <param name="apiKey">The API key provided by Metica.</param>
         /// <param name="initCallback">The callback function to be invoked after initialization. If the initialisation was successful, then the result value will be true</param>
+        [Obsolete("Please use any other overload of this method.")]
         public static void Initialise(string userId, string appId, string apiKey, MeticaSdkDelegate<bool> initCallback)
         {
             Initialise(userId, appId, apiKey, SdkConfig.Default(), initCallback);
