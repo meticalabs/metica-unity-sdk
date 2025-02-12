@@ -1,3 +1,7 @@
+# [1.2.1](https://github.com/meticalabs/metica-unity-sdk/compare/v1.1.0...v1.0.9) (2025-02-12)
+### Improvements
+- refactor: Removes outdated editor components (MET-2394)
+
 # [1.2.0](https://github.com/meticalabs/metica-unity-sdk/compare/v1.1.0...v1.0.9) (2024-10-22)
 ### Features
 - feat(remote config): Adds an SDK operation for invoking the remote config service (MET-1604)
