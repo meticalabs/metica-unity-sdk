@@ -30,7 +30,7 @@ namespace Metica.Unity
                 foreach (var p in placements)
                 {
                     var cachedResult = MeticaAPI.OffersCache.Read(p);
-                    if (cachedResult != null)
+                    if (cachedResult != null && cachedResult.Count > 0)
                     {
                         resultOffers.Add(p, cachedResult);
                     }
