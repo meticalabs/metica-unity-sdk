@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using Metica.Unity;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -20,6 +21,7 @@ public class SampleScript : MonoBehaviour
         Assert.IsFalse(string.IsNullOrEmpty(_userId));
         Assert.IsFalse(string.IsNullOrEmpty(_appId));
         Assert.IsFalse(string.IsNullOrEmpty(_apiKey));
+        Assert.IsNotNull(_sdkConfiguration, "Please assign an Sdk Configuration. A new one can be created in Create > Metica > SDK > New SDK Configuration.");
 
         // Create new Canvas GameObject
         canvas = new GameObject("Canvas");
@@ -53,7 +55,8 @@ public class SampleScript : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.O))
         {
-            MeticaAPI.GetOffers(new[] { "main" }, (result) =>
+            MeticaAPI.UserId = _userId;
+            MeticaAPI.GetOffers(null, (result) =>
             {
                 if (result.Error != null)
                 {
@@ -62,13 +65,25 @@ public class SampleScript : MonoBehaviour
                 else
                 {
                     var resultPlacements = result.Result.placements;
-                    textElement.text = "Offers: " + (resultPlacements.ContainsKey("main") ? resultPlacements["main"].Count : 0) + " offers found";
+                    //textElement.text = "Offers: " + (resultPlacements.ContainsKey("generic") ? resultPlacements["generic"].Count : 0) + " offers found";
+                    StringBuilder sb = new();
+                    foreach (var placement in resultPlacements)
+                    {
+                        sb.Append($"Offers:\n[{placement.Key}] #{placement.Value.Count}\n");
+                        foreach (var p in placement.Value)
+                        {
+                            sb.AppendLine($"\tid:{p.offerId}");
+                        }
+                    }
+                    textElement.text = sb.ToString();
                 }
             });
         }
 
         if (Input.GetKeyDown(KeyCode.C))
         {
+            MeticaAPI.UserId = _userId;
+            // Retrieve all configs
             MeticaAPI.GetConfig(result =>
             {
                 if (result.Error != null)
@@ -81,6 +96,24 @@ public class SampleScript : MonoBehaviour
                     textElement.text = "Config: " + configStr;
                 }
             });
+        }
+
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            MeticaAPI.UserId = _userId;
+            // Retrieve config with specific name
+            MeticaAPI.GetConfig(result =>
+            {
+                if (result.Error != null)
+                {
+                    textElement.text = "GetConfig Error: " + result.Error;
+                }
+                else
+                {
+                    var configStr = JsonConvert.SerializeObject(result.Result);
+                    textElement.text = "Config: " + configStr;
+                }
+            }, new List<string> { "hello_world" });
         }
 
         if (Input.GetKeyDown(KeyCode.L))
