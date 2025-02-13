@@ -72,6 +72,10 @@ namespace Metica.Unity
                     },
                     userProperties, deviceInfo);
             }
+            else
+            {
+                offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(HandleDisplayLimitForReturnedOffers(new OffersByPlacement() { placements = resultOffers })));
+            }
         }
         
         private OffersByPlacement HandleDisplayLimitForReturnedOffers(OffersByPlacement offersByPlacement)

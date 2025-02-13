@@ -86,7 +86,7 @@ namespace Metica.Unity
 
                     if (www.result != UnityWebRequest.Result.Success)
                     {
-                        var error = $"Error: {www.error}, status: {www.responseCode}, endpoint:{www.url}";
+                        var error = $"Error: {www.error}, status: {www.responseCode}, endpoint: {www.url}";
                         MeticaLogger.LogError(() => error);
                         callback(SdkResultImpl<RequestResponse<T>>.WithError($"API Error: {error}"));
                     }
