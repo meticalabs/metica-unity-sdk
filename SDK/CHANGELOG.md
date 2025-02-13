@@ -1,3 +1,7 @@
+# [1.2.2]([1.2.1](https://github.com/meticalabs/metica-unity-sdk/compare/v1.2.1...v1.2.2)
+### Hot Fixes
+- Patch an issue with offers and configs retrieval and processing.
+
 # [1.2.1](https://github.com/meticalabs/metica-unity-sdk/compare/v1.1.0...v1.0.9) (2025-02-12)
 ### Improvements
 - refactor: Removes outdated editor components (MET-2394)
