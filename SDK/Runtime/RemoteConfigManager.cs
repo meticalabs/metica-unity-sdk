@@ -65,12 +65,16 @@ namespace Metica.Unity
                                 resultConfig.Add(pair.Key, pair.Value);
                                 MeticaAPI.RemoteConfigCache.Write(pair.Key, pair.Value, sdkResult.Result.CacheDurationSecs);
                             }
+                            responseCallback(SdkResultImpl<Dictionary<string, object>>.WithResult(resultConfig));
                         }
                     },
                     userProperties, deviceInfo);
             }
+            else
+            {
+                responseCallback(SdkResultImpl<Dictionary<string, object>>.WithResult(resultConfig));
+            }
 
-            responseCallback(SdkResultImpl<Dictionary<string, object>>.WithResult(resultConfig));
         }
     }
 }
