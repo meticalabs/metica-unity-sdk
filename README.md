@@ -51,8 +51,8 @@ the '+' button in the top left corner. Select "Add package from git URL" and ent
 
 ### 1. Initialize the API
 
-Use the `Initialise` method to prepare the MeticaAPI for use. To obtain your API key please contact Metica.
-
+Use the `Initialise` method to prepare the MeticaAPI for use. To obtain your API key please contact Metica.  
+⚠️: This method is obsolete. Please use the next call.
 ```csharp
 MeticaAPI.Initialise("userId", "appId", "apiKey", result => { 
     if (result.Result) { Debug.Log("Metica API Initialized"); } 
@@ -60,8 +60,7 @@ MeticaAPI.Initialise("userId", "appId", "apiKey", result => {
 });
 ```
 
-You can optionally pass an instance of SdkConfig as well, if you want to have greater control over the SDK's operations.
-
+You can also pass an instance of `SdkConfig`, if you want to have greater control over the SDK's operations.
 ```csharp
 var config = SdkConfig.Default();
 config.logLevel = LogLevel.Off;
