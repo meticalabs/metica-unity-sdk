@@ -21,6 +21,10 @@
     "url": "https://metica.com"
   },
   "samples": [
-    
+    {
+      "displayName": "Simple Test",
+      "description": "Minimal script example with chance to test main requests.",
+      "path": "Samples~/TestProject"
+    }
   ]
 }
