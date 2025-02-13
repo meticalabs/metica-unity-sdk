@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using UnityEngine;
 
 // ReSharper disable all NotAccessedField.Global
 // ReSharper disable file UnusedMember.Local
