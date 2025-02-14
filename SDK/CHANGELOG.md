@@ -1,3 +1,9 @@
+# [1.2.3]([1.2.1](https://github.com/meticalabs/metica-unity-sdk/compare/v1.2.2...v1.2.3)
+### Fixes
+- Minor improvements to SampleScript (including setting userId upon test call).
+- Make `UserId` not internal
+- Minor updates to README
+
 # [1.2.2]([1.2.1](https://github.com/meticalabs/metica-unity-sdk/compare/v1.2.1...v1.2.2)
 ### Hot Fixes
 - Patch an issue with offers and configs retrieval and processing.
