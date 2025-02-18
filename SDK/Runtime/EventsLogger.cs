@@ -71,9 +71,11 @@ namespace Metica.Unity
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.OfferInAppPurchase);
+            attributes[Constants.CurrencyCode] = currency;
+            attributes[Constants.TotalAmount] = amount;
             var meticaAttributes = GetOrCreateMeticaAttributes(offerId, placementId);
-            meticaAttributes[Constants.CurrencyCode] = currency;
-            meticaAttributes[Constants.TotalAmount] = amount; // TODO : Currency Code and Total Amount should be OUT of Metica Attributes.
+            //meticaAttributes[Constants.CurrencyCode] = currency;
+            //meticaAttributes[Constants.TotalAmount] = amount;
             attributes[Constants.MeticaAttributes] = meticaAttributes;
             LogEvent(attributes);
         }
