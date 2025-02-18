@@ -217,6 +217,21 @@ namespace Metica.Unity
         }
 
         /// <summary>
+        /// Log a partial update of a user's state (attributes).
+        /// </summary>
+        /// <param name="userAttributes"></param>
+        public static void LogPartialStateUpdate(Dictionary<string, object> userAttributes)
+        {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogPartialUserAttributes(userAttributes);
+        }
+
+        /// <summary>
         /// Logs a custom user event to the Metica API.
         /// </summary>
         /// <remarks>

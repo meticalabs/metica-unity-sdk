@@ -90,10 +90,20 @@ namespace Metica.Unity
             LogEvent(attributes);
         }
 
+        // TODO: rename this method to reflect new API naming
         public void LogUserAttributes(Dictionary<string, object> userAttributes)
         {
             var attributes = new Dictionary<string, object>();
-            AddCommonEventAttributes(attributes, EventTypes.UserStateUpdate);
+            AddCommonEventAttributes(attributes, EventTypes.FullStateUpdate);
+            attributes[Constants.UserStateAttributes] = userAttributes;
+            LogEvent(attributes);
+        }
+
+        // TODO: rename this method to reflect new API naming
+        public void LogPartialUserAttributes(Dictionary<string, object> userAttributes)
+        {
+            var attributes = new Dictionary<string, object>();
+            AddCommonEventAttributes(attributes, EventTypes.PartialStateUpdate);
             attributes[Constants.UserStateAttributes] = userAttributes;
             LogEvent(attributes);
         }
