@@ -13,7 +13,10 @@ namespace Metica.Unity
         internal static readonly string OfferImpression = "impression";
         internal static readonly string OfferInteraction = "interaction";
         internal static readonly string OfferInAppPurchase = "purchase";
+        [Obsolete("Use EventTypes.FullStateUpdate")]
         internal static readonly string UserStateUpdate = "fullStateUpdate";
+        internal static readonly string FullStateUpdate = "fullStateUpdate";
+        internal static readonly string PartialStateUpdate = "partialStateUpdate";
     }
 
     internal abstract class Constants
