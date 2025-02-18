@@ -196,6 +196,12 @@ namespace Metica.Unity
         }
 
         /// <summary>
+        /// Alias for <see cref="LogUserAttributes"/>.
+        /// TODO: This method will become the one to log a user/player's state update with a full set of values.
+        /// </summary>
+        /// <param name="userAttributes"></param>
+        public static void LogFullStateUpdate(Dictionary<string, object> userAttributes) => LogUserAttributes(userAttributes);
+        /// <summary>
         /// Log an update of the user attributes.
         /// </summary>
         /// <param name="userAttributes">A mutable dictionary of user attributes. The keys represent attribute names and the values represent attribute values.</param>
