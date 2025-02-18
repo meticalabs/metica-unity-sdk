@@ -1,5 +1,7 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 // ReSharper disable all NotAccessedField.Global
@@ -218,7 +220,6 @@ namespace Metica.Unity
         /// <param name="eventType">The name/type of the event</param>
         /// <param name="userEvent">A dictionary containing the details of the user event. The dictionary should have string keys and object values.</param>
         /// <param name="reuseDictionary">Indicates if the passed dictionary can be modified to add additional Metica-specific attribute. Re-using the dictionary instance in this way can potentially save an allocation.</param>
-        /// <exception cref="ArgumentException">Thrown when a reserved <paramref name="eventType"/> is used.</exception>
         public static void LogUserEvent(string eventType, Dictionary<string, object> userEvent,
             bool reuseDictionary = false)
         {
@@ -229,7 +230,7 @@ namespace Metica.Unity
 
             if(Constants.ReservedEventNames.Contains(eventType))
             {
-                throw new ArgumentException($"A reserved name was used as {nameof(eventType)}. Core Events must be submitted via their specific methods, for example, for the 'purchase' {nameof(eventType)} relative to an offer, {nameof(LogOfferPurchase)} must be used.", nameof(eventType));
+                MeticaLogger.LogWarning(() => $"A reserved name was used as {nameof(eventType)}. Core Events should be submitted via their specific methods, for example, for the 'purchase' {nameof(eventType)} relative to an offer, {nameof(LogOfferPurchase)} should be used.");
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
