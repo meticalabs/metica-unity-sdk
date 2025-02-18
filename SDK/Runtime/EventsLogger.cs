@@ -84,8 +84,8 @@ namespace Metica.Unity
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.OfferInteraction);
+            attributes[Constants.InteractionType] = interactionType;
             var meticaAttributes = GetOrCreateMeticaAttributes(offerId, placementId);
-            meticaAttributes[Constants.InteractionType] = interactionType;
             attributes[Constants.MeticaAttributes] = meticaAttributes;
             LogEvent(attributes);
         }
