@@ -14,7 +14,7 @@ public class SampleScript : MonoBehaviour
     [SerializeField] private SdkConfigProvider _sdkConfiguration;
 
     [SerializeField] Text textElement;
-    [SerializeField] Button _getOffersButton, _getConfigButton, _getConfigSpecificButton, _logOfferDisplayButton, _logUserAttributesButton;
+    [SerializeField] Button _getOffersButton, _getConfigButton, _getConfigSpecificButton, _logOfferDisplayButton, _logUserAttributesButton, _logPartialUserAttributesButton;
     [SerializeField] InputField _configIdInput;
 
     void Start()
@@ -40,6 +40,7 @@ public class SampleScript : MonoBehaviour
         _getConfigSpecificButton.onClick.AddListener(TestGetConfigSpecific);
         _logOfferDisplayButton.onClick.AddListener(TestLogOfferDisplay);
         _logUserAttributesButton.onClick.AddListener(TestLogUserAttributes);
+        _logPartialUserAttributesButton.onClick.AddListener(TestPartialLogUserAttributes);
     }
 
     private void TestGetOffers()
@@ -121,6 +122,16 @@ public class SampleScript : MonoBehaviour
             });
     }
 
+    private void TestPartialLogUserAttributes()
+    {
+        textElement.text = "Logging user attributes";
+        MeticaAPI.LogPartialStateUpdate(new Dictionary<string, object>()
+            {
+                //{ "name", "Joe" },
+                { "level", 6 },
+            });
+    }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.O))
@@ -156,5 +167,6 @@ public class SampleScript : MonoBehaviour
         _getConfigSpecificButton.onClick.RemoveAllListeners();
         _logOfferDisplayButton.onClick.RemoveAllListeners();
         _logUserAttributesButton.onClick.RemoveAllListeners();
+        _logPartialUserAttributesButton.onClick.RemoveAllListeners();
     }
 }
