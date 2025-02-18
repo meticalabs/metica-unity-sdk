@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 // ReSharper disable all NotAccessedField.Global
 // ReSharper disable file UnusedMember.Local
@@ -210,15 +211,25 @@ namespace Metica.Unity
         /// <summary>
         /// Logs a custom user event to the Metica API.
         /// </summary>
+        /// <remarks>
+        /// Do not use this method for logging any of the documented <see href="https://docs.metica.com/integration#core-events">Core Events</see>.
+        /// If you do, an exception will be thrown. Specific methods are available for all of the listed Core event tpyes.
+        /// </remarks>
         /// <param name="eventType">The name/type of the event</param>
         /// <param name="userEvent">A dictionary containing the details of the user event. The dictionary should have string keys and object values.</param>
         /// <param name="reuseDictionary">Indicates if the passed dictionary can be modified to add additional Metica-specific attribute. Re-using the dictionary instance in this way can potentially save an allocation.</param>
+        /// <exception cref="ArgumentException">Thrown when a reserved <paramref name="eventType"/> is used.</exception>
         public static void LogUserEvent(string eventType, Dictionary<string, object> userEvent,
             bool reuseDictionary = false)
         {
             if (!checkPreconditions())
             {
                 return;
+            }
+
+            if(Constants.ReservedEventNames.Contains(eventType))
+            {
+                throw new ArgumentException($"A reserved name was used as {nameof(eventType)}. Core Events must be submitted via their specific methods, for example, for the 'purchase' {nameof(eventType)} relative to an offer, {nameof(LogOfferPurchase)} must be used.", nameof(eventType));
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();

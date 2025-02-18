@@ -36,6 +36,10 @@ namespace Metica.Unity
         internal static readonly string Offer = "offer";
         internal static readonly string DefaultLocale = "en-US";
         internal static readonly string DefaultAppVersion = "1.0.0";
+
+        internal static readonly string[] ReservedEventNames = new string[] {
+            "purchase", "impression", "interaction", "adRevenue", "fullStateUpdate", "partialStateUpdate", "login", "install"
+        };
     }
 
     [Serializable]
