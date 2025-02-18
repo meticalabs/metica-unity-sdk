@@ -10,10 +10,10 @@ namespace Metica.Unity
 {
     internal abstract class EventTypes
     {
-        internal static readonly string OfferImpression = "meticaOfferImpression";
-        internal static readonly string OfferInteraction = "meticaOfferInteraction";
-        internal static readonly string OfferInAppPurchase = "meticaOfferInAppPurchase";
-        internal static readonly string UserStateUpdate = "meticaUserStateUpdate";
+        internal static readonly string OfferImpression = "impression";
+        internal static readonly string OfferInteraction = "interaction";
+        internal static readonly string OfferInAppPurchase = "purchase";
+        internal static readonly string UserStateUpdate = "fullStateUpdate";
     }
 
     internal abstract class Constants
