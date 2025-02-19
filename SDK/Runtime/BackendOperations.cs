@@ -90,7 +90,8 @@ namespace Metica.Unity
                             {"X-API-KEY"} : {www.GetRequestHeader("X-API-KEY")}
                         Method: {www.method}
                         Timeout: {www.timeout}
-                        Url: {www.url}");
+                        Url: {www.url}
+                        Body: {jsonBody}");
 
                     yield return www.SendWebRequest();
 
@@ -103,6 +104,7 @@ namespace Metica.Unity
                     else
                     {
                         var responseText = www.downloadHandler.text;
+                        MeticaLogger.LogDebug(() => $"Response raw text:\n{responseText}");
 
                         if (string.IsNullOrEmpty(responseText) && (www.responseCode >= 200 || www.responseCode <= 204))
                         {
