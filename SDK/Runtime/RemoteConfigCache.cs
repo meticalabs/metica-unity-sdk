@@ -27,7 +27,9 @@ namespace Metica.Unity
 
         public object? Read(string configKey)
         {
-            return _cache?.Read(GetCacheKey(configKey));
+            object? value = _cache?.Read(GetCacheKey(configKey));
+            MeticaLogger.LogDebug(() => value == null ? "<b>CONFIG CACHE MISS</b>" : "<b>CONFIG CACHE HIT</b>");
+            return value;
         }
 
         public void Write(string configKey, object value, long ttlSeconds)
