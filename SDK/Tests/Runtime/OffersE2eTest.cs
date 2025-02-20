@@ -31,8 +31,8 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             MeticaAPI.Initialise(userId, appId, apiKey, config, result => Assert.That(result.Result));
             MeticaLogger.CurrentLogLevel = LogLevel.Info;
 
-            var displayLog = MeticaAPI.DisplayLog;
-            displayLog.Awake();
+            // var displayLog = MeticaAPI.DisplayLog;
+            // displayLog.Awake();
 
             yield return new WaitForSeconds(3);
 
@@ -101,8 +101,8 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             MeticaLogger.CurrentLogLevel = LogLevel.Info;
             LogAssert.ignoreFailingMessages = true;
 
-            var displayLog = MeticaAPI.DisplayLog;
-            displayLog.Awake();
+            // var displayLog = MeticaAPI.DisplayLog;
+            // displayLog.Awake();
 
             yield return new WaitForSeconds(3);
 
