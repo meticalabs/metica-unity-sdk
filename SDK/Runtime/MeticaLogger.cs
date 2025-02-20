@@ -12,7 +12,7 @@ namespace Metica.Unity
         Debug,
     }
 
-    public abstract class MeticaLogger
+    public static class MeticaLogger
     {
         public static LogLevel CurrentLogLevel { get; set; } = LogLevel.Error;
 

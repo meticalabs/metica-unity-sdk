@@ -71,9 +71,11 @@ namespace Metica.Unity
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.OfferInAppPurchase);
+            attributes[Constants.CurrencyCode] = currency;
+            attributes[Constants.TotalAmount] = amount;
             var meticaAttributes = GetOrCreateMeticaAttributes(offerId, placementId);
-            meticaAttributes[Constants.CurrencyCode] = currency;
-            meticaAttributes[Constants.TotalAmount] = amount;
+            //meticaAttributes[Constants.CurrencyCode] = currency;
+            //meticaAttributes[Constants.TotalAmount] = amount;
             attributes[Constants.MeticaAttributes] = meticaAttributes;
             LogEvent(attributes);
         }
@@ -82,16 +84,26 @@ namespace Metica.Unity
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.OfferInteraction);
+            attributes[Constants.InteractionType] = interactionType;
             var meticaAttributes = GetOrCreateMeticaAttributes(offerId, placementId);
-            meticaAttributes[Constants.InteractionType] = interactionType;
             attributes[Constants.MeticaAttributes] = meticaAttributes;
             LogEvent(attributes);
         }
 
+        // TODO: rename this method to reflect new API naming
         public void LogUserAttributes(Dictionary<string, object> userAttributes)
         {
             var attributes = new Dictionary<string, object>();
-            AddCommonEventAttributes(attributes, EventTypes.UserStateUpdate);
+            AddCommonEventAttributes(attributes, EventTypes.FullStateUpdate);
+            attributes[Constants.UserStateAttributes] = userAttributes;
+            LogEvent(attributes);
+        }
+
+        // TODO: rename this method to reflect new API naming
+        public void LogPartialUserAttributes(Dictionary<string, object> userAttributes)
+        {
+            var attributes = new Dictionary<string, object>();
+            AddCommonEventAttributes(attributes, EventTypes.PartialStateUpdate);
             attributes[Constants.UserStateAttributes] = userAttributes;
             LogEvent(attributes);
         }

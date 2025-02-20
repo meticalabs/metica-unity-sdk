@@ -34,7 +34,9 @@ namespace Metica.Unity
         
         public List<Offer>? Read(string placement)
         {
-            return _cache?.Read(CacheKeyForPlacement(placement));
+            List<Offer>? value = _cache?.Read(CacheKeyForPlacement(placement));
+            MeticaLogger.LogDebug(() => value == null ? "<b>OFFER CACHE MISS</b>" : "<b>OFFER CACHE HIT</b>");
+            return value;
         }
 
         public void Write(string placement, List<Offer> offers)

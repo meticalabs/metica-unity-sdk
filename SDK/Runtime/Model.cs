@@ -10,10 +10,13 @@ namespace Metica.Unity
 {
     internal abstract class EventTypes
     {
-        internal static readonly string OfferImpression = "meticaOfferImpression";
-        internal static readonly string OfferInteraction = "meticaOfferInteraction";
-        internal static readonly string OfferInAppPurchase = "meticaOfferInAppPurchase";
-        internal static readonly string UserStateUpdate = "meticaUserStateUpdate";
+        internal static readonly string OfferImpression = "impression";
+        internal static readonly string OfferInteraction = "interaction";
+        internal static readonly string OfferInAppPurchase = "purchase";
+        [Obsolete("Use EventTypes.FullStateUpdate")]
+        internal static readonly string UserStateUpdate = "fullStateUpdate";
+        internal static readonly string FullStateUpdate = "fullStateUpdate";
+        internal static readonly string PartialStateUpdate = "partialStateUpdate";
     }
 
     internal abstract class Constants
@@ -36,6 +39,10 @@ namespace Metica.Unity
         internal static readonly string Offer = "offer";
         internal static readonly string DefaultLocale = "en-US";
         internal static readonly string DefaultAppVersion = "1.0.0";
+
+        internal static readonly string[] ReservedEventNames = new string[] {
+            "purchase", "impression", "interaction", "adRevenue", "fullStateUpdate", "partialStateUpdate", "login", "install"
+        };
     }
 
     [Serializable]

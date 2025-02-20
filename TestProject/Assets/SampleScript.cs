@@ -13,8 +13,9 @@ public class SampleScript : MonoBehaviour
     [SerializeField] private string _apiKey = string.Empty;
     [SerializeField] private SdkConfigProvider _sdkConfiguration;
 
-    GameObject canvas;
-    Text textElement;
+    [SerializeField] Text textElement;
+    [SerializeField] Button _getOffersButton, _getConfigButton, _getConfigSpecificButton, _logOfferDisplayButton, _logUserAttributesButton, _logPartialUserAttributesButton;
+    [SerializeField] InputField _configIdInput;
 
     void Start()
     {
@@ -22,22 +23,6 @@ public class SampleScript : MonoBehaviour
         Assert.IsFalse(string.IsNullOrEmpty(_appId));
         Assert.IsFalse(string.IsNullOrEmpty(_apiKey));
         Assert.IsNotNull(_sdkConfiguration, "Please assign an Sdk Configuration. A new one can be created in Create > Metica > SDK > New SDK Configuration.");
-
-        // Create new Canvas GameObject
-        canvas = new GameObject("Canvas");
-        Canvas c = canvas.AddComponent<Canvas>();
-        c.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.AddComponent<CanvasScaler>();
-        canvas.AddComponent<GraphicRaycaster>();
-
-        // Create the Button
-        var elements = new GameObject("Elements");
-        elements.transform.SetParent(canvas.transform, false);
-
-        // textElement = new GameObject("Text", typeof(Text)).GetComponent<Text>();
-        textElement = elements.AddComponent<Text>();
-        textElement.transform.SetParent(canvas.transform, false);
-        textElement.color = Color.white;
 
         Font legacyFont = (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
         textElement.font = legacyFont;
@@ -49,87 +34,139 @@ public class SampleScript : MonoBehaviour
 
         MeticaAPI.Initialise(_userId, _appId, _apiKey, _sdkConfiguration.SdkConfig,
             (result => textElement.text = (result.Result ? "Initialised" : "Failed to initialise")));
+
+        _getOffersButton.onClick.AddListener(TestGetOffers);
+        _getConfigButton.onClick.AddListener(TestGetConfig);
+        _getConfigSpecificButton.onClick.AddListener(TestGetConfigSpecific);
+        _logOfferDisplayButton.onClick.AddListener(TestLogOfferDisplay);
+        _logUserAttributesButton.onClick.AddListener(TestLogUserAttributes);
+        _logPartialUserAttributesButton.onClick.AddListener(TestPartialLogUserAttributes);
+    }
+
+    private void TestGetOffers()
+    {
+        MeticaAPI.UserId = _userId;
+        MeticaAPI.GetOffers(null, (result) =>
+        {
+            if (result.Error != null)
+            {
+                textElement.text = "Error: " + result.Error;
+            }
+            else
+            {
+                var resultPlacements = result.Result.placements;
+                //textElement.text = "Offers: " + (resultPlacements.ContainsKey("generic") ? resultPlacements["generic"].Count : 0) + " offers found";
+                StringBuilder sb = new();
+                foreach (var placement in resultPlacements)
+                {
+                    sb.Append($"Offers:\n[{placement.Key}] #{placement.Value.Count}\n");
+                    foreach (var p in placement.Value)
+                    {
+                        sb.AppendLine($"\tid:{p.offerId}");
+                    }
+                }
+                textElement.text = sb.ToString();
+            }
+        });
+    }
+
+    private void TestGetConfig()
+    {
+        MeticaAPI.UserId = _userId;
+        // Retrieve all configs
+        MeticaAPI.GetConfig(result =>
+        {
+            if (result.Error != null)
+            {
+                textElement.text = "GetConfig Error: " + result.Error;
+            }
+            else
+            {
+                var configStr = JsonConvert.SerializeObject(result.Result);
+                textElement.text = "Config: " + configStr;
+            }
+        });
+    }
+
+    private void TestGetConfigSpecific()
+    {
+        MeticaAPI.UserId = _userId;
+        // Retrieve config with specific name
+        MeticaAPI.GetConfig(result =>
+        {
+            if (result.Error != null)
+            {
+                textElement.text = "GetConfig Error: " + result.Error;
+            }
+            else
+            {
+                var configStr = JsonConvert.SerializeObject(result.Result);
+                textElement.text = "Config: " + configStr;
+            }
+        }, new List<string> { _configIdInput.text });
+    }
+
+    private void TestLogOfferDisplay()
+    {
+        textElement.text = "Logging offer display";
+        MeticaAPI.LogOfferDisplay("offerId", "main");
+    }
+
+    private void TestLogUserAttributes()
+    {
+        textElement.text = "Logging user attributes";
+        MeticaAPI.LogUserAttributes(new Dictionary<string, object>()
+            {
+                { "name", "Joe" },
+                { "level", 5 },
+            });
+    }
+
+    private void TestPartialLogUserAttributes()
+    {
+        textElement.text = "Logging user attributes";
+        MeticaAPI.LogPartialStateUpdate(new Dictionary<string, object>()
+            {
+                //{ "name", "Joe" },
+                { "level", 6 },
+            });
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.O))
         {
-            MeticaAPI.UserId = _userId;
-            MeticaAPI.GetOffers(null, (result) =>
-            {
-                if (result.Error != null)
-                {
-                    textElement.text = "Error: " + result.Error;
-                }
-                else
-                {
-                    var resultPlacements = result.Result.placements;
-                    //textElement.text = "Offers: " + (resultPlacements.ContainsKey("generic") ? resultPlacements["generic"].Count : 0) + " offers found";
-                    StringBuilder sb = new();
-                    foreach (var placement in resultPlacements)
-                    {
-                        sb.Append($"Offers:\n[{placement.Key}] #{placement.Value.Count}\n");
-                        foreach (var p in placement.Value)
-                        {
-                            sb.AppendLine($"\tid:{p.offerId}");
-                        }
-                    }
-                    textElement.text = sb.ToString();
-                }
-            });
+            TestGetOffers();
         }
 
         if (Input.GetKeyDown(KeyCode.C))
         {
-            MeticaAPI.UserId = _userId;
-            // Retrieve all configs
-            MeticaAPI.GetConfig(result =>
-            {
-                if (result.Error != null)
-                {
-                    textElement.text = "GetConfig Error: " + result.Error;
-                }
-                else
-                {
-                    var configStr = JsonConvert.SerializeObject(result.Result);
-                    textElement.text = "Config: " + configStr;
-                }
-            });
+            TestGetConfig();
         }
 
         if (Input.GetKeyDown(KeyCode.D))
         {
-            MeticaAPI.UserId = _userId;
-            // Retrieve config with specific name
-            MeticaAPI.GetConfig(result =>
-            {
-                if (result.Error != null)
-                {
-                    textElement.text = "GetConfig Error: " + result.Error;
-                }
-                else
-                {
-                    var configStr = JsonConvert.SerializeObject(result.Result);
-                    textElement.text = "Config: " + configStr;
-                }
-            }, new List<string> { "hello_world" });
+            TestGetConfigSpecific();
         }
 
         if (Input.GetKeyDown(KeyCode.L))
         {
-            textElement.text = "Logging offer display";
-            MeticaAPI.LogOfferDisplay("offerId", "main");
+            TestLogOfferDisplay();
         }
 
         if (Input.GetKeyDown(KeyCode.U))
         {
-            textElement.text = "Logging user attributes";
-            MeticaAPI.LogUserAttributes(new Dictionary<string, object>()
-            {
-                { "name", "Joe" },
-                { "level", 5 },
-            });
+            TestLogUserAttributes();
         }
+    }
+
+    private void OnDestroy()
+    {
+        _getOffersButton.onClick.RemoveAllListeners();
+        _getConfigButton.onClick.RemoveAllListeners();
+        _getConfigSpecificButton.onClick.RemoveAllListeners();
+        _logOfferDisplayButton.onClick.RemoveAllListeners();
+        _logUserAttributesButton.onClick.RemoveAllListeners();
+        _logPartialUserAttributesButton.onClick.RemoveAllListeners();
     }
 }

@@ -1,5 +1,8 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 // ReSharper disable all NotAccessedField.Global
 // ReSharper disable file UnusedMember.Local
@@ -26,7 +29,7 @@ namespace Metica.Unity
     /// </summary>
     public class MeticaAPI
     {
-        public static string SDKVersion = "1.2.0";
+        public static string SDKVersion = "1.2.4";
         public static string UserId { get; set; }
         public static string AppId { get; internal set; }
         public static string ApiKey { get; internal set; }
@@ -193,6 +196,12 @@ namespace Metica.Unity
         }
 
         /// <summary>
+        /// Alias for <see cref="LogUserAttributes"/>.
+        /// TODO: This method will become the one to log a user/player's state update with a full set of values.
+        /// </summary>
+        /// <param name="userAttributes"></param>
+        public static void LogFullStateUpdate(Dictionary<string, object> userAttributes) => LogUserAttributes(userAttributes);
+        /// <summary>
         /// Log an update of the user attributes.
         /// </summary>
         /// <param name="userAttributes">A mutable dictionary of user attributes. The keys represent attribute names and the values represent attribute values.</param>
@@ -208,8 +217,27 @@ namespace Metica.Unity
         }
 
         /// <summary>
+        /// Log a partial update of a user's state (attributes).
+        /// </summary>
+        /// <param name="userAttributes"></param>
+        public static void LogPartialStateUpdate(Dictionary<string, object> userAttributes)
+        {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogPartialUserAttributes(userAttributes);
+        }
+
+        /// <summary>
         /// Logs a custom user event to the Metica API.
         /// </summary>
+        /// <remarks>
+        /// Do not use this method for logging any of the documented <see href="https://docs.metica.com/integration#core-events">Core Events</see>.
+        /// If you do, an exception will be thrown. Specific methods are available for all of the listed Core event tpyes.
+        /// </remarks>
         /// <param name="eventType">The name/type of the event</param>
         /// <param name="userEvent">A dictionary containing the details of the user event. The dictionary should have string keys and object values.</param>
         /// <param name="reuseDictionary">Indicates if the passed dictionary can be modified to add additional Metica-specific attribute. Re-using the dictionary instance in this way can potentially save an allocation.</param>
@@ -219,6 +247,11 @@ namespace Metica.Unity
             if (!checkPreconditions())
             {
                 return;
+            }
+
+            if(Constants.ReservedEventNames.Contains(eventType))
+            {
+                MeticaLogger.LogWarning(() => $"A reserved name was used as {nameof(eventType)}. Core Events should be submitted via their specific methods, for example, for the 'purchase' {nameof(eventType)} relative to an offer, {nameof(LogOfferPurchase)} should be used.");
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
