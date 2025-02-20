@@ -36,8 +36,6 @@ namespace Metica.Unity
 
         public static SdkConfig Config { get; internal set; }
         
-        internal static DisplayLog DisplayLog { get; set; }
-
         internal static IOffersManager OffersManager { get; set; }
 
         internal static IRemoteConfigManager RemoteConfigManager { get; set; }
@@ -79,7 +77,6 @@ namespace Metica.Unity
             OffersManager = new OffersManager();
             RemoteConfigManager = new RemoteConfigManager();
 
-            DisplayLog = ScriptingObjects.GetComponent<DisplayLog>();
             OffersCache = ScriptingObjects.GetComponent<OffersCache>();
             RemoteConfigCache = ScriptingObjects.GetComponent<RemoteConfigCache>();
 
@@ -153,11 +150,6 @@ namespace Metica.Unity
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
             logger.LogOfferDisplay(offerId, placementId);
-
-            DisplayLog.AppendDisplayLogs(new[]
-            {
-                DisplayLogEntry.Create(offerId, placementId)
-            });
         }
 
        #endregion Offer Impression
