@@ -123,11 +123,11 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
 
             var meticaAttributes = (Dictionary<string, object>)recordedEvent[Constants.MeticaAttributes];
             var offerDetails = (Dictionary<string, object>)meticaAttributes[Constants.Offer];
+            Assert.That(recordedEvent[Constants.TotalAmount], Is.EqualTo(1.0));
+            Assert.That(recordedEvent[Constants.CurrencyCode], Is.EqualTo("USD"));
             Assert.That(offerDetails[Constants.BundleId], Is.EqualTo(Utils.testBundleId));
             Assert.That(offerDetails[Constants.VariantId], Is.EqualTo(Utils.testVariantId));
             Assert.That(meticaAttributes[Constants.PlacementId], Is.EqualTo(Utils.testPlacementId));
-            Assert.That(meticaAttributes[Constants.TotalAmount], Is.EqualTo(1.0));
-            Assert.That(meticaAttributes[Constants.CurrencyCode], Is.EqualTo("USD"));
         }
 
         [Test]
@@ -164,10 +164,10 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
 
             var meticaAttributes = (Dictionary<string, object>)recordedEvent[Constants.MeticaAttributes];
             var offerDetails = (Dictionary<string, object>)meticaAttributes[Constants.Offer];
+            Assert.That(recordedEvent[Constants.InteractionType], Is.EqualTo("click"));
             Assert.That(offerDetails[Constants.BundleId], Is.EqualTo(Utils.testBundleId));
             Assert.That(offerDetails[Constants.VariantId], Is.EqualTo(Utils.testVariantId));
             Assert.That(meticaAttributes[Constants.PlacementId], Is.EqualTo(Utils.testPlacementId));
-            Assert.That(meticaAttributes[Constants.InteractionType], Is.EqualTo("click"));
         }
 
         [Test]
