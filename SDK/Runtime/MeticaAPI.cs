@@ -1,7 +1,5 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 // ReSharper disable all NotAccessedField.Global
@@ -27,7 +25,7 @@ namespace Metica.Unity
     /// <summary>
     /// The main class for interacting with the Metica API.
     /// </summary>
-    public class MeticaAPI
+    public static class MeticaAPI
     {
         public static string SDKVersion = "1.2.4";
         public static string UserId { get; set; }
@@ -139,6 +137,8 @@ namespace Metica.Unity
             }
         }
 
+        #region Offer Impression
+
         /// <summary>
         /// Logs the display of an offer.
         /// </summary>
@@ -160,6 +160,10 @@ namespace Metica.Unity
             });
         }
 
+       #endregion Offer Impression
+
+        #region Offer Purchase
+
         /// <summary>
         /// Logs the purchase of an offer.
         /// </summary>
@@ -178,6 +182,21 @@ namespace Metica.Unity
             logger.LogOfferPurchase(offerId, placementId, amount, currency);
         }
 
+        public static void LogOfferPurchaseWithProductId(string productId, double amount, string currency)
+        {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogOfferPurchaseWithProductId(productId, amount, currency);
+        }
+
+        #endregion Offer Purchase
+
+        #region Offer Interaction
+
         /// <summary>
         /// Logs an offer interaction event.
         /// </summary>
@@ -194,6 +213,19 @@ namespace Metica.Unity
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
             logger.LogOfferInteraction(offerId, placementId, interactionType);
         }
+
+        public static void LogOfferInteractionWithProductId(string productId, string interactionType)
+        {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogOfferInteractionWithProductId(productId, interactionType);
+        }
+
+        #endregion Offer Interaction
 
         /// <summary>
         /// Alias for <see cref="LogUserAttributes"/>.
