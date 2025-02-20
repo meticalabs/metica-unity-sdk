@@ -69,6 +69,13 @@ namespace Metica.Unity
             LogEvent(attributes);
         }
 
+        public void LogOfferDisplayWithProductId(string productId)
+        {
+            var attributes = new Dictionary<string, object>();
+            AddCommonEventAttributes(attributes, EventTypes.OfferImpression);
+            attributes[Constants.AppId] = productId;
+            LogEvent(attributes);
+        }
 
         #endregion Offer Impression
 
@@ -87,12 +94,6 @@ namespace Metica.Unity
             LogEvent(attributes);
         }
 
-        /// <summary>
-        /// Logs an offer purchase event using a `productId` value instead of Metica information.
-        /// </summary>
-        /// <param name="productId">The id of the purchased product.</param>
-        /// <param name="amount">The spent amount.</param>
-        /// <param name="currency">The currency used for this purchase.</param>
         public void LogOfferPurchaseWithProductId(string productId, double amount, string currency)
         {
             var attributes = new Dictionary <string, object>();

@@ -152,6 +152,21 @@ namespace Metica.Unity
             logger.LogOfferDisplay(offerId, placementId);
         }
 
+        /// <summary>
+        /// Logs an offer impression event using a `productId` value instead of Metica information.
+        /// </summary>
+        /// <param name="productId">The id of the displayed product.</param>
+        public static void LogOfferDisplayWithProductId(string productId)
+        {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogOfferDisplayWithProductId(productId);
+        }
+
        #endregion Offer Impression
 
         #region Offer Purchase
@@ -174,6 +189,12 @@ namespace Metica.Unity
             logger.LogOfferPurchase(offerId, placementId, amount, currency);
         }
 
+        /// <summary>
+        /// Logs an offer purchase event using a `productId` value instead of Metica information.
+        /// </summary>
+        /// <param name="productId">The id of the purchased product.</param>
+        /// <param name="amount">The spent amount.</param>
+        /// <param name="currency">The currency used for this purchase.</param>
         public static void LogOfferPurchaseWithProductId(string productId, double amount, string currency)
         {
             if (!checkPreconditions())
