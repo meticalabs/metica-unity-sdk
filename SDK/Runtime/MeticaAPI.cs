@@ -29,7 +29,7 @@ namespace Metica.Unity
     /// </summary>
     public class MeticaAPI
     {
-        public static string SDKVersion = "1.2.0";
+        public static string SDKVersion = "1.2.4";
         public static string UserId { get; set; }
         public static string AppId { get; internal set; }
         public static string ApiKey { get; internal set; }

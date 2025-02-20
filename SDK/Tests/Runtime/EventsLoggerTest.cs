@@ -170,6 +170,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             Assert.That(meticaAttributes[Constants.PlacementId], Is.EqualTo(Utils.testPlacementId));
         }
 
+        // TODO: add test for partial state update and rename the following to TestTheAttributesOfFullStateUpdate
         [Test]
         public void TestTheAttributesOfUserStateUpdate()
         {
