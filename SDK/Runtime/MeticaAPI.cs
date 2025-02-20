@@ -1,7 +1,5 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 // ReSharper disable all NotAccessedField.Global
@@ -27,7 +25,7 @@ namespace Metica.Unity
     /// <summary>
     /// The main class for interacting with the Metica API.
     /// </summary>
-    public class MeticaAPI
+    public static class MeticaAPI
     {
         public static string SDKVersion = "1.2.4";
         public static string UserId { get; set; }
@@ -38,8 +36,6 @@ namespace Metica.Unity
 
         public static SdkConfig Config { get; internal set; }
         
-        internal static DisplayLog DisplayLog { get; set; }
-
         internal static IOffersManager OffersManager { get; set; }
 
         internal static IRemoteConfigManager RemoteConfigManager { get; set; }
@@ -81,7 +77,6 @@ namespace Metica.Unity
             OffersManager = new OffersManager();
             RemoteConfigManager = new RemoteConfigManager();
 
-            DisplayLog = ScriptingObjects.GetComponent<DisplayLog>();
             OffersCache = ScriptingObjects.GetComponent<OffersCache>();
             RemoteConfigCache = ScriptingObjects.GetComponent<RemoteConfigCache>();
 
@@ -139,6 +134,8 @@ namespace Metica.Unity
             }
         }
 
+        #region Offer Impression
+
         /// <summary>
         /// Logs the display of an offer.
         /// </summary>
@@ -153,12 +150,26 @@ namespace Metica.Unity
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
             logger.LogOfferDisplay(offerId, placementId);
-
-            DisplayLog.AppendDisplayLogs(new[]
-            {
-                DisplayLogEntry.Create(offerId, placementId)
-            });
         }
+
+        /// <summary>
+        /// Logs an offer impression event using a `productId` value instead of Metica information.
+        /// </summary>
+        /// <param name="productId">The id of the displayed product.</param>
+        public static void LogOfferDisplayWithProductId(string productId)
+        {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogOfferDisplayWithProductId(productId);
+        }
+
+       #endregion Offer Impression
+
+        #region Offer Purchase
 
         /// <summary>
         /// Logs the purchase of an offer.
@@ -179,6 +190,27 @@ namespace Metica.Unity
         }
 
         /// <summary>
+        /// Logs an offer purchase event using a `productId` value instead of Metica information.
+        /// </summary>
+        /// <param name="productId">The id of the purchased product.</param>
+        /// <param name="amount">The spent amount.</param>
+        /// <param name="currency">The currency used for this purchase.</param>
+        public static void LogOfferPurchaseWithProductId(string productId, double amount, string currency)
+        {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogOfferPurchaseWithProductId(productId, amount, currency);
+        }
+
+        #endregion Offer Purchase
+
+        #region Offer Interaction
+
+        /// <summary>
         /// Logs an offer interaction event.
         /// </summary>
         /// <param name="offerId">The ID of the offer.</param>
@@ -194,6 +226,19 @@ namespace Metica.Unity
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
             logger.LogOfferInteraction(offerId, placementId, interactionType);
         }
+
+        public static void LogOfferInteractionWithProductId(string productId, string interactionType)
+        {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogOfferInteractionWithProductId(productId, interactionType);
+        }
+
+        #endregion Offer Interaction
 
         /// <summary>
         /// Alias for <see cref="LogUserAttributes"/>.

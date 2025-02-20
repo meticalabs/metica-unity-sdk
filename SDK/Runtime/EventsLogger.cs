@@ -59,6 +59,8 @@ namespace Metica.Unity
             LogEvent(attributes);
         }
 
+        #region Offer Impression
+
         public void LogOfferDisplay(string offerId, string placementId)
         {
             var attributes = new Dictionary<string, object>();
@@ -66,6 +68,18 @@ namespace Metica.Unity
             attributes[Constants.MeticaAttributes] = GetOrCreateMeticaAttributes(offerId, placementId);
             LogEvent(attributes);
         }
+
+        public void LogOfferDisplayWithProductId(string productId)
+        {
+            var attributes = new Dictionary<string, object>();
+            AddCommonEventAttributes(attributes, EventTypes.OfferImpression);
+            attributes[Constants.AppId] = productId;
+            LogEvent(attributes);
+        }
+
+        #endregion Offer Impression
+
+        #region Offer Purchase
 
         public void LogOfferPurchase(string offerId, string placementId, double amount, string currency)
         {
@@ -80,6 +94,20 @@ namespace Metica.Unity
             LogEvent(attributes);
         }
 
+        public void LogOfferPurchaseWithProductId(string productId, double amount, string currency)
+        {
+            var attributes = new Dictionary <string, object>();
+            AddCommonEventAttributes(attributes, EventTypes.OfferInAppPurchase);
+            attributes[Constants.CurrencyCode] = currency;
+            attributes[Constants.TotalAmount] = amount;
+            attributes[Constants.ProductId] = productId;
+            LogEvent(attributes);
+        }
+
+        #endregion Offer Purchase
+
+        #region Offer Interaction
+
         public void LogOfferInteraction(string offerId, string placementId, string interactionType)
         {
             var attributes = new Dictionary<string, object>();
@@ -89,6 +117,22 @@ namespace Metica.Unity
             attributes[Constants.MeticaAttributes] = meticaAttributes;
             LogEvent(attributes);
         }
+
+        /// <summary>
+        /// Logs an offer interaction event using a `productId` value instead of Metica information.
+        /// </summary>
+        /// <param name="productId">The id of the purchased product.</param>
+        /// <param name="interactionType">The type of interaction performed by the user.</param>
+        public void LogOfferInteractionWithProductId(string productId, string interactionType)
+        {
+            var attributes = new Dictionary<string, object>();
+            AddCommonEventAttributes(attributes, EventTypes.OfferInteraction);
+            attributes[Constants.ProductId] = productId;
+            attributes[Constants.InteractionType] = interactionType;
+            LogEvent(attributes);
+        }
+
+        #endregion Offer Interaction
 
         // TODO: rename this method to reflect new API naming
         public void LogUserAttributes(Dictionary<string, object> userAttributes)

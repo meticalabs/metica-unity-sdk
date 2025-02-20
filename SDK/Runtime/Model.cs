@@ -26,6 +26,7 @@ namespace Metica.Unity
         internal static readonly string TotalAmount = "totalAmount";
         internal static readonly string PlacementId = "placementId";
         internal static readonly string OfferId = "offerId";
+        internal static readonly string ProductId = "productId";
         internal static readonly string VariantId = "variantId";
         internal static readonly string BundleId = "bundleId";
         internal static readonly string UserId = "userId";
