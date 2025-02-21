@@ -15,6 +15,8 @@ namespace Metica.Unity
 
         private Coroutine _logEventsRoutine;
 
+        #region Unity Lifecycle
+
         void Start()
         {
             if (Application.isEditor && !Application.isPlaying)
@@ -37,6 +39,8 @@ namespace Metica.Unity
             FlushEvents();
         }
 
+        #endregion Unity Lifecycle
+
         private void LogEvent(Dictionary<string, object> eventDetails)
         {
             _eventsList.AddFirst(eventDetails);
@@ -46,18 +50,6 @@ namespace Metica.Unity
             }
         }
 
-        public void LogCustomEvent(string eventType, Dictionary<string, object> eventDetails, bool reuseDictionary)
-        {
-            if (eventType == null)
-            {
-                MeticaLogger.LogError(() => "The event type must be specified");
-                return;
-            }
-
-            var attributes = reuseDictionary ? eventDetails : new Dictionary<string, object>(eventDetails);
-            AddCommonEventAttributes(attributes, eventType);
-            LogEvent(attributes);
-        }
 
         #region Offer Impression
 
@@ -134,6 +126,24 @@ namespace Metica.Unity
 
         #endregion Offer Interaction
 
+        #region Ad Revenue
+
+        public void LogAdRevenue(double amount, string currencyCode, string adPlacement = null, string adPlacementType = null, string adPlacementSource = null)
+        {
+            var attributes = new Dictionary<string, object>();
+            AddCommonEventAttributes(attributes, EventTypes.AdRevenue);
+            attributes[Constants.CurrencyCode] = currencyCode;
+            attributes[Constants.TotalAmount] = amount;
+            attributes[Constants.AdPlacement] = adPlacement;
+            attributes[Constants.AdPlacementType] = adPlacementType;
+            attributes[Constants.AdPlacementSource] = adPlacementSource;
+            LogEvent(attributes);
+        }
+
+        #endregion Ad Revenue
+
+        #region State Update
+
         // TODO: rename this method to reflect new API naming
         public void LogUserAttributes(Dictionary<string, object> userAttributes)
         {
@@ -151,6 +161,25 @@ namespace Metica.Unity
             attributes[Constants.UserStateAttributes] = userAttributes;
             LogEvent(attributes);
         }
+
+        #endregion State Update
+
+        #region Custom Event
+
+        public void LogCustomEvent(string eventType, Dictionary<string, object> eventDetails, bool reuseDictionary)
+        {
+            if (eventType == null)
+            {
+                MeticaLogger.LogError(() => "The event type must be specified");
+                return;
+            }
+
+            var attributes = reuseDictionary ? eventDetails : new Dictionary<string, object>(eventDetails);
+            AddCommonEventAttributes(attributes, eventType);
+            LogEvent(attributes);
+        }
+
+        #endregion Custom Event
 
         private IEnumerator LogEventsRoutine()
         {
