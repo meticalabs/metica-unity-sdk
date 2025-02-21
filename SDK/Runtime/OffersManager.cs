@@ -67,58 +67,42 @@ namespace Metica.Unity
                             }
                             
                             // filter out the offers that have exceeded their display limit
-                            offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(HandleDisplayLimitForReturnedOffers(new OffersByPlacement() { placements = resultOffers })));
+                            offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(new OffersByPlacement() { placements = resultOffers }));
                         }
                     },
                     userProperties, deviceInfo);
             }
             else
             {
-                offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(HandleDisplayLimitForReturnedOffers(new OffersByPlacement() { placements = resultOffers })));
+                offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(new OffersByPlacement() { placements = resultOffers }));
             }
         }
         
-        private OffersByPlacement HandleDisplayLimitForReturnedOffers(OffersByPlacement offersByPlacement)
-        {
-            var filteredDictionary = offersByPlacement.placements.ToDictionary(
-                offersByPlacement => offersByPlacement.Key,
-                offersByPlacement => MeticaAPI.DisplayLog.FilterOffers(offersByPlacement.Value));
-
-            LogDisplays(filteredDictionary);
-
-            return new OffersByPlacement()
-            {
-                placements = filteredDictionary
-            };
-        }
-
         // Logs the display of offers by placement.
         // 
         // Parameters:
         //   offersByPlacement: A dictionary containing offers grouped by placement.
         //
         // Returns: void
-        private void LogDisplays(Dictionary<string, List<Offer>> offersByPlacement)
-        {
-            var currentTime = MeticaAPI.TimeSource.EpochSeconds();
-            var offerIds = new HashSet<String>();
+        //private void LogDisplays(Dictionary<string, List<Offer>> offersByPlacement)
+        //{
+        //    var currentTime = MeticaAPI.TimeSource.EpochSeconds();
+        //    var offerIds = new HashSet<String>();
 
-            foreach (var entry in offersByPlacement)
-            {
-                var newEntries = from offer in entry.Value
-                    where !offerIds.Contains(offer.offerId) && offer.displayLimits != null && offer.metrics?.display?.meticaAttributes?.offer != null
-                    let displayLogEntry = DisplayLogEntry.Create(
-                        offerId: offer.offerId,
-                        placementId: entry.Key,
-                        variantId: offer.metrics.display.meticaAttributes.offer.variantId
-                    )
-                    select displayLogEntry;
+        //    foreach (var entry in offersByPlacement)
+        //    {
+        //        var newEntries = from offer in entry.Value
+        //            where !offerIds.Contains(offer.offerId) && offer.displayLimits != null && offer.metrics?.display?.meticaAttributes?.offer != null
+        //            let displayLogEntry = DisplayLogEntry.Create(
+        //                offerId: offer.offerId,
+        //                placementId: entry.Key,
+        //                variantId: offer.metrics.display.meticaAttributes.offer.variantId
+        //            )
+        //            select displayLogEntry;
 
-                MeticaAPI.DisplayLog.AppendDisplayLogs(newEntries);
-
-                offerIds.UnionWith(from e in newEntries select e.offerId);
-            }
-        }
+        //        offerIds.UnionWith(from e in newEntries select e.offerId);
+        //    }
+        //}
 
         private bool isSupportedPlatform()
         {

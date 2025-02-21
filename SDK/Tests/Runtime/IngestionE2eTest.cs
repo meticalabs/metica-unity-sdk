@@ -32,8 +32,8 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
 
             MeticaAPI.Initialise(userId, appId, apiKey, config, result => Assert.That(result.Result));
 
-            var displayLog = MeticaAPI.DisplayLog;
-            displayLog.Awake();
+            // var displayLog = MeticaAPI.DisplayLog;
+            // displayLog.Awake();
 
             yield return new WaitForSeconds(3);
 

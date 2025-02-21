@@ -22,7 +22,7 @@ abstract class Utils
         MeticaLogger.CurrentLogLevel = LogLevel.Info;
         MeticaAPI.OffersCache.Clear();
         MeticaAPI.RemoteConfigCache.Clear();
-        MeticaAPI.DisplayLog.Clear();
+        // MeticaAPI.DisplayLog.Clear();
     }
 
     public static string RandomUserId()
