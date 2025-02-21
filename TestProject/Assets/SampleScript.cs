@@ -14,7 +14,7 @@ public class SampleScript : MonoBehaviour
     [SerializeField] private SdkConfigProvider _sdkConfiguration;
 
     [SerializeField] Text textElement;
-    [SerializeField] Button _getOffersButton, _getConfigButton, _getConfigSpecificButton, _logOfferDisplayButton, _logUserAttributesButton, _logPartialUserAttributesButton;
+    [SerializeField] Button _getOffersButton, _getConfigButton, _getConfigSpecificButton, _logOfferDisplayButton, _logUserAttributesButton, _logPartialUserAttributesButton, _logAdRevenueButton;
     [SerializeField] InputField _configIdInput;
 
     void Start()
@@ -41,6 +41,7 @@ public class SampleScript : MonoBehaviour
         _logOfferDisplayButton.onClick.AddListener(TestLogOfferDisplay);
         _logUserAttributesButton.onClick.AddListener(TestLogUserAttributes);
         _logPartialUserAttributesButton.onClick.AddListener(TestPartialLogUserAttributes);
+        _logAdRevenueButton.onClick.AddListener(TestLogAdRevenue);
     }
 
     private void TestGetOffers()
@@ -109,7 +110,7 @@ public class SampleScript : MonoBehaviour
     private void TestLogOfferDisplay()
     {
         textElement.text = "Logging offer display";
-        MeticaAPI.LogOfferDisplay("offerId", "main");
+        MeticaAPI.LogOfferDisplay("offerId", "23851");
     }
 
     private void TestLogUserAttributes()
@@ -130,6 +131,12 @@ public class SampleScript : MonoBehaviour
                 //{ "name", "Joe" },
                 { "level", 6 },
             });
+    }
+
+    private void TestLogAdRevenue()
+    {
+        textElement.text = "Logging Ad Revenue";
+        MeticaAPI.LogAdRevenue(0.0001d, "GBP", "GameOverScreen", "video", "serendipitAds");
     }
 
     void Update()

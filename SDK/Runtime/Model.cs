@@ -17,6 +17,7 @@ namespace Metica.Unity
         internal static readonly string UserStateUpdate = "fullStateUpdate";
         internal static readonly string FullStateUpdate = "fullStateUpdate";
         internal static readonly string PartialStateUpdate = "partialStateUpdate";
+        internal static readonly string AdRevenue = "adRevenue";
     }
 
     internal abstract class Constants
@@ -25,6 +26,9 @@ namespace Metica.Unity
         internal static readonly string CurrencyCode = "currencyCode";
         internal static readonly string TotalAmount = "totalAmount";
         internal static readonly string PlacementId = "placementId";
+        internal static readonly string AdPlacement = "placement";
+        internal static readonly string AdPlacementType = "type";
+        internal static readonly string AdPlacementSource = "source";
         internal static readonly string OfferId = "offerId";
         internal static readonly string ProductId = "productId";
         internal static readonly string VariantId = "variantId";
