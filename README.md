@@ -52,7 +52,7 @@ the '+' button in the top left corner. Select "Add package from git URL" and ent
 ### 1. Initialize the API
 
 Use the `Initialise` method to prepare the MeticaAPI for use. To obtain your API key please contact Metica.  
-⚠️: This method is obsolete. Please use the next call.
+⚠️: This method is obsolete. Please prefer the next call using `SdkConfig`.
 ```csharp
 MeticaAPI.Initialise("userId", "appId", "apiKey", result => { 
     if (result.Result) { Debug.Log("Metica API Initialized"); } 
@@ -77,9 +77,9 @@ The SdkConfig provides the following configuration parameters
 | `offersEndpoint`           | The full endpoint to the Metica offers endpoint.                                                                                                                                                  |
 | `ingestionEndpoint`        | The full endpoint to the Metica ingestion service.                                                                                                                                                |
 | `remoteConfigEndpoint`     | The full endpoint to the Metica remote config service.                                                                                                                                            |
-| `maxDisplayLogEntries`     | The maximum number of entries stored in the displays log. This limit is shared by all offers and once reached, oldest entries will be removed and replaced by newly incoming ones.                |
-| `displayLogFlushCadence`   | The cadence, in seconds, by which the displays log will be persisted to the filesystem.                                                                                                           |
-| `displayLogPath`           | The filesystem path where the display log will be persisted.                                                                                                                                      |
+| `maxDisplayLogEntries`     | [Obsolete] The maximum number of entries stored in the displays log. This limit is shared by all offers and once reached, oldest entries will be removed and replaced by newly incoming ones.                |
+| `displayLogFlushCadence`   | [Obsolete] The cadence, in seconds, by which the displays log will be persisted to the filesystem.                                                                                                           |
+| `displayLogPath`           | [Obsolete] The filesystem path where the display log will be persisted.                                                                                                                                      |
 | `eventsLogFlushCadence`    | The cadence, in seconds, by which the logged events will be sent to the ingestion service.                                                                                                        |
 | `maxPendingLoggedEvents`   | The maximum number of pending logged events before they are sent to the ingestion service. When this value is reached, oldest accumulated events will be dropped to accommodate most recent ones. |
 | `offersCacheTtlMinutes`    | The time-to-live, in minutes, for the offers cache.                                                                                                                                               |
@@ -194,10 +194,14 @@ For more details regarding the DeviceInfo properties, check the section on [Get 
 
 Logs offer related events like offer display, offer purchase, and offer interaction.
 
+Examples:
 ```csharp
-MeticaAPI.LogOfferDisplay("offerId", "placementId"); 
-MeticaAPI.LogOfferPurchase("offerId", "placementId", 10.0, "USD"); 
-MeticaAPI.LogOfferInteraction("offerId", "placementId", "interactionType");
+MeticaAPI.LogOfferDisplay("<offerId>", "<placementId>");
+MeticaAPI.LogOfferDisplayWithProductId("<productId>");
+MeticaAPI.LogOfferPurchase("<offerId>", "<placementId>", 10.0, "USD");
+MeticaAPI.LogOfferPurchaseWithProductId("<offerId>", "<placementId>", 10.0, "USD");
+MeticaAPI.LogOfferInteraction("<offerId>", "<placementId>", "click");
+MeticaAPI.LogOfferInteractionWithProductId("<productId>", "click");
 ```
 
 ### 5. User Attributes Logging
@@ -232,7 +236,7 @@ MeticaAPI.LogUserEvent(userEvent, true);
 ### Code Sample
 
 An example usage of the above operations can be found in a small code sample can be found
-at [Samples/MeticaSample.cs](Samples/MeticaSample.cs).
+at `TestProject/Assets/SampleScript.cs`.
 
 ## Privacy Manifest
 
