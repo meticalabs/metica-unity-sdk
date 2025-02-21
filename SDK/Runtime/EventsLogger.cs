@@ -80,8 +80,6 @@ namespace Metica.Unity
             attributes[Constants.CurrencyCode] = currency;
             attributes[Constants.TotalAmount] = amount;
             var meticaAttributes = GetOrCreateMeticaAttributes(offerId, placementId);
-            //meticaAttributes[Constants.CurrencyCode] = currency;
-            //meticaAttributes[Constants.TotalAmount] = amount;
             attributes[Constants.MeticaAttributes] = meticaAttributes;
             LogEvent(attributes);
         }
@@ -110,11 +108,6 @@ namespace Metica.Unity
             LogEvent(attributes);
         }
 
-        /// <summary>
-        /// Logs an offer interaction event using a `productId` value instead of Metica information.
-        /// </summary>
-        /// <param name="productId">The id of the purchased product.</param>
-        /// <param name="interactionType">The type of interaction performed by the user.</param>
         public void LogOfferInteractionWithProductId(string productId, string interactionType)
         {
             var attributes = new Dictionary<string, object>();
