@@ -13,7 +13,7 @@ public class SampleScript : MonoBehaviour
     [SerializeField] private string _apiKey = string.Empty;
     [SerializeField] private SdkConfigProvider _sdkConfiguration;
 
-    [SerializeField] Text textElement;
+    [SerializeField] Text textElement, _versionText;
     [SerializeField] Button _getOffersButton, _getConfigButton, _getConfigSpecificButton, _logOfferDisplayButton, _logUserAttributesButton, _logPartialUserAttributesButton, _logAdRevenueButton;
     [SerializeField] InputField _configIdInput;
 
@@ -42,6 +42,8 @@ public class SampleScript : MonoBehaviour
         _logUserAttributesButton.onClick.AddListener(TestLogUserAttributes);
         _logPartialUserAttributesButton.onClick.AddListener(TestPartialLogUserAttributes);
         _logAdRevenueButton.onClick.AddListener(TestLogAdRevenue);
+
+        _versionText.text = MeticaAPI.SDKVersion;
     }
 
     private void TestGetOffers()
