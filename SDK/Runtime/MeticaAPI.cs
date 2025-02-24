@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
-// ReSharper disable all NotAccessedField.Global
-// ReSharper disable file UnusedMember.Local
+using Newtonsoft.Json;
+using System.IO;
 
 namespace Metica.Unity
 {
@@ -28,7 +27,18 @@ namespace Metica.Unity
     /// </summary>
     public static class MeticaAPI
     {
-        public static string SDKVersion = "1.2.4";
+        private static SdkInfo _sdkInfoCache = null;
+
+        public static string SDKVersion
+        {
+            get {
+                if(_sdkInfoCache == null)
+                {
+                    _sdkInfoCache = GetSdkInfo();
+                }  
+                return _sdkInfoCache.Version;
+            }
+        }
         public static string UserId { get; set; }
         public static string AppId { get; internal set; }
         public static string ApiKey { get; internal set; }
@@ -341,6 +351,105 @@ namespace Metica.Unity
         }
 
         #endregion Custom Event
+
+        #region SDK Info
+        internal class SdkInfo
+        {
+            public string Version { get; set; }
+        }
+
+        /// <summary>
+        /// Gets an SdkInfo file, obtained from the correspondent json file in StreamingAssets.
+        /// </summary>
+        /// <returns></returns>
+        private static SdkInfo GetSdkInfo()
+        {
+            string filePath = Path.Combine(Application.streamingAssetsPath, "sdkInfo.json");
+
+            if (!File.Exists(filePath))
+            {
+#if UNITY_EDITOR
+                WriteJsonSdkInfo();
+#else
+                return new SdkInfo { Version = "unknown" };
+#endif
+            }
+
+            string json = File.ReadAllText(filePath);
+            SdkInfo sdkInfo = JsonConvert.DeserializeObject<SdkInfo>(json);
+            return sdkInfo;
+        }
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// Just to force Unity to check the info file.
+        /// </summary>
+        [UnityEditor.InitializeOnLoadMethod]
+        private static void TouchSdkInfo()
+        {
+            GetSdkInfo();
+        }
+
+        /// <summary>
+        /// Get a package version by its name.
+        /// </summary>
+        /// <param name="packageName">Name of the package as it appears in the manifest file.</param>
+        /// <returns>The version of the package if the package is found, null otherwise.</returns>
+        private static string GetPackageVersion(string packageName)
+        {
+            var listRequest = UnityEditor.PackageManager.Client.List(true); // true = include dependencies
+            while (!listRequest.IsCompleted) { }
+
+            if (listRequest.Status == UnityEditor.PackageManager.StatusCode.Success)
+            {
+                foreach (var package in listRequest.Result)
+                {
+                    Debug.Log($"{package.name} : {package.version}");
+                    if (package.name == packageName)
+                    {
+                        return package.version;
+                    }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Editor utility to write an SdkInfo json file in Unity's StreamingAssets folder.
+        /// If StreamingAssets doesn't exist, it will be created.
+        /// </summary>
+        private static void WriteJsonSdkInfo()
+        {
+            string streamingAssetsPath = Path.Combine(Application.dataPath, "StreamingAssets");
+
+            if (!Directory.Exists(streamingAssetsPath))
+            {
+                Directory.CreateDirectory(streamingAssetsPath);
+                UnityEditor.AssetDatabase.Refresh();
+            }
+
+            string filePath = Path.Combine(streamingAssetsPath, "sdkInfo.json");
+
+            if (!File.Exists(filePath))
+            {
+                string version = GetPackageVersion("com.metica.unity");
+                if (version != null)
+                {
+                    string jsonData = $"{{\"Version\": \"{version}\"}}";  // Ensure version is quoted for valid JSON
+                    File.WriteAllText(filePath, jsonData);
+                    Debug.Log($"SDK Info JSON written to: {filePath}");
+                    UnityEditor.AssetDatabase.Refresh();
+                }
+                else
+                {
+                    Debug.LogError("Package version not found.");
+                }
+            }
+        }
+
+#endif
+
+        #endregion SDK Info
 
         private static bool checkPreconditions()
         {
