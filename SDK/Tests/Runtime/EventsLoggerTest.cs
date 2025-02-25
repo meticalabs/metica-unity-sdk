@@ -4,7 +4,6 @@ using UnityEngine.TestTools;
 using System.Collections;
 using System.Collections.Generic;
 using Metica.Unity;
-using Moq;
 using NUnit.Framework;
 using UnityEngine;
 using Assert = NUnit.Framework.Assert;

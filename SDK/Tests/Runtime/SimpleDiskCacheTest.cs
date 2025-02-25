@@ -1,9 +1,7 @@
-using UnityEngine.TestTools;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Metica.Unity;
-using Moq;
 using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;
 
@@ -68,10 +66,8 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             var cache = new SimpleDiskCache<OffersByPlacement>("testCache", tempFileName);
             cache.Prepare();
 
-            var mockTimeSource = new Mock<ITimeSource>();
-            MeticaAPI.TimeSource = mockTimeSource.Object;
-
-            mockTimeSource.Setup(t => t.EpochSeconds()).Returns(0);
+            var mockTimeSource = new DummyTimeSource();
+            MeticaAPI.TimeSource = mockTimeSource;
 
             cache.Write("k", new OffersByPlacement()
             {
@@ -83,10 +79,10 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
 
             Assert.That(cache.Read("k") != null);
 
-            mockTimeSource.Setup(t => t.EpochSeconds()).Returns(9_000);
+            mockTimeSource.SetValue(9_000);
             Assert.That(cache.Read("k") != null);
 
-            mockTimeSource.Setup(t => t.EpochSeconds()).Returns(10_000);
+            mockTimeSource.SetValue(10_000);
             Assert.That(cache.Read("k") == null);
         }
     }
