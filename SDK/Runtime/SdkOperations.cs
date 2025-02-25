@@ -208,7 +208,7 @@ namespace Metica.Unity
             var deviceInfo = overrideDeviceInfo ?? new DeviceInfo();
             deviceInfo.locale = string.IsNullOrEmpty(overrideDeviceInfo?.locale) ? locale : overrideDeviceInfo.locale;
             deviceInfo.store = overrideDeviceInfo?.store ??
-                               MapRuntimePlatformToStoreType(Application.platform).ToString();
+                               MapRuntimePlatformToStoreType(Application.platform)?.ToString();
             deviceInfo.timezone = overrideDeviceInfo?.timezone ?? timezone;
             deviceInfo.appVersion =
                 overrideDeviceInfo?.appVersion ?? Application.version ?? Constants.DefaultAppVersion;
@@ -219,14 +219,21 @@ namespace Metica.Unity
                 userData = userData,
                 deviceInfo = deviceInfo
             };
-            
-            MeticaLogger.LogInfo(() => $"The request is {JsonConvert.SerializeObject(userData)}");
+
+            // Prefer excluding fields with null or empty values.
+            var serializationSettings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                DefaultValueHandling = DefaultValueHandling.Ignore
+            };
+
+            MeticaLogger.LogInfo(() => $"The request is {JsonConvert.SerializeObject(userData, serializationSettings)}");
 
             return request;
         }
 
 
-        private static StoreTypeEnum MapRuntimePlatformToStoreType(RuntimePlatform runtimePlatform)
+        private static StoreTypeEnum? MapRuntimePlatformToStoreType(RuntimePlatform runtimePlatform)
         {
             switch (runtimePlatform)
             {
@@ -234,14 +241,11 @@ namespace Metica.Unity
                     return StoreTypeEnum.GooglePlayStore;
                 case RuntimePlatform.IPhonePlayer:
                 case RuntimePlatform.OSXEditor:
-#if UNITY_EDITOR
-                case RuntimePlatform.WindowsEditor:
-                case RuntimePlatform.LinuxEditor:
-#endif
                 case RuntimePlatform.OSXPlayer:
                     return StoreTypeEnum.AppStore;
                 default:
-                    throw new Exception($"Got an unsupported application platform: {runtimePlatform}");
+                    // Fallback to null
+                    return null;
             }
         }
     }
