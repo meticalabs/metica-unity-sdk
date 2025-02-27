@@ -6,6 +6,10 @@ namespace Metica.Unity
     [System.Serializable]
     public struct SdkConfig
     {
+        public string apiKey;
+        public string appId;
+        public string initialUserId;
+
         /// <summary>
         /// The full endpoint to the Metica offers endpoint.
         /// </summary>
