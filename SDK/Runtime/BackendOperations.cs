@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -132,6 +133,121 @@ namespace Metica.Unity
             }
         }
 
+        /// <summary>
+        /// Async version of <see cref="PostRequest{T}(string, Dictionary{string, object}?, string, object, MeticaSdkDelegate{RequestResponse{T}})"/>
+        /// </summary>
+        /// <typeparam name="T">The type wrapped inside the <see cref="RequestResponse{T}"/></typeparam>
+        /// <param name="url">Endpoint.</param>
+        /// <param name="queryParams">Query parameters.</param>
+        /// <param name="apiKey">The secret API Key.</param>
+        /// <param name="body">The POST request body.</param>
+        /// <returns></returns>
+        public async static Task<ISdkResult<RequestResponse<T>>> PostRequestAsync<T>
+            (
+            string url,
+            Dictionary<string, object>? queryParams,
+            string apiKey,
+            object body) where T : class
+        {
+            // if there is no internet connection, return the cached offers
+            if (Application.internetReachability == NetworkReachability.NotReachable)
+            {
+                return SdkResultImpl<RequestResponse<T>>.WithError("No internet connection");
+            }
+
+            if (apiKey == null)
+            {
+                return SdkResultImpl<RequestResponse<T>>.WithError("API Key is not set");
+            }
+
+            if (body == null)
+            {
+                return SdkResultImpl<RequestResponse<T>>.WithError("Body is null");
+            }
+
+            string jsonBody = null;
+            try
+            {
+                jsonBody = JsonConvert.SerializeObject(body, new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                });
+            }
+            catch (Exception e)
+            {
+                MeticaLogger.LogError(() => $"Error while fetching offers: {e.Message}", e);
+            }
+
+            if (jsonBody == null)
+            {
+                return SdkResultImpl<RequestResponse<T>>.WithError("Failed to serialize body");
+            }
+            else
+            {
+                var fullUrl = queryParams is { Count: > 0 } ? $"{url}?{BuildUrlWithParameters(queryParams)}" : url;
+
+                using (var www = new UnityWebRequest(fullUrl, "PUT"))
+                {
+                    var jsonToSend = Encoding.UTF8.GetBytes(jsonBody);
+                    www.uploadHandler = new UploadHandlerRaw(jsonToSend);
+                    www.downloadHandler = new DownloadHandlerBuffer();
+                    www.SetRequestHeader("Content-Type", "application/json");
+                    www.SetRequestHeader("X-API-KEY", apiKey);
+                    www.method = "POST";
+                    www.timeout = MeticaAPI.Config.networkTimeout;
+
+                    MeticaLogger.LogDebug(() =>
+                        $@"Sending request using {www}:
+                        --------
+                        Headers:
+                            {"Content-Type"} : {www.GetRequestHeader("Content-Type")}
+                            {"X-API-KEY"} : {www.GetRequestHeader("X-API-KEY")}
+                        Method: {www.method}
+                        Timeout: {www.timeout}
+                        Url: {www.url}
+                        Body: {jsonBody}");
+
+
+                    var tcs = new TaskCompletionSource<UnityWebRequest>();
+                    www.SendWebRequest().completed += _ => tcs.SetResult(www);
+                    await tcs.Task;
+
+                    if (www.result != UnityWebRequest.Result.Success)
+                    {
+                        var error = $"Error: {www.error}, status: {www.responseCode}, endpoint: {www.url}";
+                        MeticaLogger.LogError(() => error);
+                        return SdkResultImpl<RequestResponse<T>>.WithError($"API Error: {error}");
+                    }
+                    else
+                    {
+                        var responseText = www.downloadHandler.text;
+                        MeticaLogger.LogDebug(() => $"Response raw text:\n{responseText}");
+
+                        if (string.IsNullOrEmpty(responseText) && (www.responseCode >= 200 || www.responseCode <= 204))
+                        {
+                            return SdkResultImpl<RequestResponse<T>>.WithResult(null);
+                        }
+                        else
+                        {
+                            RequestResponse<T> response = null;
+                            try
+                            {
+                                var result = JsonConvert.DeserializeObject<T>(responseText);
+                                response = new RequestResponse<T>(data: result, headers: www.GetResponseHeaders(), responseCode: www.responseCode);
+                            }
+                            catch (Exception e)
+                            {
+                                MeticaLogger.LogError(() => $"Error while decoding the ODS response: {e.Message}", e);
+                            }
+
+                            return response != null
+                                ? SdkResultImpl<RequestResponse<T>>.WithResult(response)
+                                : SdkResultImpl<RequestResponse<T>>.WithError("Failed to decode the server response");
+                        }
+                    }
+                }
+            }
+        }
 
         private static string BuildUrlWithParameters(Dictionary<string, object> parameters)
         {
