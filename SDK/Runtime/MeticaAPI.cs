@@ -146,6 +146,36 @@ namespace Metica.Unity
             }
         }
 
+        #region Install & Login Events
+
+        public static void LogInstall()
+        {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogInstall();
+        }
+
+        /// <summary>
+        /// Logs a login event with an optional current user id change.
+        /// </summary>
+        /// <param name="newCurrentUserId"></param>
+        public static void LogLogin(string newCurrentUserId = null)
+        {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogLogin(newCurrentUserId);
+        }
+        
+        #endregion Install & Login Events
+
         #region Offer Impression
 
         /// <summary>
@@ -324,12 +354,15 @@ namespace Metica.Unity
 
         #region Custom Event
 
+        // ALIAS (will be promoted to main method call for custom events.
+        public static void LogCustomEvent(string eventType, Dictionary<string, object> userEvent, bool reuseDictionary = false) =>
+            LogUserEvent(eventType, userEvent, reuseDictionary);
         /// <summary>
         /// Logs a custom user event to the Metica API.
         /// </summary>
         /// <remarks>
         /// Do not use this method for logging any of the documented <see href="https://docs.metica.com/integration#core-events">Core Events</see>.
-        /// If you do, an exception will be thrown. Specific methods are available for all of the listed Core event tpyes.
+        /// If you do, a warning will be thrown. Specific methods are available for all of the listed Core event tpyes.
         /// </remarks>
         /// <param name="eventType">The name/type of the event</param>
         /// <param name="userEvent">A dictionary containing the details of the user event. The dictionary should have string keys and object values.</param>

@@ -104,7 +104,7 @@ namespace Metica.Unity
                     else
                     {
                         var responseText = www.downloadHandler.text;
-                        MeticaLogger.LogDebug(() => $"Response raw text:\n{responseText}");
+                        MeticaLogger.LogDebug(() => $"Response raw text:\n{responseText}, endpoint: {www.url}");
 
                         if (string.IsNullOrEmpty(responseText) && (www.responseCode >= 200 || www.responseCode <= 204))
                         {
