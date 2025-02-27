@@ -32,10 +32,10 @@ namespace Metica.Unity
         public static string SDKVersion
         {
             get {
-                if(_sdkInfoCache == null)
+                if (_sdkInfoCache == null)
                 {
                     _sdkInfoCache = GetSdkInfo();
-                }  
+                }
                 return _sdkInfoCache.Version;
             }
         }
@@ -73,8 +73,9 @@ namespace Metica.Unity
             Initialise(initialUserId, appId, apiKey, SdkConfig.Default(), initCallback);
         }
 
-        public static void Initialise(string initialUserId, string appId, string apiKey, SdkConfig sdkConfig,
-            MeticaSdkDelegate<bool> initCallback)
+        public static void Initialise(SdkConfig sdkConfig, MeticaSdkDelegate<bool> initCallback) => Initialise(sdkConfig.initialUserId, sdkConfig.appId, sdkConfig.apiKey, sdkConfig, initCallback);
+        // TODO: deprecate the following method.
+        public static void Initialise(string initialUserId, string appId, string apiKey, SdkConfig sdkConfig, MeticaSdkDelegate<bool> initCallback)
         {
             UserId = initialUserId;
             AppId = appId;

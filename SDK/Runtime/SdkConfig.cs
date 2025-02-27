@@ -89,6 +89,10 @@ namespace Metica.Unity
         {
             return new SdkConfig()
             {
+                initialUserId = string.Empty,
+                appId = string.Empty,
+                apiKey = string.Empty,
+                // - - - - - - - - - -
                 ingestionEndpoint = "https://api.prod-eu.metica.com",
                 offersEndpoint = "https://api.prod-eu.metica.com",
                 remoteConfigEndpoint = "https://api.prod-eu.metica.com",
