@@ -65,7 +65,7 @@ namespace Metica.Unity
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.OfferImpression);
-            attributes[Constants.AppId] = productId;
+            attributes[Constants.ProductId] = productId;
             LogEvent(attributes);
         }
 
