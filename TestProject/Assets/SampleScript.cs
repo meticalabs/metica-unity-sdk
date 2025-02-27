@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Metica.Unity;
 using Newtonsoft.Json;
@@ -111,8 +112,29 @@ public class SampleScript : MonoBehaviour
 
     private void TestLogOfferDisplay()
     {
-        textElement.text = "Logging offer display";
-        MeticaAPI.LogOfferDisplay("offerId", "23851");
+        MeticaAPI.UserId = _userId;
+        MeticaAPI.GetOffers(null, (result) =>
+        {
+            if (result.Error != null)
+            {
+                textElement.text = "Error: " + result.Error;
+            }
+            else
+            {
+                var resultPlacements = result.Result.placements;
+                //textElement.text = "Offers: " + (resultPlacements.ContainsKey("generic") ? resultPlacements["generic"].Count : 0) + " offers found";
+
+                if(resultPlacements != null && resultPlacements.Count > 0)
+                {
+                    textElement.text = "Logging offer display";
+                    MeticaAPI.LogOfferDisplay("offerId", resultPlacements[resultPlacements.Keys.First()][0].offerId);
+                }
+                else
+                {
+                    MeticaLogger.LogError(() => "No placements were retrieved.");
+                }
+            }
+        });
     }
 
     private void TestLogUserAttributes()
