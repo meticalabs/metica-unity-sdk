@@ -82,6 +82,17 @@ namespace Metica.Unity
                     www.method = "POST";
                     www.timeout = MeticaAPI.Config.networkTimeout;
 
+                    MeticaLogger.LogDebug(() =>
+                        $@"Sending request using {www}:
+                        --------
+                        Headers:
+                            {"Content-Type"} : {www.GetRequestHeader("Content-Type")}
+                            {"X-API-KEY"} : {www.GetRequestHeader("X-API-KEY")}
+                        Method: {www.method}
+                        Timeout: {www.timeout}
+                        Url: {www.url}
+                        Body: {jsonBody}");
+
                     yield return www.SendWebRequest();
 
                     if (www.result != UnityWebRequest.Result.Success)
@@ -93,6 +104,7 @@ namespace Metica.Unity
                     else
                     {
                         var responseText = www.downloadHandler.text;
+                        MeticaLogger.LogDebug(() => $"Response raw text:\n{responseText}, endpoint: {www.url}");
 
                         if (string.IsNullOrEmpty(responseText) && (www.responseCode >= 200 || www.responseCode <= 204))
                         {

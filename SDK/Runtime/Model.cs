@@ -10,10 +10,16 @@ namespace Metica.Unity
 {
     internal abstract class EventTypes
     {
-        internal static readonly string OfferImpression = "meticaOfferImpression";
-        internal static readonly string OfferInteraction = "meticaOfferInteraction";
-        internal static readonly string OfferInAppPurchase = "meticaOfferInAppPurchase";
-        internal static readonly string UserStateUpdate = "meticaUserStateUpdate";
+        internal static readonly string Install = "install";
+        internal static readonly string Login = "login";
+        internal static readonly string OfferImpression = "impression";
+        internal static readonly string OfferInteraction = "interaction";
+        internal static readonly string OfferInAppPurchase = "purchase";
+        [Obsolete("Use EventTypes.FullStateUpdate")]
+        internal static readonly string UserStateUpdate = "fullStateUpdate";
+        internal static readonly string FullStateUpdate = "fullStateUpdate";
+        internal static readonly string PartialStateUpdate = "partialStateUpdate";
+        internal static readonly string AdRevenue = "adRevenue";
     }
 
     internal abstract class Constants
@@ -22,7 +28,11 @@ namespace Metica.Unity
         internal static readonly string CurrencyCode = "currencyCode";
         internal static readonly string TotalAmount = "totalAmount";
         internal static readonly string PlacementId = "placementId";
+        internal static readonly string AdPlacement = "placement";
+        internal static readonly string AdPlacementType = "type";
+        internal static readonly string AdPlacementSource = "source";
         internal static readonly string OfferId = "offerId";
+        internal static readonly string ProductId = "productId";
         internal static readonly string VariantId = "variantId";
         internal static readonly string BundleId = "bundleId";
         internal static readonly string UserId = "userId";
@@ -36,6 +46,10 @@ namespace Metica.Unity
         internal static readonly string Offer = "offer";
         internal static readonly string DefaultLocale = "en-US";
         internal static readonly string DefaultAppVersion = "1.0.0";
+
+        internal static readonly string[] ReservedEventNames = new string[] {
+            "purchase", "impression", "interaction", "adRevenue", "fullStateUpdate", "partialStateUpdate", "login", "install"
+        };
     }
 
     [Serializable]
@@ -68,6 +82,20 @@ namespace Metica.Unity
     public class OffersByPlacement
     {
         public Dictionary<string, List<Offer>> placements = new Dictionary<string, List<Offer>>();
+        public override string ToString()
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder("OffersByPlacement:");
+            foreach (var placement in placements.Keys)
+            {
+                sb.AppendLine($"Placement: {placement}");
+                foreach (var offer in placements[placement])
+                {
+                    sb.AppendLine($"\tOffer: {offer.offerId}");
+                    sb.AppendLine($"\t\t{offer.iap}");
+                }
+            }
+            return sb.ToString();
+        }
     }
 
     [Serializable]

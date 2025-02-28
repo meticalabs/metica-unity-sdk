@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Metica.Unity;
-using Moq;
 using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;
 
@@ -60,10 +59,10 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
                 },
                 cacheDurationSecs: 100);
 
-            var mockTimeSource = new Mock<ITimeSource>();
-            mockTimeSource.Setup(t => t.EpochSeconds()).Returns(0);
+            var mockTimeSource = new DummyTimeSource();
+            mockTimeSource.SetValue(0);
 
-            MeticaAPI.TimeSource = mockTimeSource.Object;
+            MeticaAPI.TimeSource = mockTimeSource;
 
             // first call to populate the cache
             remoteConfigManager.GetConfig(new List<string>() { "testKey1", "testKey2" }, result =>
@@ -75,7 +74,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             });
 
             // testKey1 and testKey2 should be served from the cache
-            mockTimeSource.Setup(t => t.EpochSeconds()).Returns(90);
+            mockTimeSource.SetValue(90);
             testOps.ShouldBeInvoked = false;
             remoteConfigManager.GetConfig(new List<string>() { "testKey1", "testKey2" }, result =>
             {
@@ -86,7 +85,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             });
             
             // testKey1 and testKey2 should be served from the cache while testKey3 will result in a call
-            mockTimeSource.Setup(t => t.EpochSeconds()).Returns(99);
+            mockTimeSource.SetValue(99);
             testOps.ShouldBeInvoked = true;
             testOps.MockRemoteConfig = new RemoteConfig(
                 config: new Dictionary<string, object>()
@@ -104,7 +103,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             });
             
             // testKey1 and testKey2 should have expired from the cache and result in a call
-            mockTimeSource.Setup(t => t.EpochSeconds()).Returns(100);
+            mockTimeSource.SetValue(100);
             testOps.MockRemoteConfig = new RemoteConfig(
                 config: new Dictionary<string, object>()
                 {

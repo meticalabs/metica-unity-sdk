@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Metica.Unity;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using UnityEngine;
 // ReSharper disable once RedundantUsingDirective
