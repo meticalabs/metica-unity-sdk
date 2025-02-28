@@ -6,6 +6,10 @@ namespace Metica.Unity
     [System.Serializable]
     public struct SdkConfig
     {
+        public string apiKey;
+        public string appId;
+        public string initialUserId;
+
         /// <summary>
         /// The full endpoint to the Metica offers endpoint.
         /// </summary>
@@ -85,6 +89,10 @@ namespace Metica.Unity
         {
             return new SdkConfig()
             {
+                initialUserId = string.Empty,
+                appId = string.Empty,
+                apiKey = string.Empty,
+                // - - - - - - - - - -
                 ingestionEndpoint = "https://api.prod-eu.metica.com",
                 offersEndpoint = "https://api.prod-eu.metica.com",
                 remoteConfigEndpoint = "https://api.prod-eu.metica.com",

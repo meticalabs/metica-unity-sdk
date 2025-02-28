@@ -50,6 +50,27 @@ namespace Metica.Unity
             }
         }
 
+        #region Install & Login Events
+
+        public void LogInstall()
+        {
+            var attributes = new Dictionary<string, object>();
+            AddCommonEventAttributes(attributes, EventTypes.Install);
+            LogEvent(attributes);
+        }
+
+        public void LogLogin(string newCurrentUserId = null)
+        {
+            if(newCurrentUserId !=  null)
+            {
+                MeticaAPI.UserId = newCurrentUserId;
+            }
+            var attributes = new Dictionary<string, object>();
+            AddCommonEventAttributes(attributes, EventTypes.Login);
+            LogEvent(attributes);
+        }
+
+        #endregion Install & Login Events
 
         #region Offer Impression
 
@@ -65,7 +86,7 @@ namespace Metica.Unity
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.OfferImpression);
-            attributes[Constants.AppId] = productId;
+            attributes[Constants.ProductId] = productId;
             LogEvent(attributes);
         }
 

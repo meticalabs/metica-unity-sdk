@@ -32,10 +32,10 @@ namespace Metica.Unity
         public static string SDKVersion
         {
             get {
-                if(_sdkInfoCache == null)
+                if (_sdkInfoCache == null)
                 {
                     _sdkInfoCache = GetSdkInfo();
-                }  
+                }
                 return _sdkInfoCache.Version;
             }
         }
@@ -73,8 +73,9 @@ namespace Metica.Unity
             Initialise(initialUserId, appId, apiKey, SdkConfig.Default(), initCallback);
         }
 
-        public static void Initialise(string initialUserId, string appId, string apiKey, SdkConfig sdkConfig,
-            MeticaSdkDelegate<bool> initCallback)
+        public static void Initialise(SdkConfig sdkConfig, MeticaSdkDelegate<bool> initCallback) => Initialise(sdkConfig.initialUserId, sdkConfig.appId, sdkConfig.apiKey, sdkConfig, initCallback);
+        // TODO: deprecate the following method.
+        public static void Initialise(string initialUserId, string appId, string apiKey, SdkConfig sdkConfig, MeticaSdkDelegate<bool> initCallback)
         {
             UserId = initialUserId;
             AppId = appId;
@@ -144,6 +145,36 @@ namespace Metica.Unity
                 OffersManager.GetOffers(placements, offersCallback, userProperties, deviceInfo);
             }
         }
+
+        #region Install & Login Events
+
+        public static void LogInstall()
+        {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogInstall();
+        }
+
+        /// <summary>
+        /// Logs a login event with an optional current user id change.
+        /// </summary>
+        /// <param name="newCurrentUserId"></param>
+        public static void LogLogin(string newCurrentUserId = null)
+        {
+            if (!checkPreconditions())
+            {
+                return;
+            }
+
+            var logger = ScriptingObjects.GetComponent<EventsLogger>();
+            logger.LogLogin(newCurrentUserId);
+        }
+        
+        #endregion Install & Login Events
 
         #region Offer Impression
 
@@ -323,12 +354,15 @@ namespace Metica.Unity
 
         #region Custom Event
 
+        // ALIAS (will be promoted to main method call for custom events.
+        public static void LogCustomEvent(string eventType, Dictionary<string, object> userEvent, bool reuseDictionary = false) =>
+            LogUserEvent(eventType, userEvent, reuseDictionary);
         /// <summary>
         /// Logs a custom user event to the Metica API.
         /// </summary>
         /// <remarks>
         /// Do not use this method for logging any of the documented <see href="https://docs.metica.com/integration#core-events">Core Events</see>.
-        /// If you do, an exception will be thrown. Specific methods are available for all of the listed Core event tpyes.
+        /// If you do, a warning will be thrown. Specific methods are available for all of the listed Core event tpyes.
         /// </remarks>
         /// <param name="eventType">The name/type of the event</param>
         /// <param name="userEvent">A dictionary containing the details of the user event. The dictionary should have string keys and object values.</param>
@@ -369,7 +403,7 @@ namespace Metica.Unity
             if (!File.Exists(filePath))
             {
 #if UNITY_EDITOR
-                WriteJsonSdkInfo();
+                //WriteJsonSdkInfo();
 #else
                 return new SdkInfo { Version = "unknown" };
 #endif
@@ -387,7 +421,7 @@ namespace Metica.Unity
         [UnityEditor.InitializeOnLoadMethod]
         private static void TouchSdkInfo()
         {
-            GetSdkInfo();
+            WriteJsonSdkInfo();
         }
 
         /// <summary>
@@ -430,20 +464,18 @@ namespace Metica.Unity
 
             string filePath = Path.Combine(streamingAssetsPath, "sdkInfo.json");
 
-            if (!File.Exists(filePath))
+ 
+            string packageVersion = GetPackageVersion("com.metica.unity");
+            if (packageVersion != null)
             {
-                string version = GetPackageVersion("com.metica.unity");
-                if (version != null)
-                {
-                    string jsonData = $"{{\"Version\": \"{version}\"}}";  // Ensure version is quoted for valid JSON
-                    File.WriteAllText(filePath, jsonData);
-                    Debug.Log($"SDK Info JSON written to: {filePath}");
-                    UnityEditor.AssetDatabase.Refresh();
-                }
-                else
-                {
-                    Debug.LogError("Package version not found.");
-                }
+                string jsonData = $"{{\"Version\": \"{packageVersion}\"}}";  // Ensure version is quoted for valid JSON
+                File.WriteAllText(filePath, jsonData);
+                Debug.Log($"SDK Info JSON written to: {filePath}");
+                UnityEditor.AssetDatabase.Refresh(); 
+            }
+            else
+            {
+                Debug.LogError("Package version not found.");
             }
         }
 

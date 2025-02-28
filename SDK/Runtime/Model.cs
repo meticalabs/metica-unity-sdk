@@ -10,6 +10,8 @@ namespace Metica.Unity
 {
     internal abstract class EventTypes
     {
+        internal static readonly string Install = "install";
+        internal static readonly string Login = "login";
         internal static readonly string OfferImpression = "impression";
         internal static readonly string OfferInteraction = "interaction";
         internal static readonly string OfferInAppPurchase = "purchase";
@@ -80,6 +82,20 @@ namespace Metica.Unity
     public class OffersByPlacement
     {
         public Dictionary<string, List<Offer>> placements = new Dictionary<string, List<Offer>>();
+        public override string ToString()
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder("OffersByPlacement:");
+            foreach (var placement in placements.Keys)
+            {
+                sb.AppendLine($"Placement: {placement}");
+                foreach (var offer in placements[placement])
+                {
+                    sb.AppendLine($"\tOffer: {offer.offerId}");
+                    sb.AppendLine($"\t\t{offer.iap}");
+                }
+            }
+            return sb.ToString();
+        }
     }
 
     [Serializable]

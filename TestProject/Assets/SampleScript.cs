@@ -9,9 +9,6 @@ using UnityEngine.UI;
 
 public class SampleScript : MonoBehaviour
 {
-    [SerializeField] private string _userId = string.Empty;
-    [SerializeField] private string _appId = string.Empty;
-    [SerializeField] private string _apiKey = string.Empty;
     [SerializeField] private SdkConfigProvider _sdkConfiguration;
 
     [SerializeField] Text textElement, _versionText;
@@ -20,9 +17,6 @@ public class SampleScript : MonoBehaviour
 
     void Start()
     {
-        Assert.IsFalse(string.IsNullOrEmpty(_userId));
-        Assert.IsFalse(string.IsNullOrEmpty(_appId));
-        Assert.IsFalse(string.IsNullOrEmpty(_apiKey));
         Assert.IsNotNull(_sdkConfiguration, "Please assign an Sdk Configuration. A new one can be created in Create > Metica > SDK > New SDK Configuration.");
 
         Font legacyFont = (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
@@ -33,7 +27,7 @@ public class SampleScript : MonoBehaviour
         // transform.localPosition = new Vector3(0, 0, 0);
         textElement.GetComponent<RectTransform>().localPosition = new Vector3(0, 50, 0);
 
-        MeticaAPI.Initialise(_userId, _appId, _apiKey, _sdkConfiguration.SdkConfig,
+        MeticaAPI.Initialise(_sdkConfiguration.SdkConfig,
             (result => textElement.text = (result.Result ? "Initialised" : "Failed to initialise")));
 
         _getOffersButton.onClick.AddListener(TestGetOffers);
@@ -49,7 +43,8 @@ public class SampleScript : MonoBehaviour
 
     private void TestGetOffers()
     {
-        MeticaAPI.UserId = _userId;
+
+        MeticaAPI.UserId = _sdkConfiguration.SdkConfig.initialUserId;
         MeticaAPI.GetOffers(null, (result) =>
         {
             if (result.Error != null)
@@ -76,7 +71,7 @@ public class SampleScript : MonoBehaviour
 
     private void TestGetConfig()
     {
-        MeticaAPI.UserId = _userId;
+        MeticaAPI.UserId = _sdkConfiguration.SdkConfig.initialUserId;
         // Retrieve all configs
         MeticaAPI.GetConfig(result =>
         {
@@ -94,7 +89,7 @@ public class SampleScript : MonoBehaviour
 
     private void TestGetConfigSpecific()
     {
-        MeticaAPI.UserId = _userId;
+        MeticaAPI.UserId = _sdkConfiguration.SdkConfig.initialUserId;
         // Retrieve config with specific name
         MeticaAPI.GetConfig(result =>
         {
@@ -112,7 +107,7 @@ public class SampleScript : MonoBehaviour
 
     private void TestLogOfferDisplay()
     {
-        MeticaAPI.UserId = _userId;
+        MeticaAPI.UserId = _sdkConfiguration.SdkConfig.initialUserId;
         MeticaAPI.GetOffers(null, (result) =>
         {
             if (result.Error != null)
