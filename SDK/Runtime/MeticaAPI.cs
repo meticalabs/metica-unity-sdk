@@ -421,7 +421,7 @@ namespace Metica.Unity
         [UnityEditor.InitializeOnLoadMethod]
         private static void TouchSdkInfo()
         {
-            GetSdkInfo();
+            WriteJsonSdkInfo();
         }
 
         /// <summary>
@@ -464,20 +464,22 @@ namespace Metica.Unity
 
             string filePath = Path.Combine(streamingAssetsPath, "sdkInfo.json");
 
-            if (!File.Exists(filePath))
+            SdkInfo currentSdkInfo = GetSdkInfo();
+ 
+            string packageVersion = GetPackageVersion("com.metica.unity");
+            if (packageVersion != null)
             {
-                string version = GetPackageVersion("com.metica.unity");
-                if (version != null)
+                if (packageVersion != currentSdkInfo?.Version)
                 {
-                    string jsonData = $"{{\"Version\": \"{version}\"}}";  // Ensure version is quoted for valid JSON
+                    string jsonData = $"{{\"Version\": \"{packageVersion}\"}}";  // Ensure version is quoted for valid JSON
                     File.WriteAllText(filePath, jsonData);
                     Debug.Log($"SDK Info JSON written to: {filePath}");
-                    UnityEditor.AssetDatabase.Refresh();
+                    UnityEditor.AssetDatabase.Refresh(); 
                 }
-                else
-                {
-                    Debug.LogError("Package version not found.");
-                }
+            }
+            else
+            {
+                Debug.LogError("Package version not found.");
             }
         }
 
