@@ -403,7 +403,7 @@ namespace Metica.Unity
             if (!File.Exists(filePath))
             {
 #if UNITY_EDITOR
-                WriteJsonSdkInfo();
+                //WriteJsonSdkInfo();
 #else
                 return new SdkInfo { Version = "unknown" };
 #endif
@@ -464,18 +464,14 @@ namespace Metica.Unity
 
             string filePath = Path.Combine(streamingAssetsPath, "sdkInfo.json");
 
-            SdkInfo currentSdkInfo = GetSdkInfo();
  
             string packageVersion = GetPackageVersion("com.metica.unity");
             if (packageVersion != null)
             {
-                if (packageVersion != currentSdkInfo?.Version)
-                {
-                    string jsonData = $"{{\"Version\": \"{packageVersion}\"}}";  // Ensure version is quoted for valid JSON
-                    File.WriteAllText(filePath, jsonData);
-                    Debug.Log($"SDK Info JSON written to: {filePath}");
-                    UnityEditor.AssetDatabase.Refresh(); 
-                }
+                string jsonData = $"{{\"Version\": \"{packageVersion}\"}}";  // Ensure version is quoted for valid JSON
+                File.WriteAllText(filePath, jsonData);
+                Debug.Log($"SDK Info JSON written to: {filePath}");
+                UnityEditor.AssetDatabase.Refresh(); 
             }
             else
             {
