@@ -290,16 +290,19 @@ namespace Metica.Unity
         #region State Update
 
         /// <summary>
-        /// Alias for <see cref="LogUserAttributes"/>.
-        /// TODO: This method will become the one to log a user/player's state update with a full set of values.
-        /// </summary>
-        /// <param name="userAttributes"></param>
-        public static void LogFullStateUpdate(Dictionary<string, object> userAttributes) => LogUserAttributes(userAttributes);
-        /// <summary>
-        /// Log an update of the user attributes.
+        /// Alias for <see cref="LogFullStateUpdate(Dictionary{string, object})"/>
         /// </summary>
         /// <param name="userAttributes">A mutable dictionary of user attribute identifiers and their new values.</param>
-        public static void LogUserAttributes(Dictionary<string, object> userAttributes)
+        [Obsolete("Please use LogFullStateUpdate")]
+        public static void LogUserAttributes(Dictionary<string, object> userAttributes) => LogFullStateUpdate(userAttributes);
+        /// <summary>
+        /// Sends a complete snapshot of the user's state to the server, replacing any previously stored data. 
+        /// This method fully resets the user's state on the server and expects all relevant state information to be included in the request.
+        /// Any user attributes that are currently stored in the server with the given userId but are not sent with this update, will be erased.
+        /// </summary>
+        /// <param name="userAttributes">An exhaustive dictionary of user attribute identifiers and their new values.
+        /// Please note that ALL user properties should be passed in the payload.</param>
+        public static void LogFullStateUpdate(Dictionary<string, object> userAttributes)
         {
             if (!checkPreconditions())
             {
@@ -311,9 +314,11 @@ namespace Metica.Unity
         }
 
         /// <summary>
-        /// Log a partial update of a user's state (attributes).
+        /// Sends a partial update of the user's state to the server
+        /// modifying or adding only the provided fields while preserving those that are currently stored on the server.
+        /// This method cannot erase existing fields (like `LogFullStateUpdate` does); it can only overwrite values or introduce new ones.
         /// </summary>
-        /// <param name="userAttributes">A mutable dictionary of user attribute identifiers and their new values.</param>
+        /// <param name="userAttributes">A dictionary of user attribute identifiers and their new values.</param>
         public static void LogPartialStateUpdate(Dictionary<string, object> userAttributes)
         {
             if (!checkPreconditions())
