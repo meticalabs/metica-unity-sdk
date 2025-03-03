@@ -290,16 +290,16 @@ namespace Metica.Unity
         #region State Update
 
         /// <summary>
-        /// Alias for <see cref="LogUserAttributes"/>.
-        /// TODO: This method will become the one to log a user/player's state update with a full set of values.
+        /// Alias for <see cref="LogFullStateUpdate(Dictionary{string, object})"/>
         /// </summary>
-        /// <param name="userAttributes"></param>
-        public static void LogFullStateUpdate(Dictionary<string, object> userAttributes) => LogUserAttributes(userAttributes);
+        /// <param name="userAttributes">A mutable dictionary of user attribute identifiers and their new values.</param>
+        [Obsolete("Please use LogFullStateUpdate")]
+        public static void LogUserAttributes(Dictionary<string, object> userAttributes) => LogFullStateUpdate(userAttributes);
         /// <summary>
         /// Log an update of the user attributes.
         /// </summary>
         /// <param name="userAttributes">A mutable dictionary of user attribute identifiers and their new values.</param>
-        public static void LogUserAttributes(Dictionary<string, object> userAttributes)
+        public static void LogFullStateUpdate(Dictionary<string, object> userAttributes)
         {
             if (!checkPreconditions())
             {
