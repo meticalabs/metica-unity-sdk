@@ -311,7 +311,7 @@ namespace Metica.Unity
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogUserAttributes(userAttributes, customPayload);
+            logger.LogFullStateUpdate(userAttributes, customPayload);
         }
 
         /// <summary>
