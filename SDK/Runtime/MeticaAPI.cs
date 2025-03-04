@@ -361,8 +361,8 @@ namespace Metica.Unity
         #region Custom Event
 
         // ALIAS (will be promoted to main method call for custom events.
-        public static void LogCustomEvent(string eventType, Dictionary<string, object> userEvent, bool reuseDictionary = false) =>
-            LogUserEvent(eventType, userEvent, reuseDictionary);
+        public static void LogUserEvent(string eventType, Dictionary<string, object> userEvent, bool reuseDictionary) =>
+            LogCustomEvent(eventType, userEvent);
         /// <summary>
         /// Logs a custom user event to the Metica API.
         /// </summary>
@@ -373,8 +373,7 @@ namespace Metica.Unity
         /// <param name="eventType">The name/type of the event</param>
         /// <param name="userEvent">A dictionary containing the details of the user event. The dictionary should have string keys and object values.</param>
         /// <param name="reuseDictionary">Indicates if the passed dictionary can be modified to add additional Metica-specific attribute. Re-using the dictionary instance in this way can potentially save an allocation.</param>
-        public static void LogUserEvent(string eventType, Dictionary<string, object> userEvent,
-            bool reuseDictionary = false)
+        public static void LogCustomEvent(string eventType, Dictionary<string, object> userEvent)
         {
             if (!checkPreconditions())
             {
@@ -387,7 +386,7 @@ namespace Metica.Unity
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogCustomEvent(eventType, userEvent, reuseDictionary);
+            logger.LogCustomEvent(eventType, userEvent);
         }
 
         #endregion Custom Event

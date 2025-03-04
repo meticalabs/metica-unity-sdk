@@ -212,8 +212,9 @@ namespace Metica.Unity
                 return;
             }
 
-            AddCommonEventAttributes(eventDetails, eventType);
-            LogEvent(eventDetails, customPayload: null);
+            var attributes = new Dictionary<string, object>(eventDetails);
+            AddCommonEventAttributes(attributes, eventType);
+            LogEvent(attributes, customPayload: null);
         }
 
         #endregion Custom Event
