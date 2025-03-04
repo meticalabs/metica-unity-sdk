@@ -175,9 +175,11 @@ namespace Metica.Unity
 
         #region State Update
 
-
-        // TODO: rename this method to reflect new API naming
+        [Obsolete("Please use LogFullStateUpdate")]
         public void LogUserAttributes(Dictionary<string, object> userAttributes, Dictionary<string, object> customPayload = null)
+            => LogFullStateUpdate(userAttributes, customPayload);
+
+        public void LogFullStateUpdate(Dictionary<string, object> userAttributes, Dictionary<string, object> customPayload = null)
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.FullStateUpdate);
