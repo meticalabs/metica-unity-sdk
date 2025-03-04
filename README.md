@@ -1,5 +1,9 @@
 # MeticaAPI Unity SDK Guide
 
+**Disclaimer: please note that the SDK is undergoing some quick changes so, for the time being, this information might contain inaccuracies.**
+
+---
+
 This document provides a quick summary on how to use the MeticaAPI Unity SDK.
 
 Further information about the Metica backend API can be found at
@@ -49,7 +53,7 @@ the '+' button in the top left corner. Select "Add package from git URL" and ent
 
 ## Available SDK Operations
 
-### 1. Initialize the API
+### Initialize the API
 
 Use the `Initialise` method to prepare the MeticaAPI for use. To obtain your API key please contact Metica.  
 ⚠️: This method is obsolete. Please prefer the next call using `SdkConfig`.
@@ -100,7 +104,7 @@ delegate void EventsSubmissionResultDelegate(ISdkResult<Int32> result);
 If the events' submission was successful, then the reported `Int32` result is the number of events submitted.
 Otherwise, in case of error, the field `result.Error` will be non-empty and provide some description of the error.
 
-### 2. Get Offers
+### Get Offers
 
 After initialization, use the `GetOffers` method to obtain offers available for particular placements.
 
@@ -150,7 +154,7 @@ An overview of the role of each DeviceInfo property:
 | appVersion | The game/app version, in [SemVer](https://semver.org/) format                                                                                                                                   | 1.2.3           | 
 | locale     | Locale expressed as a combination of language (ISO 639) and country (ISO 3166), // [JDK 8 standard reference](https://www.oracle.com/java/technologies/javase/jdk8-jre8-suported-locales.html). | en-US           |
 
-### 3. Remote Configuration
+### Remote Configuration
 
 The `GetConfig` method can be used to obtain the remote configuration.
 
@@ -193,7 +197,7 @@ Note that the server side response for this call is going to be cached according
 
 For more details regarding the `DeviceInfo` properties, check the section on [Get Offers](#2-get-offers)
 
-### 4. Offer Lifecycle Events
+### Offer Lifecycle Events
 
 Logs offer related events like offer display, offer purchase, and offer interaction.
 
@@ -207,7 +211,7 @@ MeticaAPI.LogOfferInteraction("<offerId>", "<placementId>", "click");
 MeticaAPI.LogOfferInteractionWithProductId("<productId>", "click");
 ```
 
-### 5. Full State Update
+### Full State Update
 
 Formerly known as `LogUserAttributes`.
 
@@ -220,13 +224,29 @@ Dictionary<string, object> userAttributes = new Dictionary<string, object> { { "
 MeticaAPI.LogFullStateUpdate(userAttributes); 
 ```
 
-### 6. Partial State Update
+### Partial State Update
 
 `LogPartialStateUpdate` sends a partial update of the user's state to the server
 modifying or adding only the provided fields while preserving those that are currently stored on the server.
 This method cannot erase existing fields (like `LogFullStateUpdate` does); it can only overwrite values or introduce new ones.
 
-### 7. Custom Event Logging
+### Custom Payloads
+
+All events support a custom payload that can include any information.  
+It's passed as a `Dictionary<string, object>` to the logging methods. To avoid confusion with other fields, it is recommended to pass the parameter by name, i.g. `LogInstall(customPayload: playerExtraParams)` rather than just `LogInstall(playerExtraParams)`.
+
+**Example**  
+
+```
+Dictionary<string, object> myCustomPayload {
+{ "set", "Intense Stare Magic Mastery" },
+{ "cosmetic", "flamingo shades" },
+};
+LogOfferInteraction(someOfferId, somePlacementId, "selected", myCustomPayload);
+LogOfferPurchase(someOfferId, somePlacementId, 2.49, "GBP", customPayload: myCustomPayload);
+```
+
+### Custom Event Logging
 
 Formerly known as `LogUserEvent`.
 
