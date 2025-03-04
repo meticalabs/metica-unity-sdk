@@ -200,17 +200,20 @@ namespace Metica.Unity
 
         #region Custom Event
 
+        [Obsolete("Please use LogCustomEvent(string eventType, Dictionary<string, object> eventDetails)")]
         public void LogCustomEvent(string eventType, Dictionary<string, object> eventDetails, bool reuseDictionary)
+            => LogCustomEvent(eventType, eventDetails);
+
+        public void LogCustomEvent(string eventType, Dictionary<string, object> eventDetails)
         {
-            if (eventType == null)
+            if (string.IsNullOrEmpty(eventType))
             {
                 MeticaLogger.LogError(() => "The event type must be specified");
                 return;
             }
 
-            var attributes = reuseDictionary ? eventDetails : new Dictionary<string, object>(eventDetails);
-            AddCommonEventAttributes(attributes, eventType);
-            LogEvent(attributes, null);
+            AddCommonEventAttributes(eventDetails, eventType);
+            LogEvent(eventDetails, customPayload: null);
         }
 
         #endregion Custom Event
