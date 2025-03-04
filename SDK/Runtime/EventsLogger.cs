@@ -39,6 +39,18 @@ namespace Metica.Unity
             FlushEvents();
         }
 
+        private void AppendCustomPayload(Dictionary<string, object> attributes, Dictionary<string, object> customAttributes)
+        {
+            if(customAttributes == null || attributes == null)
+            {
+                // TODO : warn!
+                return;
+            }
+            if (!attributes.ContainsKey(Constants.CustomPayload))
+            {
+                attributes.Add(Constants.CustomPayload, customAttributes);
+            }
+        }
         #endregion Unity Lifecycle
 
         private void LogEvent(Dictionary<string, object> eventDetails)

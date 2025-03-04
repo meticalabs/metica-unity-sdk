@@ -25,6 +25,7 @@ namespace Metica.Unity
     internal abstract class Constants
     {
         internal static readonly string MeticaAttributes = "meticaAttributes";
+        internal static readonly string CustomPayload = "customPayload";
         internal static readonly string CurrencyCode = "currencyCode";
         internal static readonly string TotalAmount = "totalAmount";
         internal static readonly string PlacementId = "placementId";
