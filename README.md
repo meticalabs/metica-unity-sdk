@@ -156,7 +156,7 @@ An overview of the role of each DeviceInfo property:
 
 ### Remote Configuration
 
-The `GetConfig` method can be used to obtain the remote configuration.
+The `GetConfig` method can be used to obtain the smart config.
 
 Similar to the `GetOffers` method, the operation is performed asynchronously and the result is delivered through a callback.
 Because the result is specific to each application, the SDK represents it in a generic manner, through a `Dictionary<string, object>` instance.
