@@ -176,24 +176,26 @@ namespace Metica.Unity
         #region State Update
 
         [Obsolete("Please use LogFullStateUpdate")]
-        public void LogUserAttributes(Dictionary<string, object> userAttributes, Dictionary<string, object> customPayload = null)
-            => LogFullStateUpdate(userAttributes, customPayload);
+        public void LogUserAttributes(Dictionary<string, object> userAttributes)
+            => LogFullStateUpdate(userAttributes);
 
-        public void LogFullStateUpdate(Dictionary<string, object> userAttributes, Dictionary<string, object> customPayload = null)
+        public void LogFullStateUpdate(Dictionary<string, object> fullUserAttributes)
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.FullStateUpdate);
-            attributes[Constants.UserStateAttributes] = userAttributes;
-            LogEvent(attributes, customPayload);
+            attributes[Constants.UserStateAttributes] = fullUserAttributes;
+            LogEvent(attributes);
         }
 
-        // TODO: rename this method to reflect new API naming
-        public void LogPartialUserAttributes(Dictionary<string, object> userAttributes, Dictionary<string, object> customPayload = null)
+        [Obsolete]
+        public void LogPartialUserAttributes(Dictionary<string, object> userAttributes) => LogPartialStateUpdate(userAttributes);
+
+        public void LogPartialStateUpdate(Dictionary<string, object> partialStateAttributes)
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.PartialStateUpdate);
-            attributes[Constants.UserStateAttributes] = userAttributes;
-            LogEvent(attributes, customPayload);
+            attributes[Constants.UserStateAttributes] = partialStateAttributes;
+            LogEvent(attributes);
         }
 
         #endregion State Update

@@ -294,16 +294,16 @@ namespace Metica.Unity
         /// </summary>
         /// <param name="userAttributes">A mutable dictionary of user attribute identifiers and their new values.</param>
         [Obsolete("Please use LogFullStateUpdate")]
-        public static void LogUserAttributes(Dictionary<string, object> userAttributes, Dictionary<string, object> customPayload = null)
-            => LogFullStateUpdate(userAttributes, customPayload);
+        public static void LogUserAttributes(Dictionary<string, object> userAttributes)
+            => LogFullStateUpdate(userAttributes);
         /// <summary>
         /// Sends a complete snapshot of the user's state to the server, replacing any previously stored data. 
         /// This method fully resets the user's state on the server and expects all relevant state information to be included in the request.
         /// Any user attributes that are currently stored in the server with the given userId but are not sent with this update, will be erased.
         /// </summary>
-        /// <param name="userAttributes">An exhaustive dictionary of user attribute identifiers and their new values.
+        /// <param name="fullUserAttributes">An exhaustive dictionary of user attribute identifiers and their new values.
         /// Please note that ALL user properties should be passed in the payload.</param>
-        public static void LogFullStateUpdate(Dictionary<string, object> userAttributes, Dictionary<string, object> customPayload = null)
+        public static void LogFullStateUpdate(Dictionary<string, object> fullUserAttributes)
         {
             if (!checkPreconditions())
             {
@@ -311,7 +311,7 @@ namespace Metica.Unity
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogFullStateUpdate(userAttributes, customPayload);
+            logger.LogFullStateUpdate(fullUserAttributes);
         }
 
         /// <summary>
@@ -319,8 +319,8 @@ namespace Metica.Unity
         /// modifying or adding only the provided fields while preserving those that are currently stored on the server.
         /// This method cannot erase existing fields (like `LogFullStateUpdate` does); it can only overwrite values or introduce new ones.
         /// </summary>
-        /// <param name="userAttributes">A dictionary of user attribute identifiers and their new values.</param>
-        public static void LogPartialStateUpdate(Dictionary<string, object> userAttributes, Dictionary<string, object> customPayload = null)
+        /// <param name="partialUserAttributes">A dictionary of user attribute identifiers and their new values.</param>
+        public static void LogPartialStateUpdate(Dictionary<string, object> partialUserAttributes)
         {
             if (!checkPreconditions())
             {
@@ -328,7 +328,7 @@ namespace Metica.Unity
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogPartialUserAttributes(userAttributes, customPayload);
+            logger.LogPartialStateUpdate(partialUserAttributes);
         }
 
         #endregion State Update
@@ -360,7 +360,7 @@ namespace Metica.Unity
 
         #region Custom Event
 
-        // ALIAS (will be promoted to main method call for custom events.
+        [Obsolete("Please use LogCustomEvent(string eventType, Dictionary<string, object> userEvent)")]
         public static void LogUserEvent(string eventType, Dictionary<string, object> userEvent, bool reuseDictionary) =>
             LogCustomEvent(eventType, userEvent);
         /// <summary>
