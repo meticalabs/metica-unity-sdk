@@ -79,7 +79,7 @@ The SdkConfig provides the following configuration parameters
 | Property                   | Description                                                                                                                                                                                       |
 |----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `apiKey`					 | Your API key
-| `appId`					 | The application identifier that can be configured in Metica's dashboard
+| `appId`					 | The application identifier accessible from Metica's dashboard.
 | `initialUserId`			 | A string that identifies a user. This can change during the lifetime of your app/game so, for example and depending on your needs, this could be a temporary id like "guest" that later becomes a specific userId, or it can be the current user's id if it's already identified.
 | `offersEndpoint`           | The full endpoint to the Metica offers endpoint.                                                                                                                                                  |
 | `ingestionEndpoint`        | The full endpoint to the Metica ingestion service.                                                                                                                                                |
