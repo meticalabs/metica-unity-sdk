@@ -206,7 +206,7 @@ Examples:
 MeticaAPI.LogOfferDisplay("<offerId>", "<placementId>");
 MeticaAPI.LogOfferDisplayWithProductId("<productId>");
 MeticaAPI.LogOfferPurchase("<offerId>", "<placementId>", 10.0, "USD");
-MeticaAPI.LogOfferPurchaseWithProductId("<offerId>", "<placementId>", 10.0, "USD");
+MeticaAPI.LogOfferPurchaseWithProductId("<productId>", 10.0, "USD");
 MeticaAPI.LogOfferInteraction("<offerId>", "<placementId>", "click");
 MeticaAPI.LogOfferInteractionWithProductId("<productId>", "click");
 ```
@@ -232,7 +232,7 @@ This method cannot erase existing fields (like `LogFullStateUpdate` does); it ca
 
 ### Custom Payloads
 
-All events support a custom payload that can include any information.  
+All events, except `fullStateUpdate`, `partialStateUpdate` and `CustomEvent`, support a custom payload that can include any information.  
 It's passed as a `Dictionary<string, object>` to the logging methods. To avoid confusion with other fields, it is recommended to pass the parameter by name, i.g. `LogInstall(customPayload: playerExtraParams)` rather than just `LogInstall(playerExtraParams)`.
 
 **Example**  
