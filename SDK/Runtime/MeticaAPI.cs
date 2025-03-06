@@ -148,7 +148,7 @@ namespace Metica.Unity
 
         #region Install & Login Events
 
-        public static void LogInstall()
+        public static void LogInstall(Dictionary<string, object> customPayload = null)
         {
             if (!checkPreconditions())
             {
@@ -156,14 +156,14 @@ namespace Metica.Unity
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogInstall();
+            logger.LogInstall(customPayload);
         }
 
         /// <summary>
         /// Logs a login event with an optional current user id change.
         /// </summary>
         /// <param name="newCurrentUserId"></param>
-        public static void LogLogin(string newCurrentUserId = null)
+        public static void LogLogin(string newCurrentUserId = null, Dictionary<string, object> customPayload = null)
         {
             if (!checkPreconditions())
             {
@@ -171,7 +171,7 @@ namespace Metica.Unity
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogLogin(newCurrentUserId);
+            logger.LogLogin(newCurrentUserId, customPayload);
         }
         
         #endregion Install & Login Events
@@ -183,7 +183,7 @@ namespace Metica.Unity
         /// </summary>
         /// <param name="offerId">The ID of the offer.</param>
         /// <param name="placementId">The ID of the placement where the offer is displayed.</param>
-        public static void LogOfferDisplay(string offerId, string placementId)
+        public static void LogOfferDisplay(string offerId, string placementId, Dictionary<string, object> customPayload = null)
         {
             if (!checkPreconditions())
             {
@@ -191,14 +191,14 @@ namespace Metica.Unity
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogOfferDisplay(offerId, placementId);
+            logger.LogOfferDisplay(offerId, placementId, customPayload);
         }
 
         /// <summary>
         /// Logs an offer impression event using a `productId` value instead of Metica information.
         /// </summary>
         /// <param name="productId">The id of the displayed product.</param>
-        public static void LogOfferDisplayWithProductId(string productId)
+        public static void LogOfferDisplayWithProductId(string productId, Dictionary<string, object> customPayload = null)
         {
             if (!checkPreconditions())
             {
@@ -206,7 +206,7 @@ namespace Metica.Unity
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogOfferDisplayWithProductId(productId);
+            logger.LogOfferDisplayWithProductId(productId, customPayload);
         }
 
        #endregion Offer Impression
@@ -220,7 +220,7 @@ namespace Metica.Unity
         /// <param name="placementId">The ID of the placement where the offer is displayed.</param>
         /// <param name="amount">The amount of the purchase.</param>
         /// <param name="currency">The currency of the purchase.</param>
-        public static void LogOfferPurchase(string offerId, string placementId, double amount, string currency)
+        public static void LogOfferPurchase(string offerId, string placementId, double amount, string currency, Dictionary<string, object> customPayload = null)
         {
             if (!checkPreconditions())
             {
@@ -228,7 +228,7 @@ namespace Metica.Unity
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogOfferPurchase(offerId, placementId, amount, currency);
+            logger.LogOfferPurchase(offerId, placementId, amount, currency, customPayload);
         }
 
         /// <summary>
@@ -237,7 +237,7 @@ namespace Metica.Unity
         /// <param name="productId">The id of the purchased product.</param>
         /// <param name="amount">The spent amount.</param>
         /// <param name="currency">The currency used for this purchase.</param>
-        public static void LogOfferPurchaseWithProductId(string productId, double amount, string currency)
+        public static void LogOfferPurchaseWithProductId(string productId, double amount, string currency, Dictionary<string, object> customPayload = null)
         {
             if (!checkPreconditions())
             {
@@ -245,7 +245,7 @@ namespace Metica.Unity
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogOfferPurchaseWithProductId(productId, amount, currency);
+            logger.LogOfferPurchaseWithProductId(productId, amount, currency, customPayload);
         }
 
         #endregion Offer Purchase
@@ -258,7 +258,7 @@ namespace Metica.Unity
         /// <param name="offerId">The ID of the offer.</param>
         /// <param name="placementId">The ID of the placement where the offer is displayed.</param>
         /// <param name="interactionType">The type of interaction.</param>
-        public static void LogOfferInteraction(string offerId, string placementId, string interactionType)
+        public static void LogOfferInteraction(string offerId, string placementId, string interactionType, Dictionary<string, object> customPayload = null)
         {
             if (!checkPreconditions())
             {
@@ -266,7 +266,7 @@ namespace Metica.Unity
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogOfferInteraction(offerId, placementId, interactionType);
+            logger.LogOfferInteraction(offerId, placementId, interactionType, customPayload);
         }
 
         /// <summary>
@@ -274,7 +274,7 @@ namespace Metica.Unity
         /// </summary>
         /// <param name="productId">The id of the purchased product.</param>
         /// <param name="interactionType">The type of interaction performed by the user.</param>
-        public static void LogOfferInteractionWithProductId(string productId, string interactionType)
+        public static void LogOfferInteractionWithProductId(string productId, string interactionType, Dictionary<string, object> customPayload = null)
         {
             if (!checkPreconditions())
             {
@@ -282,7 +282,7 @@ namespace Metica.Unity
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogOfferInteractionWithProductId(productId, interactionType);
+            logger.LogOfferInteractionWithProductId(productId, interactionType, customPayload);
         }
 
         #endregion Offer Interaction
@@ -290,16 +290,20 @@ namespace Metica.Unity
         #region State Update
 
         /// <summary>
-        /// Alias for <see cref="LogUserAttributes"/>.
-        /// TODO: This method will become the one to log a user/player's state update with a full set of values.
-        /// </summary>
-        /// <param name="userAttributes"></param>
-        public static void LogFullStateUpdate(Dictionary<string, object> userAttributes) => LogUserAttributes(userAttributes);
-        /// <summary>
-        /// Log an update of the user attributes.
+        /// Alias for <see cref="LogFullStateUpdate(Dictionary{string, object})"/>
         /// </summary>
         /// <param name="userAttributes">A mutable dictionary of user attribute identifiers and their new values.</param>
+        [Obsolete("Please use LogFullStateUpdate")]
         public static void LogUserAttributes(Dictionary<string, object> userAttributes)
+            => LogFullStateUpdate(userAttributes);
+        /// <summary>
+        /// Sends a complete snapshot of the user's state to the server, replacing any previously stored data. 
+        /// This method fully resets the user's state on the server and expects all relevant state information to be included in the request.
+        /// Any user attributes that are currently stored in the server with the given userId but are not sent with this update, will be erased.
+        /// </summary>
+        /// <param name="fullUserAttributes">An exhaustive dictionary of user attribute identifiers and their new values.
+        /// Please note that ALL user properties should be passed in the payload.</param>
+        public static void LogFullStateUpdate(Dictionary<string, object> fullUserAttributes)
         {
             if (!checkPreconditions())
             {
@@ -307,14 +311,16 @@ namespace Metica.Unity
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogUserAttributes(userAttributes);
+            logger.LogFullStateUpdate(fullUserAttributes);
         }
 
         /// <summary>
-        /// Log a partial update of a user's state (attributes).
+        /// Sends a partial update of the user's state to the server
+        /// modifying or adding only the provided fields while preserving those that are currently stored on the server.
+        /// This method cannot erase existing fields (like `LogFullStateUpdate` does); it can only overwrite values or introduce new ones.
         /// </summary>
-        /// <param name="userAttributes">A mutable dictionary of user attribute identifiers and their new values.</param>
-        public static void LogPartialStateUpdate(Dictionary<string, object> userAttributes)
+        /// <param name="partialUserAttributes">A dictionary of user attribute identifiers and their new values.</param>
+        public static void LogPartialStateUpdate(Dictionary<string, object> partialUserAttributes)
         {
             if (!checkPreconditions())
             {
@@ -322,7 +328,7 @@ namespace Metica.Unity
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogPartialUserAttributes(userAttributes);
+            logger.LogPartialStateUpdate(partialUserAttributes);
         }
 
         #endregion State Update
@@ -340,23 +346,23 @@ namespace Metica.Unity
         /// <remarks>
         /// Documentation: <see href="https://docs.metica.com/integration#adrevenue"/>
         /// </remarks>
-        public static void LogAdRevenue(double totalAmount, string currencyCode, string adPlacement = null, string adPlacementType = null, string adPlacementSource = null)
+        public static void LogAdRevenue(double totalAmount, string currencyCode, string adPlacement = null, string adPlacementType = null, string adPlacementSource = null, Dictionary<string, object> customPayload = null)
         {
             if (!checkPreconditions())
             {
                 return;
             }
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogAdRevenue(totalAmount, currencyCode, adPlacement, adPlacementType, adPlacementSource);
+            logger.LogAdRevenue(totalAmount, currencyCode, adPlacement, adPlacementType, adPlacementSource, customPayload);
         }
 
         #endregion Ad Revenue
 
         #region Custom Event
 
-        // ALIAS (will be promoted to main method call for custom events.
-        public static void LogCustomEvent(string eventType, Dictionary<string, object> userEvent, bool reuseDictionary = false) =>
-            LogUserEvent(eventType, userEvent, reuseDictionary);
+        [Obsolete("Please use LogCustomEvent(string eventType, Dictionary<string, object> userEvent)")]
+        public static void LogUserEvent(string eventType, Dictionary<string, object> userEvent, bool reuseDictionary) =>
+            LogCustomEvent(eventType, userEvent);
         /// <summary>
         /// Logs a custom user event to the Metica API.
         /// </summary>
@@ -367,8 +373,7 @@ namespace Metica.Unity
         /// <param name="eventType">The name/type of the event</param>
         /// <param name="userEvent">A dictionary containing the details of the user event. The dictionary should have string keys and object values.</param>
         /// <param name="reuseDictionary">Indicates if the passed dictionary can be modified to add additional Metica-specific attribute. Re-using the dictionary instance in this way can potentially save an allocation.</param>
-        public static void LogUserEvent(string eventType, Dictionary<string, object> userEvent,
-            bool reuseDictionary = false)
+        public static void LogCustomEvent(string eventType, Dictionary<string, object> userEvent)
         {
             if (!checkPreconditions())
             {
@@ -381,7 +386,7 @@ namespace Metica.Unity
             }
 
             var logger = ScriptingObjects.GetComponent<EventsLogger>();
-            logger.LogCustomEvent(eventType, userEvent, reuseDictionary);
+            logger.LogCustomEvent(eventType, userEvent);
         }
 
         #endregion Custom Event
@@ -389,6 +394,7 @@ namespace Metica.Unity
         #region SDK Info
         internal class SdkInfo
         {
+            public static string SdkInfoFolder { get => Path.Combine(Application.streamingAssetsPath, "Metica"); }
             public string Version { get; set; }
         }
 
@@ -398,19 +404,19 @@ namespace Metica.Unity
         /// <returns></returns>
         private static SdkInfo GetSdkInfo()
         {
-            string filePath = Path.Combine(Application.streamingAssetsPath, "sdkInfo.json");
+            string filePath = Path.Combine(SdkInfo.SdkInfoFolder, "sdkInfo.json");
 
+            MeticaLogger.LogDebug(() => $"File {filePath} esists = {File.Exists(filePath)}");
             if (!File.Exists(filePath))
             {
-#if UNITY_EDITOR
-                //WriteJsonSdkInfo();
-#else
+#if !UNITY_EDITOR
                 return new SdkInfo { Version = "unknown" };
 #endif
             }
 
             string json = File.ReadAllText(filePath);
             SdkInfo sdkInfo = JsonConvert.DeserializeObject<SdkInfo>(json);
+            MeticaLogger.LogDebug(() => $"SDK version found = {sdkInfo.Version}");
             return sdkInfo;
         }
 
@@ -438,7 +444,6 @@ namespace Metica.Unity
             {
                 foreach (var package in listRequest.Result)
                 {
-                    Debug.Log($"{package.name} : {package.version}");
                     if (package.name == packageName)
                     {
                         return package.version;
@@ -454,23 +459,22 @@ namespace Metica.Unity
         /// </summary>
         private static void WriteJsonSdkInfo()
         {
-            string streamingAssetsPath = Path.Combine(Application.dataPath, "StreamingAssets");
+            string sdkInfoFolder = SdkInfo.SdkInfoFolder;
 
-            if (!Directory.Exists(streamingAssetsPath))
+            if (!Directory.Exists(sdkInfoFolder))
             {
-                Directory.CreateDirectory(streamingAssetsPath);
+                Directory.CreateDirectory(sdkInfoFolder);
                 UnityEditor.AssetDatabase.Refresh();
             }
 
-            string filePath = Path.Combine(streamingAssetsPath, "sdkInfo.json");
-
+            string filePath = Path.Combine(sdkInfoFolder, "sdkInfo.json");
  
             string packageVersion = GetPackageVersion("com.metica.unity");
             if (packageVersion != null)
             {
                 string jsonData = $"{{\"Version\": \"{packageVersion}\"}}";  // Ensure version is quoted for valid JSON
                 File.WriteAllText(filePath, jsonData);
-                Debug.Log($"SDK Info JSON written to: {filePath}");
+                MeticaLogger.LogDebug(() => $"SDK Info JSON written to: {filePath}");
                 UnityEditor.AssetDatabase.Refresh(); 
             }
             else
