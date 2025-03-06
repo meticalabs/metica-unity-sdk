@@ -394,6 +394,7 @@ namespace Metica.Unity
         #region SDK Info
         internal class SdkInfo
         {
+            public static string SdkInfoFolder { get => Path.Combine(Application.streamingAssetsPath, "Metica"); }
             public string Version { get; set; }
         }
 
@@ -403,19 +404,19 @@ namespace Metica.Unity
         /// <returns></returns>
         private static SdkInfo GetSdkInfo()
         {
-            string filePath = Path.Combine(Application.streamingAssetsPath, "sdkInfo.json");
+            string filePath = Path.Combine(SdkInfo.SdkInfoFolder, "sdkInfo.json");
 
+            MeticaLogger.LogDebug(() => $"File {filePath} esists = {File.Exists(filePath)}");
             if (!File.Exists(filePath))
             {
-#if UNITY_EDITOR
-                //WriteJsonSdkInfo();
-#else
+#if !UNITY_EDITOR
                 return new SdkInfo { Version = "unknown" };
 #endif
             }
 
             string json = File.ReadAllText(filePath);
             SdkInfo sdkInfo = JsonConvert.DeserializeObject<SdkInfo>(json);
+            MeticaLogger.LogDebug(() => $"SDK version found = {sdkInfo.Version}");
             return sdkInfo;
         }
 
@@ -443,7 +444,6 @@ namespace Metica.Unity
             {
                 foreach (var package in listRequest.Result)
                 {
-                    Debug.Log($"{package.name} : {package.version}");
                     if (package.name == packageName)
                     {
                         return package.version;
@@ -459,23 +459,22 @@ namespace Metica.Unity
         /// </summary>
         private static void WriteJsonSdkInfo()
         {
-            string streamingAssetsPath = Path.Combine(Application.dataPath, "StreamingAssets");
+            string sdkInfoFolder = SdkInfo.SdkInfoFolder;
 
-            if (!Directory.Exists(streamingAssetsPath))
+            if (!Directory.Exists(sdkInfoFolder))
             {
-                Directory.CreateDirectory(streamingAssetsPath);
+                Directory.CreateDirectory(sdkInfoFolder);
                 UnityEditor.AssetDatabase.Refresh();
             }
 
-            string filePath = Path.Combine(streamingAssetsPath, "sdkInfo.json");
-
+            string filePath = Path.Combine(sdkInfoFolder, "sdkInfo.json");
  
             string packageVersion = GetPackageVersion("com.metica.unity");
             if (packageVersion != null)
             {
                 string jsonData = $"{{\"Version\": \"{packageVersion}\"}}";  // Ensure version is quoted for valid JSON
                 File.WriteAllText(filePath, jsonData);
-                Debug.Log($"SDK Info JSON written to: {filePath}");
+                MeticaLogger.LogDebug(() => $"SDK Info JSON written to: {filePath}");
                 UnityEditor.AssetDatabase.Refresh(); 
             }
             else
