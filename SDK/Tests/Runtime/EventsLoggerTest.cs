@@ -207,23 +207,6 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             Assert.That(logger.EventsQueue.Count, Is.EqualTo(256));
         }
 
-        [Test]
-        public void TestTheReuseOfTheDictionaryInstance()
-        {
-            var logger = new GameObject().AddComponent<EventsLogger>();
-
-            var eventType = "test";
-            var eventData = new Dictionary<string, object> { { "userId", "rejected" }, { "key2", "value2" } };
-            var copyDict = new Dictionary<string, object>(eventData);
-
-            logger.LogCustomEvent(eventType, eventData, false);
-
-            Assert.That(copyDict, Is.EqualTo(eventData));
-
-            logger.LogCustomEvent(eventType, eventData, true);
-            Assert.That(copyDict, Is.Not.EqualTo(eventData));
-        }
-
         private static void assertCommonAttributes(string eventType, Dictionary<string, object> recordedEvent)
         {
             Assert.That(recordedEvent[Constants.EventId], Is.Not.Null);

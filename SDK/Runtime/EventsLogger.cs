@@ -39,10 +39,27 @@ namespace Metica.Unity
             FlushEvents();
         }
 
+        private void AppendCustomPayload(Dictionary<string, object> attributes, Dictionary<string, object> customAttributes)
+        {
+            if(customAttributes == null || attributes == null)
+            {
+                // TODO : warn!
+                return;
+            }
+            if (!attributes.ContainsKey(Constants.CustomPayload))
+            {
+                attributes.Add(Constants.CustomPayload, customAttributes);
+            }
+        }
+
         #endregion Unity Lifecycle
 
-        private void LogEvent(Dictionary<string, object> eventDetails)
+        private void LogEvent(Dictionary<string, object> eventDetails, Dictionary<string, object> customPayload = null)
         {
+            if (customPayload != null && customPayload.Count > 0)
+            {
+                AppendCustomPayload(eventDetails, customPayload);
+            }
             _eventsList.AddFirst(eventDetails);
             if (_eventsList.Count > MeticaAPI.Config.maxPendingLoggedEvents)
             {
@@ -52,14 +69,14 @@ namespace Metica.Unity
 
         #region Install & Login Events
 
-        public void LogInstall()
+        public void LogInstall(Dictionary<string, object> customPayload = null)
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.Install);
-            LogEvent(attributes);
+            LogEvent(attributes, customPayload);
         }
 
-        public void LogLogin(string newCurrentUserId = null)
+        public void LogLogin(string newCurrentUserId = null, Dictionary<string, object> customPayload = null)
         {
             if(newCurrentUserId !=  null)
             {
@@ -67,34 +84,34 @@ namespace Metica.Unity
             }
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.Login);
-            LogEvent(attributes);
+            LogEvent(attributes, customPayload);
         }
 
         #endregion Install & Login Events
 
         #region Offer Impression
 
-        public void LogOfferDisplay(string offerId, string placementId)
+        public void LogOfferDisplay(string offerId, string placementId, Dictionary<string, object> customPayload = null)
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.OfferImpression);
             attributes[Constants.MeticaAttributes] = GetOrCreateMeticaAttributes(offerId, placementId);
-            LogEvent(attributes);
+            LogEvent(attributes, customPayload);
         }
 
-        public void LogOfferDisplayWithProductId(string productId)
+        public void LogOfferDisplayWithProductId(string productId, Dictionary<string, object> customPayload = null)
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.OfferImpression);
             attributes[Constants.ProductId] = productId;
-            LogEvent(attributes);
+            LogEvent(attributes, customPayload);
         }
 
         #endregion Offer Impression
 
         #region Offer Purchase
 
-        public void LogOfferPurchase(string offerId, string placementId, double amount, string currency)
+        public void LogOfferPurchase(string offerId, string placementId, double amount, string currency, Dictionary<string, object> customPayload = null)
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.OfferInAppPurchase);
@@ -102,47 +119,47 @@ namespace Metica.Unity
             attributes[Constants.TotalAmount] = amount;
             var meticaAttributes = GetOrCreateMeticaAttributes(offerId, placementId);
             attributes[Constants.MeticaAttributes] = meticaAttributes;
-            LogEvent(attributes);
+            LogEvent(attributes, customPayload);
         }
 
-        public void LogOfferPurchaseWithProductId(string productId, double amount, string currency)
+        public void LogOfferPurchaseWithProductId(string productId, double amount, string currency, Dictionary<string, object> customPayload = null)
         {
             var attributes = new Dictionary <string, object>();
             AddCommonEventAttributes(attributes, EventTypes.OfferInAppPurchase);
             attributes[Constants.CurrencyCode] = currency;
             attributes[Constants.TotalAmount] = amount;
             attributes[Constants.ProductId] = productId;
-            LogEvent(attributes);
+            LogEvent(attributes, customPayload);
         }
 
         #endregion Offer Purchase
 
         #region Offer Interaction
 
-        public void LogOfferInteraction(string offerId, string placementId, string interactionType)
+        public void LogOfferInteraction(string offerId, string placementId, string interactionType, Dictionary<string, object> customPayload = null)
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.OfferInteraction);
             attributes[Constants.InteractionType] = interactionType;
             var meticaAttributes = GetOrCreateMeticaAttributes(offerId, placementId);
             attributes[Constants.MeticaAttributes] = meticaAttributes;
-            LogEvent(attributes);
+            LogEvent(attributes, customPayload);
         }
 
-        public void LogOfferInteractionWithProductId(string productId, string interactionType)
+        public void LogOfferInteractionWithProductId(string productId, string interactionType, Dictionary<string, object> customPayload = null)
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.OfferInteraction);
             attributes[Constants.ProductId] = productId;
             attributes[Constants.InteractionType] = interactionType;
-            LogEvent(attributes);
+            LogEvent(attributes, customPayload);
         }
 
         #endregion Offer Interaction
 
         #region Ad Revenue
 
-        public void LogAdRevenue(double amount, string currencyCode, string adPlacement = null, string adPlacementType = null, string adPlacementSource = null)
+        public void LogAdRevenue(double amount, string currencyCode, string adPlacement = null, string adPlacementType = null, string adPlacementSource = null, Dictionary<string, object> customPayload = null)
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.AdRevenue);
@@ -151,28 +168,33 @@ namespace Metica.Unity
             attributes[Constants.AdPlacement] = adPlacement;
             attributes[Constants.AdPlacementType] = adPlacementType;
             attributes[Constants.AdPlacementSource] = adPlacementSource;
-            LogEvent(attributes);
+            LogEvent(attributes, customPayload);
         }
 
         #endregion Ad Revenue
 
         #region State Update
 
-        // TODO: rename this method to reflect new API naming
+        [Obsolete("Please use LogFullStateUpdate")]
         public void LogUserAttributes(Dictionary<string, object> userAttributes)
+            => LogFullStateUpdate(userAttributes);
+
+        public void LogFullStateUpdate(Dictionary<string, object> fullUserAttributes)
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.FullStateUpdate);
-            attributes[Constants.UserStateAttributes] = userAttributes;
+            attributes[Constants.UserStateAttributes] = fullUserAttributes;
             LogEvent(attributes);
         }
 
-        // TODO: rename this method to reflect new API naming
-        public void LogPartialUserAttributes(Dictionary<string, object> userAttributes)
+        [Obsolete]
+        public void LogPartialUserAttributes(Dictionary<string, object> userAttributes) => LogPartialStateUpdate(userAttributes);
+
+        public void LogPartialStateUpdate(Dictionary<string, object> partialStateAttributes)
         {
             var attributes = new Dictionary<string, object>();
             AddCommonEventAttributes(attributes, EventTypes.PartialStateUpdate);
-            attributes[Constants.UserStateAttributes] = userAttributes;
+            attributes[Constants.UserStateAttributes] = partialStateAttributes;
             LogEvent(attributes);
         }
 
@@ -180,17 +202,21 @@ namespace Metica.Unity
 
         #region Custom Event
 
+        [Obsolete("Please use LogCustomEvent(string eventType, Dictionary<string, object> eventDetails)")]
         public void LogCustomEvent(string eventType, Dictionary<string, object> eventDetails, bool reuseDictionary)
+            => LogCustomEvent(eventType, eventDetails);
+
+        public void LogCustomEvent(string eventType, Dictionary<string, object> eventDetails)
         {
-            if (eventType == null)
+            if (string.IsNullOrEmpty(eventType))
             {
                 MeticaLogger.LogError(() => "The event type must be specified");
                 return;
             }
 
-            var attributes = reuseDictionary ? eventDetails : new Dictionary<string, object>(eventDetails);
+            var attributes = new Dictionary<string, object>(eventDetails);
             AddCommonEventAttributes(attributes, eventType);
-            LogEvent(attributes);
+            LogEvent(attributes, customPayload: null);
         }
 
         #endregion Custom Event
