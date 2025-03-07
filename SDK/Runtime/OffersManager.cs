@@ -36,6 +36,7 @@ namespace Metica.Unity
                     }
                 }
 
+                // select the placements that are requested but weren't found in the cache
                 pendingFetch = placements.Where(key => !resultOffers.ContainsKey(key)).ToArray();
                 if (!pendingFetch.Any())
                 {

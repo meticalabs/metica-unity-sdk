@@ -13,7 +13,7 @@ namespace Metica.Unity
         public long ExpiresOn;
     }
 
-    internal class SimpleDiskCache<T> where T : class
+    internal class SimpleDiskCache<TKey, TValue> where TValue : class
     {
         private readonly string _name;
         private readonly string _cacheFilePath;
@@ -36,7 +36,7 @@ namespace Metica.Unity
                 {
                     using StreamReader reader = new StreamReader(_cacheFilePath);
                     var content = reader.ReadToEnd();
-                    var savedDict = JsonConvert.DeserializeObject<Dictionary<string, CachedValue<T>>>(content) ?? new Dictionary<string, CachedValue<T>>();
+                    var savedDict = JsonConvert.DeserializeObject<Dictionary<string, CachedValue<TValue>>>(content) ?? new Dictionary<string, CachedValue<TValue>>();
 
                     foreach (var pair in savedDict)
                     {
@@ -57,28 +57,28 @@ namespace Metica.Unity
             }
         }
 
-        internal void Clear()
+        public void Clear()
         {
             _cachedData.Clear();
         }
         
-        internal void Save()
+        public void Save()
         {
             using StreamWriter writer = new StreamWriter(_cacheFilePath);
             writer.Write(JsonConvert.SerializeObject(_cachedData));
         }
 
-        public T? Read(string key)
+        public TValue? Read(TKey key)
         {
-            var result = (CachedValue<T>?)_cachedData[key];
+            var result = (CachedValue<TValue>?)_cachedData[key];
             return result?.ExpiresOn > MeticaAPI.TimeSource.EpochSeconds() ? result.Data : null;
         }
 
-        public void Write(string key, T data, long ttlSeconds)
+        public void Write(TKey key, TValue data, long ttlSeconds)
         {
             try
             {
-                var cachedValue =  new CachedValue<T>
+                var cachedValue =  new CachedValue<TValue>
                 {
                     Data = data,
                     ExpiresOn = MeticaAPI.TimeSource.EpochSeconds() + ttlSeconds

@@ -5,7 +5,7 @@ namespace Metica.Unity
 {
     public class RemoteConfigCache : MonoBehaviour
     {
-        private SimpleDiskCache<object>? _cache;
+        private SimpleDiskCache<string, object>? _cache;
 
         internal void Awake()
         {
@@ -15,7 +15,7 @@ namespace Metica.Unity
                 return;
             }
 
-            _cache = new SimpleDiskCache<object>("RemoteConfigCache", MeticaAPI.Config.remoteConfigCachePath);
+            _cache = new SimpleDiskCache<string, object>("RemoteConfigCache", MeticaAPI.Config.remoteConfigCachePath);
             _cache.Prepare();
             DontDestroyOnLoad(this);
         }

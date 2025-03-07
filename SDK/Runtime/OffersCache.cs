@@ -4,10 +4,9 @@ using UnityEngine;
 
 namespace Metica.Unity
 {
-    
     internal class OffersCache : MonoBehaviour
     {
-        private SimpleDiskCache<List<Offer>>? _cache;
+        private SimpleDiskCache<string, List<Offer>>? _cache;
             
         internal void Awake()
         {
@@ -17,7 +16,7 @@ namespace Metica.Unity
                 return;
             }
 
-            _cache = new SimpleDiskCache<List<Offer>>("OffersCache", MeticaAPI.Config.offersCachePath);
+            _cache = new SimpleDiskCache<string, List<Offer>>("OffersCache", MeticaAPI.Config.offersCachePath);
             _cache.Prepare();
             DontDestroyOnLoad(this);
         }
