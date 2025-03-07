@@ -33,7 +33,6 @@ namespace Metica.SDK.Caching
         {
             try
             {
-                // Ensure the file exists
                 if (File.Exists(_cacheFilePath))
                 {
                     using StreamReader reader = new StreamReader(_cacheFilePath);

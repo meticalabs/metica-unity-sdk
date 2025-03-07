@@ -278,6 +278,7 @@ namespace Metica.Unity
         private static Dictionary<string, object> GetOrCreateMeticaAttributes(string offerId, string placementId)
         {
             var cachedOffers = MeticaAPI.OffersCache.Read(placementId);
+            MeticaLogger.LogDebug(() => $"EventsLogger : {(cachedOffers != null ? "HIT" : "MISS")}" );
             var offerDetails = cachedOffers?.Find(offer => offer.offerId == offerId);
             return (offerDetails == null)
                 ? CreateMeticaAttributes(offerId, placementId)

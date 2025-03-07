@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using UnityEngine;
 
 // ReSharper disable all NotAccessedField.Global
@@ -31,6 +30,8 @@ namespace Metica.Unity
                 foreach (var p in placements)
                 {
                     var cachedResult = MeticaAPI.OffersCache.Read(p);
+
+                    MeticaLogger.LogDebug(() => $"OffersCache : cache {(cachedResult != null ? "HIT" : "MISS")}" );
                     if (cachedResult != null && cachedResult.Count > 0)
                     {
                         resultOffers.Add(p, cachedResult);
