@@ -91,7 +91,7 @@ namespace Metica.Unity
             RemoteConfigManager = new RemoteConfigManager();
 
             OffersCache = new OffersCache("OffersCache", Config.offersCachePath); //ScriptingObjects.GetComponent<OffersCache>();
-            RemoteConfigCache = ScriptingObjects.GetComponent<RemoteConfigCache>();
+            RemoteConfigCache = new RemoteConfigCache("RemoteConfigCache", Config.remoteConfigCachePath); // ScriptingObjects.GetComponent<RemoteConfigCache>();
 
             BackendOperations = new BackendOperationsImpl();
 

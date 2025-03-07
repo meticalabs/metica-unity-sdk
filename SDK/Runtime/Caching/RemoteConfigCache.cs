@@ -1,51 +1,25 @@
 #nullable enable
 using UnityEngine;
 using Metica.Unity;
+using UnityEngine.UIElements;
 
 namespace Metica.SDK.Caching
 {
-    public class RemoteConfigCache : MonoBehaviour
+    // TODO : This should probably extend Cache<string, RemoteConfig> but for now this should work with the code in place.
+    internal class RemoteConfigCache : Cache<string, object>
     {
-        private SimpleDiskCache<string, object>? _cache;
-
-        internal void Awake()
+        public RemoteConfigCache(string name, string cacheFilePath, int maxEntries = 100) : base(name, cacheFilePath, maxEntries)
         {
-            if (Application.isEditor && !Application.isPlaying)
-            {
-                MeticaLogger.LogWarning(() => "The remote config cache will not be available in the editor");
-                return;
-            }
-
-            _cache = new SimpleDiskCache<string, object>("RemoteConfigCache", MeticaAPI.Config.remoteConfigCachePath);
-            _cache.Prepare();
-            DontDestroyOnLoad(this);
+            //if (Application.isEditor && !Application.isPlaying)
+            //{
+            //    MeticaLogger.LogWarning(() => "The remote config cache will not be available in the editor");
+            //    return;
+            //}
         }
 
-        private void OnApplicationQuit()
+        protected override string BuildKey(string key)
         {
-            _cache?.Save();
-        }
-
-        public object? Read(string configKey)
-        {
-            object? value = _cache?.Read(GetCacheKey(configKey));
-            MeticaLogger.LogDebug(() => value == null ? "<b>CONFIG CACHE MISS</b>" : "<b>CONFIG CACHE HIT</b>");
-            return value;
-        }
-
-        public void Write(string configKey, object value, long ttlSeconds)
-        {
-            _cache?.Write(GetCacheKey(configKey), value, ttlSeconds);
-        }
-
-        public void Clear()
-        {
-            _cache?.Clear();
-        }
-
-        private string GetCacheKey(string configKey)
-        {
-            return $"cfg-{MeticaAPI.AppId}-{MeticaAPI.UserId}-{configKey}";
+            return $"cfg-{MeticaAPI.AppId}-{MeticaAPI.UserId}-{key}";
         }
     }
 }
