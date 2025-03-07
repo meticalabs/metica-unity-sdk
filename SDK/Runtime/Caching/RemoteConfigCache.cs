@@ -1,7 +1,8 @@
 #nullable enable
 using UnityEngine;
+using Metica.Unity;
 
-namespace Metica.Unity
+namespace Metica.SDK.Caching
 {
     public class RemoteConfigCache : MonoBehaviour
     {

@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
+using Metica.SDK.Caching;
 
 namespace Metica.Unity
 {

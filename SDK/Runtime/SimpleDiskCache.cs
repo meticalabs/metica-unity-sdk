@@ -5,7 +5,9 @@ using System.Collections.Specialized;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace Metica.Unity
+using Metica.Unity;
+
+namespace Metica.SDK.Caching
 {
     internal class CachedValue<T>
     {
