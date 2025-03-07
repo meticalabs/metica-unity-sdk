@@ -4,50 +4,54 @@ using UnityEngine;
 
 namespace Metica.Unity
 {
-    internal class OffersCache : MonoBehaviour
+    internal abstract class Cache<TKey, TValue> : ICache<TKey, TValue> where TValue : class
     {
-        private SimpleDiskCache<string, List<Offer>>? _cache;
-            
-        internal void Awake()
-        {
-            if (Application.isEditor && !Application.isPlaying)
-            {
-                MeticaLogger.LogWarning(() => "The offers cache will not be available in the editor");
-                return;
-            }
+        private SimpleDiskCache<TKey, TValue> _cache;
 
-            _cache = new SimpleDiskCache<string, List<Offer>>("OffersCache", MeticaAPI.Config.offersCachePath);
+        public Cache(string name, string cacheFilePath, int maxEntries = 100)
+        {
+            _cache = new SimpleDiskCache<TKey, TValue> (name, cacheFilePath, maxEntries);
             _cache.Prepare();
-            DontDestroyOnLoad(this);
         }
 
-        private void OnApplicationQuit()
+        public virtual void Clear()
         {
-            _cache?.Save();
+            _cache.Clear();
         }
 
-        public void Clear()
+        public virtual TValue Read(TKey key)
         {
-            _cache?.Clear();
-        }
-        
-        public List<Offer>? Read(string placement)
-        {
-            List<Offer>? value = _cache?.Read(CacheKeyForPlacement(placement));
-            MeticaLogger.LogDebug(() => value == null ?
-                $"<b>{nameof(OffersCache)}: MISS (Placement:{placement})</b>"
-                : $"<b>{nameof(OffersCache)}: HIT (Placement:{placement})</b>");
-            return value;
+            return _cache.Read(BuildKey(key));
         }
 
-        public void Write(string placement, List<Offer> offers)
+        public virtual void Save()
         {
-            _cache?.Write(CacheKeyForPlacement(placement), offers, MeticaAPI.Config.offersCacheTtlMinutes * 60);
+            _cache.Save();
         }
 
-        private static string CacheKeyForPlacement(string placement)
+        public virtual void Write(TKey key, TValue value, long timeToLive)
         {
-            return $"offers-{MeticaAPI.AppId}-{MeticaAPI.UserId}-{placement}";
+            _cache.Write(BuildKey(key), value, timeToLive);
+        }
+
+        protected abstract TKey BuildKey(TKey key);
+    }
+
+    internal class OffersCache : Cache<string, List<Offer>>
+    {
+        public OffersCache(string name, string cacheFilePath, int maxEntries = 100)
+            : base(name, cacheFilePath, maxEntries)
+        {
+            //if (Application.isEditor && !Application.isPlaying)
+            //{
+            //    MeticaLogger.LogWarning(() => "The offers cache will not be available in the editor");
+            //    return;
+            //}
+        }
+
+        protected override string BuildKey(string key)
+        {
+            return $"offers-{MeticaAPI.AppId}-{MeticaAPI.UserId}-{key}";
         }
     }
 }

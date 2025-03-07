@@ -17,6 +17,7 @@ namespace Metica.Unity
 
     public class OffersManager : IOffersManager
     {
+        private const long CACHE_DURARION_SECONDS = 60;
         static readonly string[] FetchAllSentinel = Array.Empty<string>();
 
         public void GetOffers(string[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback,
@@ -64,7 +65,7 @@ namespace Metica.Unity
                             {
                                 resultOffers.Add(pair.Key, pair.Value);
                                 // persist the response and refresh the in-memory cache
-                                MeticaAPI.OffersCache.Write(pair.Key, pair.Value);
+                                MeticaAPI.OffersCache.Write(pair.Key, pair.Value, CACHE_DURARION_SECONDS);
                             }
                             
                             // filter out the offers that have exceeded their display limit
