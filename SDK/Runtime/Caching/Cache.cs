@@ -4,12 +4,13 @@ namespace Metica.SDK.Caching
 {
     internal abstract class Cache<TKey, TValue> : ICache<TKey, TValue> where TValue : class
     {
+        // TODO : not ideal to have a specific implementation inside a generic one.
         private SimpleDiskCache<TKey, TValue> _cache;
 
         public Cache(string name, string cacheFilePath, int maxEntries = 100)
         {
             _cache = new SimpleDiskCache<TKey, TValue>(name, cacheFilePath, maxEntries);
-            _cache.Prepare();
+            _cache.Load();
         }
 
         public virtual void Clear()
@@ -19,9 +20,13 @@ namespace Metica.SDK.Caching
 
         public virtual TValue Read(TKey key)
         {
-            return _cache.Read(BuildKey(key));
+            return _cache.Read(TransformKey(key));
         }
 
+        /// <summary>
+        /// Saves the current cached data to disk.
+        /// Must be called manually.
+        /// </summary>
         public virtual void Save()
         {
             _cache.Save();
@@ -29,9 +34,11 @@ namespace Metica.SDK.Caching
 
         public virtual void Write(TKey key, TValue value, long timeToLive)
         {
-            _cache.Write(BuildKey(key), value, timeToLive);
+            _cache.Write(TransformKey(key), value, timeToLive);
         }
 
-        protected abstract TKey BuildKey(TKey key);
+        protected abstract TKey TransformKey(TKey key);
+
+
     }
 }

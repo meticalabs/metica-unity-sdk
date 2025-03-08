@@ -17,7 +17,7 @@ namespace Metica.SDK.Caching
             //}
         }
 
-        protected override string BuildKey(string key)
+        protected override string TransformKey(string key)
         {
             return $"cfg-{MeticaAPI.AppId}-{MeticaAPI.UserId}-{key}";
         }

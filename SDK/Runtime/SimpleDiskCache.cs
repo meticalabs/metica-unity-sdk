@@ -20,6 +20,7 @@ namespace Metica.SDK.Caching
         private readonly string _name;
         private readonly string _cacheFilePath;
 
+        // TODO : do we really need an OrderedDictionary?
         private readonly OrderedDictionary _cachedData;
 
         public SimpleDiskCache(string name, string cacheFilePath, int maxEntries = 100)
@@ -29,7 +30,7 @@ namespace Metica.SDK.Caching
             _cachedData = new OrderedDictionary(maxEntries);
         }
 
-        internal void Prepare()
+        internal void Load()
         {
             try
             {
@@ -43,6 +44,7 @@ namespace Metica.SDK.Caching
                     {
                         _cachedData[pair.Key] = pair.Value;
                     }
+                    reader.Close();
                 }
             }
             catch (Exception e)
@@ -56,11 +58,6 @@ namespace Metica.SDK.Caching
                     MeticaLogger.LogError(() => $"Error while removing the existing cache file", e);
                 }
             }
-        }
-
-        public void Clear()
-        {
-            _cachedData.Clear();
         }
         
         public void Save()
@@ -99,5 +96,11 @@ namespace Metica.SDK.Caching
                 MeticaLogger.LogError(() => $"Error while trying to save the cache {_name}", e);
             }
         }
+
+        public void Clear()
+        {
+            _cachedData.Clear();
+        }
+
     }
 }
