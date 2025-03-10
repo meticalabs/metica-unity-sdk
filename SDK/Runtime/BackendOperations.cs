@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -132,7 +133,6 @@ namespace Metica.Unity
             }
         }
 
-
         private static string BuildUrlWithParameters(Dictionary<string, object> parameters)
         {
             StringBuilder parameterString = new StringBuilder();
@@ -228,28 +228,97 @@ namespace Metica.Unity
             op.Events = events;
             op.EventsSubmitCallback = callback;
         }
-        
-        private static readonly LinkedPool<CallRemoteConfigOperation> CallRemoteConfigPool = new(
-            createFunc: () =>
-            {
-                var item = ScriptingObjects.AddComponent<CallRemoteConfigOperation>();
-                return item;
-            },
-            actionOnGet: item => item.gameObject.SetActive(true),
-            actionOnRelease: item => item.gameObject.SetActive(false),
-            actionOnDestroy: item => { item.OnDestroyPoolObject(); },
-            maxSize: 100
-        );
-        
+
+        #region CONFIG REFACTOR
+        //private static readonly LinkedPool<CallRemoteConfigOperation> CallRemoteConfigPool = new(
+        //    createFunc: () =>
+        //    {
+        //        var item = ScriptingObjects.AddComponent<CallRemoteConfigOperation>();
+        //        return item;
+        //    },
+        //    actionOnGet: item => item.gameObject.SetActive(true),
+        //    actionOnRelease: item => item.gameObject.SetActive(false),
+        //    actionOnDestroy: item => { item.OnDestroyPoolObject(); },
+        //    maxSize: 100
+        //);
+
+        //public void CallRemoteConfigAPI(string[] configKeys, MeticaSdkDelegate<RemoteConfig> responseCallback, Dictionary<string, object> userProperties = null,
+        //    DeviceInfo deviceInfo = null)
+        //{
+        //    var op = CallRemoteConfigPool.Get();
+        //    op.pool = CallRemoteConfigPool;
+        //    op.ConfigKeys = configKeys;
+        //    op.UserProperties = userProperties;
+        //    op.DeviceInfo = deviceInfo;
+        //    op.ResponseCallback = responseCallback;
+        //}
+
         public void CallRemoteConfigAPI(string[] configKeys, MeticaSdkDelegate<RemoteConfig> responseCallback, Dictionary<string, object> userProperties = null,
             DeviceInfo deviceInfo = null)
         {
-            var op = CallRemoteConfigPool.Get();
-            op.pool = CallRemoteConfigPool;
-            op.ConfigKeys = configKeys;
-            op.UserProperties = userProperties;
-            op.DeviceInfo = deviceInfo;
-            op.ResponseCallback = responseCallback;
+            MeticaScriptingRoot coroutineRunner = ScriptingObjects.GetComponent<MeticaScriptingRoot>();
+            coroutineRunner.AddCoroutine(RemoteConfigOperationStart(configKeys, userProperties, deviceInfo, responseCallback));
+        }
+
+        /// <summary>
+        /// A routinable wrapper for <see cref="CallRemoteConfigAPI"/>.
+        /// </summary>
+        private IEnumerator CallRemoteConfigApiCoroutine(string[] configKeys, MeticaSdkDelegate<RemoteConfig> responseCallback,
+            Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        {
+            CallRemoteConfigAPI(configKeys, responseCallback, userProperties, deviceInfo);
+            yield return null;
+        }
+
+        public IEnumerator RemoteConfigOperationStart(
+            ICollection<string> ConfigKeys,
+            Dictionary<string, object> UserProperties,
+            DeviceInfo DeviceInfo,
+            MeticaSdkDelegate<RemoteConfig> ResponseCallback)
+        {
+            yield return PostRequestOperation.PostRequest<Dictionary<string, object>>(
+                $"{MeticaAPI.Config.remoteConfigEndpoint}/config/v1/apps/{MeticaAPI.AppId}",
+                ConfigKeys != null && ConfigKeys.Any() ?
+                new Dictionary<string, object>
+                {
+                    { "keys", ConfigKeys },
+                } : null,
+                MeticaAPI.ApiKey,
+                RequestUtils.CreateRequestWithUserDataAndDeviceInfo(UserProperties, DeviceInfo),
+                result =>
+                {
+                    if (result.Error != null)
+                    {
+                        ResponseCallback(SdkResultImpl<RemoteConfig>.WithError(result.Error));
+                    }
+                    else
+                    {
+                        var remoteConfig = new RemoteConfig(
+                            config: result.Result.Data,
+                            cacheDurationSecs: ParseCacheExpirationFromHeaders(result.Result.Headers));
+                        ResponseCallback(SdkResultImpl<RemoteConfig>.WithResult(remoteConfig));
+                    }
+                });
+        }
+
+        private static readonly char[] ChEquals = { '=' };
+        private static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromHours(3);
+        private static long ParseCacheExpirationFromHeaders(Dictionary<string, string> headers)
+        {
+            var seconds = DefaultCacheDuration.Seconds;
+            var cacheControl = headers["Cache-Control"];
+            if (cacheControl == null) return seconds;
+            try
+            {
+                seconds = int.Parse(cacheControl.Split(ChEquals)[1]);
+            }
+            catch (Exception e)
+            {
+                MeticaLogger.LogError(() => $"Failed to parse the cache control directive from the header value {cacheControl}");
+            }
+
+            return seconds;
         }
     }
+        #endregion CONFIG REFACTOR
 }

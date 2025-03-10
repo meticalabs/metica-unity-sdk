@@ -106,7 +106,7 @@ namespace Metica.Unity
         }
 
 
-        static ODSRequest CreateODSRequestBody(Dictionary<string, object> userData,
+        private static ODSRequest CreateODSRequestBody(Dictionary<string, object> userData,
             DeviceInfo overrideDeviceInfo = null)
         {
             var requestWithUserDataAndDeviceInfo = RequestUtils.CreateRequestWithUserDataAndDeviceInfo(userData, overrideDeviceInfo);
@@ -121,78 +121,78 @@ namespace Metica.Unity
         }
     }
 
-    [ExecuteAlways]
-    internal class CallRemoteConfigOperation : MonoBehaviour
+    //[ExecuteAlways]
+    //internal class CallRemoteConfigOperation : MonoBehaviour
+    //{
+    //    [Serializable]
+    //    public class RemoteConfigRequest : RequestWithUserDataAndDeviceInfo
+    //    {
+    //    }
+
+
+    //    public IObjectPool<CallRemoteConfigOperation> pool;
+    //    public ICollection<string> ConfigKeys { get; set; }
+    //    public Dictionary<string, object> UserProperties { get; set; }
+    //    public DeviceInfo DeviceInfo { get; set; }
+    //    public MeticaSdkDelegate<RemoteConfig> ResponseCallback { get; set; }
+
+    //    public void OnDestroyPoolObject()
+    //    {
+    //        pool.Release(this);
+    //        Destroy(this);
+    //    }
+
+    //    public IEnumerator Start()
+    //    {
+    //        return PostRequestOperation.PostRequest<Dictionary<string, object>>(
+    //            $"{MeticaAPI.Config.remoteConfigEndpoint}/config/v1/apps/{MeticaAPI.AppId}",
+    //            ConfigKeys != null && ConfigKeys.Any() ? 
+    //            new Dictionary<string, object>
+    //            {
+    //                { "keys", ConfigKeys },
+    //            } : null,
+    //            MeticaAPI.ApiKey,
+    //            RequestUtils.CreateRequestWithUserDataAndDeviceInfo(UserProperties, DeviceInfo),
+    //            result =>
+    //            {
+    //                if (result.Error != null)
+    //                {
+    //                    ResponseCallback(SdkResultImpl<RemoteConfig>.WithError(result.Error));
+    //                }
+    //                else
+    //                {
+    //                    var remoteConfig = new RemoteConfig(
+    //                        config: result.Result.Data,
+    //                        cacheDurationSecs: ParseCacheExpirationFromHeaders(result.Result.Headers));
+    //                    ResponseCallback(SdkResultImpl<RemoteConfig>.WithResult(remoteConfig));
+    //                }
+    //            });
+    //    }
+
+    //    private static readonly char[] ChEquals = { '=' };
+    //    private static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromHours(3);
+
+    //    private static long ParseCacheExpirationFromHeaders(Dictionary<string, string> headers)
+    //    {
+    //        var seconds = DefaultCacheDuration.Seconds;
+    //        var cacheControl = headers["Cache-Control"];
+    //        if (cacheControl == null) return seconds;
+    //        try
+    //        {
+    //            seconds = int.Parse(cacheControl.Split(ChEquals)[1]);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            MeticaLogger.LogError(() => $"Failed to parse the cache control directive from the header value {cacheControl}");
+    //        }
+
+    //        return seconds;
+    //    }
+    //}
+
+    internal static class RequestUtils
     {
-        [Serializable]
-        internal class RemoteConfigRequest : RequestWithUserDataAndDeviceInfo
-        {
-        }
-
-
-        public IObjectPool<CallRemoteConfigOperation> pool;
-        public ICollection<string> ConfigKeys { get; set; }
-        public Dictionary<string, object> UserProperties { get; set; }
-        public DeviceInfo DeviceInfo { get; set; }
-        public MeticaSdkDelegate<RemoteConfig> ResponseCallback { get; set; }
-
-        public void OnDestroyPoolObject()
-        {
-            pool.Release(this);
-            Destroy(this);
-        }
-
-        internal IEnumerator Start()
-        {
-            return PostRequestOperation.PostRequest<Dictionary<string, object>>(
-                $"{MeticaAPI.Config.remoteConfigEndpoint}/config/v1/apps/{MeticaAPI.AppId}",
-                ConfigKeys != null && ConfigKeys.Any() ? 
-                new Dictionary<string, object>
-                {
-                    { "keys", ConfigKeys },
-                } : null,
-                MeticaAPI.ApiKey,
-                RequestUtils.CreateRequestWithUserDataAndDeviceInfo(UserProperties, DeviceInfo),
-                result =>
-                {
-                    if (result.Error != null)
-                    {
-                        ResponseCallback(SdkResultImpl<RemoteConfig>.WithError(result.Error));
-                    }
-                    else
-                    {
-                        var remoteConfig = new RemoteConfig(
-                            config: result.Result.Data,
-                            cacheDurationSecs: ParseCacheExpirationFromHeaders(result.Result.Headers));
-                        ResponseCallback(SdkResultImpl<RemoteConfig>.WithResult(remoteConfig));
-                    }
-                });
-        }
-
-        private static readonly char[] ChEquals = { '=' };
-        private static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromHours(3);
-
-        private static long ParseCacheExpirationFromHeaders(Dictionary<string, string> headers)
-        {
-            var seconds = DefaultCacheDuration.Seconds;
-            var cacheControl = headers["Cache-Control"];
-            if (cacheControl == null) return seconds;
-            try
-            {
-                seconds = int.Parse(cacheControl.Split(ChEquals)[1]);
-            }
-            catch (Exception e)
-            {
-                MeticaLogger.LogError(() => $"Failed to parse the cache control directive from the header value {cacheControl}");
-            }
-
-            return seconds;
-        }
-    }
-
-    internal abstract class RequestUtils
-    {
-        internal static RequestWithUserDataAndDeviceInfo CreateRequestWithUserDataAndDeviceInfo(
+        public static RequestWithUserDataAndDeviceInfo CreateRequestWithUserDataAndDeviceInfo(
             Dictionary<string, object> userData,
             DeviceInfo overrideDeviceInfo = null)
         {
