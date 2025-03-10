@@ -80,43 +80,5 @@ namespace Metica.Unity
                 offersCallback(SdkResultImpl<OffersByPlacement>.WithResult(new OffersByPlacement() { placements = resultOffers }));
             }
         }
-        
-        // Logs the display of offers by placement.
-        // 
-        // Parameters:
-        //   offersByPlacement: A dictionary containing offers grouped by placement.
-        //
-        // Returns: void
-        //private void LogDisplays(Dictionary<string, List<Offer>> offersByPlacement)
-        //{
-        //    var currentTime = MeticaAPI.TimeSource.EpochSeconds();
-        //    var offerIds = new HashSet<String>();
-
-        //    foreach (var entry in offersByPlacement)
-        //    {
-        //        var newEntries = from offer in entry.Value
-        //            where !offerIds.Contains(offer.offerId) && offer.displayLimits != null && offer.metrics?.display?.meticaAttributes?.offer != null
-        //            let displayLogEntry = DisplayLogEntry.Create(
-        //                offerId: offer.offerId,
-        //                placementId: entry.Key,
-        //                variantId: offer.metrics.display.meticaAttributes.offer.variantId
-        //            )
-        //            select displayLogEntry;
-
-        //        offerIds.UnionWith(from e in newEntries select e.offerId);
-        //    }
-        //}
-
-        private bool isSupportedPlatform()
-        {
-            var supportedPlatforms = new List<RuntimePlatform>
-            {
-                RuntimePlatform.Android,
-                RuntimePlatform.IPhonePlayer,
-                RuntimePlatform.OSXEditor,
-                RuntimePlatform.OSXPlayer,
-            };
-            return supportedPlatforms.Contains(Application.platform);
-        }
     }
 }
