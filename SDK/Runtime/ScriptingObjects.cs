@@ -13,6 +13,8 @@ namespace Metica.Unity
             var existingRoot = GameObject.Find(ScriptingRootName);
             _scriptingRoot = existingRoot != null ? existingRoot : new GameObject(ScriptingRootName);
 
+            _scriptingRoot.AddComponent<MeticaScriptingRoot>();
+
             if (!Application.isEditor)
             {
                 Object.DontDestroyOnLoad(_scriptingRoot);
