@@ -6,7 +6,6 @@ using System.Text;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.Pool;
 
 namespace Metica.Unity
 {
@@ -185,17 +184,6 @@ namespace Metica.Unity
     internal class BackendOperationsImpl : IBackendOperations
     {
         #region OFFER REFACTOR
-        //private static readonly LinkedPool<GetOffersOperation> GetOffersPool = new(
-        //    createFunc: () =>
-        //    {
-        //        var item = ScriptingObjects.AddComponent<GetOffersOperation>();
-        //        return item;
-        //    },
-        //    actionOnGet: item => item.gameObject.SetActive(true),
-        //    actionOnRelease: item => item.gameObject.SetActive(false),
-        //    actionOnDestroy: item => { item.OnDestroyPoolObject(); },
-        //    maxSize: 100
-        //);
 
         public void CallGetOffersAPI(string[] placements,
             MeticaSdkDelegate<OffersByPlacement> offersCallback, Dictionary<string, object> userProperties = null,
@@ -203,12 +191,6 @@ namespace Metica.Unity
         {
             MeticaScriptingRoot coroutineRunner = ScriptingObjects.GetComponent<MeticaScriptingRoot>();
             coroutineRunner.AddCoroutine(GetOffersOperationStart(placements, userProperties, deviceInfo, offersCallback));
-            //var op = GetOffersPool.Get();
-            //op.pool = GetOffersPool;
-            //op.Placements = placements;
-            //op.OffersCallback = offersCallback;
-            //op.UserProperties = userProperties;
-            //op.DeviceInfo = deviceInfo;
         }
 
         [Serializable]
@@ -266,25 +248,10 @@ namespace Metica.Unity
 
 
         #region EVENT REFACTORING
-        //private static readonly LinkedPool<CallEventsIngestionOperation> CallIngestionPool = new(
-        //    createFunc: () =>
-        //    {
-        //        var item = ScriptingObjects.AddComponent<CallEventsIngestionOperation>();
-        //        return item;
-        //    },
-        //    actionOnGet: item => item.gameObject.SetActive(true),
-        //    actionOnRelease: item => item.gameObject.SetActive(false),
-        //    actionOnDestroy: item => { item.OnDestroyPoolObject(); },
-        //    maxSize: 100
-        //);
 
         public void CallSubmitEventsAPI(ICollection<Dictionary<string, object>> events,
             MeticaSdkDelegate<string> callback)
         {
-            //var op = CallIngestionPool.Get();
-            //op.pool = CallIngestionPool;
-            //op.Events = events;
-            //op.EventsSubmitCallback = callback;
             MeticaScriptingRoot coroutineRunner = ScriptingObjects.GetComponent<MeticaScriptingRoot>();
             coroutineRunner.AddCoroutine(CallEventsIngestionOperationStart(events, callback));
         }
@@ -320,28 +287,6 @@ namespace Metica.Unity
         #endregion EVENT REFACTORING
 
         #region CONFIG REFACTOR
-        //private static readonly LinkedPool<CallRemoteConfigOperation> CallRemoteConfigPool = new(
-        //    createFunc: () =>
-        //    {
-        //        var item = ScriptingObjects.AddComponent<CallRemoteConfigOperation>();
-        //        return item;
-        //    },
-        //    actionOnGet: item => item.gameObject.SetActive(true),
-        //    actionOnRelease: item => item.gameObject.SetActive(false),
-        //    actionOnDestroy: item => { item.OnDestroyPoolObject(); },
-        //    maxSize: 100
-        //);
-
-        //public void CallRemoteConfigAPI(string[] configKeys, MeticaSdkDelegate<RemoteConfig> responseCallback, Dictionary<string, object> userProperties = null,
-        //    DeviceInfo deviceInfo = null)
-        //{
-        //    var op = CallRemoteConfigPool.Get();
-        //    op.pool = CallRemoteConfigPool;
-        //    op.ConfigKeys = configKeys;
-        //    op.UserProperties = userProperties;
-        //    op.DeviceInfo = deviceInfo;
-        //    op.ResponseCallback = responseCallback;
-        //}
 
         public void CallRemoteConfigAPI(string[] configKeys, MeticaSdkDelegate<RemoteConfig> responseCallback, Dictionary<string, object> userProperties = null,
             DeviceInfo deviceInfo = null)
