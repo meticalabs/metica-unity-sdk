@@ -184,30 +184,87 @@ namespace Metica.Unity
 
     internal class BackendOperationsImpl : IBackendOperations
     {
-        private static readonly LinkedPool<GetOffersOperation> GetOffersPool = new(
-            createFunc: () =>
-            {
-                var item = ScriptingObjects.AddComponent<GetOffersOperation>();
-                return item;
-            },
-            actionOnGet: item => item.gameObject.SetActive(true),
-            actionOnRelease: item => item.gameObject.SetActive(false),
-            actionOnDestroy: item => { item.OnDestroyPoolObject(); },
-            maxSize: 100
-        );
+        #region OFFER REFACTOR
+        //private static readonly LinkedPool<GetOffersOperation> GetOffersPool = new(
+        //    createFunc: () =>
+        //    {
+        //        var item = ScriptingObjects.AddComponent<GetOffersOperation>();
+        //        return item;
+        //    },
+        //    actionOnGet: item => item.gameObject.SetActive(true),
+        //    actionOnRelease: item => item.gameObject.SetActive(false),
+        //    actionOnDestroy: item => { item.OnDestroyPoolObject(); },
+        //    maxSize: 100
+        //);
 
         public void CallGetOffersAPI(string[] placements,
             MeticaSdkDelegate<OffersByPlacement> offersCallback, Dictionary<string, object> userProperties = null,
             DeviceInfo deviceInfo = null)
         {
-            var op = GetOffersPool.Get();
-            op.pool = GetOffersPool;
-            op.Placements = placements;
-            op.OffersCallback = offersCallback;
-            op.UserProperties = userProperties;
-            op.DeviceInfo = deviceInfo;
+            MeticaScriptingRoot coroutineRunner = ScriptingObjects.GetComponent<MeticaScriptingRoot>();
+            coroutineRunner.AddCoroutine(GetOffersOperationStart(placements, userProperties, deviceInfo, offersCallback));
+            //var op = GetOffersPool.Get();
+            //op.pool = GetOffersPool;
+            //op.Placements = placements;
+            //op.OffersCallback = offersCallback;
+            //op.UserProperties = userProperties;
+            //op.DeviceInfo = deviceInfo;
         }
 
+        [Serializable]
+        internal class ODSRequest : RequestWithUserDataAndDeviceInfo
+        {
+        }
+
+        [Serializable]
+        internal class ODSResponse
+        {
+            public Dictionary<string, List<Offer>> placements;
+        }
+        
+        private static ODSRequest CreateODSRequestBody(Dictionary<string, object> userData,
+            DeviceInfo overrideDeviceInfo = null)
+        {
+            var requestWithUserDataAndDeviceInfo = RequestUtils.CreateRequestWithUserDataAndDeviceInfo(userData, overrideDeviceInfo);
+            var request = new ODSRequest
+            {
+                userId = MeticaAPI.UserId,
+                userData = requestWithUserDataAndDeviceInfo.userData,
+                deviceInfo = requestWithUserDataAndDeviceInfo.deviceInfo
+            };
+
+            return request;
+        }
+
+        private IEnumerator GetOffersOperationStart(string[] Placements, Dictionary<string, object> UserProperties, DeviceInfo DeviceInfo, MeticaSdkDelegate<OffersByPlacement> OffersCallback)
+        {
+            yield return PostRequestOperation.PostRequest<ODSResponse>(
+                $"{MeticaAPI.Config.offersEndpoint}/offers/v1/apps/{MeticaAPI.AppId}",
+                new Dictionary<string, object>
+                {
+                    { "placements", Placements },
+                },
+                MeticaAPI.ApiKey,
+                CreateODSRequestBody(UserProperties, DeviceInfo),
+                result =>
+                {
+                    if (result.Error != null)
+                    {
+                        OffersCallback(SdkResultImpl<OffersByPlacement>.WithError(result.Error));
+                    }
+                    else
+                    {
+                        OffersCallback(SdkResultImpl<OffersByPlacement>.WithResult(new OffersByPlacement
+                        {
+                            placements = result.Result.Data.placements
+                        }));
+                    }
+                });
+        }
+
+        #endregion OFFER REFACTOR
+
+        
         private static readonly LinkedPool<CallEventsIngestionOperation> CallIngestionPool = new(
             createFunc: () =>
             {
@@ -258,16 +315,6 @@ namespace Metica.Unity
         {
             MeticaScriptingRoot coroutineRunner = ScriptingObjects.GetComponent<MeticaScriptingRoot>();
             coroutineRunner.AddCoroutine(RemoteConfigOperationStart(configKeys, userProperties, deviceInfo, responseCallback));
-        }
-
-        /// <summary>
-        /// A routinable wrapper for <see cref="CallRemoteConfigAPI"/>.
-        /// </summary>
-        private IEnumerator CallRemoteConfigApiCoroutine(string[] configKeys, MeticaSdkDelegate<RemoteConfig> responseCallback,
-            Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
-        {
-            CallRemoteConfigAPI(configKeys, responseCallback, userProperties, deviceInfo);
-            yield return null;
         }
 
         public IEnumerator RemoteConfigOperationStart(

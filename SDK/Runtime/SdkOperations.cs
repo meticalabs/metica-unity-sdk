@@ -52,74 +52,74 @@ namespace Metica.Unity
         }
     }
 
-    [ExecuteAlways]
-    internal class GetOffersOperation : MonoBehaviour
-    {
-        [Serializable]
-        internal class ODSRequest : RequestWithUserDataAndDeviceInfo
-        {
-        }
+    //[ExecuteAlways]
+    //internal class GetOffersOperation : MonoBehaviour
+    //{
+    //    //[Serializable]
+    //    //internal class ODSRequest : RequestWithUserDataAndDeviceInfo
+    //    //{
+    //    //}
 
-        [Serializable]
-        internal class ODSResponse
-        {
-            public Dictionary<string, List<Offer>> placements;
-        }
+    //    //[Serializable]
+    //    //internal class ODSResponse
+    //    //{
+    //    //    public Dictionary<string, List<Offer>> placements;
+    //    //}
 
-        public IObjectPool<GetOffersOperation> pool;
-        public string[] Placements { get; set; }
-        public Dictionary<string, object> UserProperties { get; set; }
-        public DeviceInfo DeviceInfo { get; set; }
+    //    public IObjectPool<GetOffersOperation> pool;
+    //    public string[] Placements { get; set; }
+    //    public Dictionary<string, object> UserProperties { get; set; }
+    //    public DeviceInfo DeviceInfo { get; set; }
 
-        public MeticaSdkDelegate<OffersByPlacement> OffersCallback { get; set; }
+    //    public MeticaSdkDelegate<OffersByPlacement> OffersCallback { get; set; }
 
-        public void OnDestroyPoolObject()
-        {
-            pool.Release(this);
-            Destroy(this);
-        }
+    //    public void OnDestroyPoolObject()
+    //    {
+    //        pool.Release(this);
+    //        Destroy(this);
+    //    }
 
-        internal IEnumerator Start()
-        {
-            yield return PostRequestOperation.PostRequest<ODSResponse>(
-                $"{MeticaAPI.Config.offersEndpoint}/offers/v1/apps/{MeticaAPI.AppId}",
-                new Dictionary<string, object>
-                {
-                    { "placements", Placements },
-                },
-                MeticaAPI.ApiKey,
-                CreateODSRequestBody(UserProperties, DeviceInfo),
-                result =>
-                {
-                    if (result.Error != null)
-                    {
-                        OffersCallback(SdkResultImpl<OffersByPlacement>.WithError(result.Error));
-                    }
-                    else
-                    {
-                        OffersCallback(SdkResultImpl<OffersByPlacement>.WithResult(new OffersByPlacement
-                        {
-                            placements = result.Result.Data.placements
-                        }));
-                    }
-                });
-        }
+    //    internal IEnumerator Start()
+    //    {
+    //        yield return PostRequestOperation.PostRequest<ODSResponse>(
+    //            $"{MeticaAPI.Config.offersEndpoint}/offers/v1/apps/{MeticaAPI.AppId}",
+    //            new Dictionary<string, object>
+    //            {
+    //                { "placements", Placements },
+    //            },
+    //            MeticaAPI.ApiKey,
+    //            CreateODSRequestBody(UserProperties, DeviceInfo),
+    //            result =>
+    //            {
+    //                if (result.Error != null)
+    //                {
+    //                    OffersCallback(SdkResultImpl<OffersByPlacement>.WithError(result.Error));
+    //                }
+    //                else
+    //                {
+    //                    OffersCallback(SdkResultImpl<OffersByPlacement>.WithResult(new OffersByPlacement
+    //                    {
+    //                        placements = result.Result.Data.placements
+    //                    }));
+    //                }
+    //            });
+    //    }
 
 
-        private static ODSRequest CreateODSRequestBody(Dictionary<string, object> userData,
-            DeviceInfo overrideDeviceInfo = null)
-        {
-            var requestWithUserDataAndDeviceInfo = RequestUtils.CreateRequestWithUserDataAndDeviceInfo(userData, overrideDeviceInfo);
-            var request = new ODSRequest
-            {
-                userId = MeticaAPI.UserId,
-                userData = requestWithUserDataAndDeviceInfo.userData,
-                deviceInfo = requestWithUserDataAndDeviceInfo.deviceInfo
-            };
+    //    private static ODSRequest CreateODSRequestBody(Dictionary<string, object> userData,
+    //        DeviceInfo overrideDeviceInfo = null)
+    //    {
+    //        var requestWithUserDataAndDeviceInfo = RequestUtils.CreateRequestWithUserDataAndDeviceInfo(userData, overrideDeviceInfo);
+    //        var request = new ODSRequest
+    //        {
+    //            userId = MeticaAPI.UserId,
+    //            userData = requestWithUserDataAndDeviceInfo.userData,
+    //            deviceInfo = requestWithUserDataAndDeviceInfo.deviceInfo
+    //        };
 
-            return request;
-        }
-    }
+    //        return request;
+    //    }
+    //}
 
     //[ExecuteAlways]
     //internal class CallRemoteConfigOperation : MonoBehaviour
