@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
+using Metica.SDK.Caching;
 
 namespace Metica.Unity
 {
@@ -89,8 +90,8 @@ namespace Metica.Unity
             OffersManager = new OffersManager();
             RemoteConfigManager = new RemoteConfigManager();
 
-            OffersCache = ScriptingObjects.GetComponent<OffersCache>();
-            RemoteConfigCache = ScriptingObjects.GetComponent<RemoteConfigCache>();
+            OffersCache = new OffersCache("OffersCache", Config.offersCachePath); //ScriptingObjects.GetComponent<OffersCache>();
+            RemoteConfigCache = new RemoteConfigCache("RemoteConfigCache", Config.remoteConfigCachePath); // ScriptingObjects.GetComponent<RemoteConfigCache>();
 
             BackendOperations = new BackendOperationsImpl();
 

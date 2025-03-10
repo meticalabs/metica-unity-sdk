@@ -5,7 +5,9 @@ using System.Collections.Specialized;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace Metica.Unity
+using Metica.Unity;
+
+namespace Metica.SDK.Caching
 {
     internal class CachedValue<T>
     {
@@ -13,11 +15,12 @@ namespace Metica.Unity
         public long ExpiresOn;
     }
 
-    internal class SimpleDiskCache<T> where T : class
+    internal class SimpleDiskCache<TKey, TValue> where TValue : class
     {
         private readonly string _name;
         private readonly string _cacheFilePath;
 
+        // TODO : do we really need an OrderedDictionary?
         private readonly OrderedDictionary _cachedData;
 
         public SimpleDiskCache(string name, string cacheFilePath, int maxEntries = 100)
@@ -27,21 +30,21 @@ namespace Metica.Unity
             _cachedData = new OrderedDictionary(maxEntries);
         }
 
-        internal void Prepare()
+        internal void Load()
         {
             try
             {
-                // Ensure the file exists
                 if (File.Exists(_cacheFilePath))
                 {
                     using StreamReader reader = new StreamReader(_cacheFilePath);
                     var content = reader.ReadToEnd();
-                    var savedDict = JsonConvert.DeserializeObject<Dictionary<string, CachedValue<T>>>(content) ?? new Dictionary<string, CachedValue<T>>();
+                    var savedDict = JsonConvert.DeserializeObject<Dictionary<string, CachedValue<TValue>>>(content) ?? new Dictionary<string, CachedValue<TValue>>();
 
                     foreach (var pair in savedDict)
                     {
                         _cachedData[pair.Key] = pair.Value;
                     }
+                    reader.Close();
                 }
             }
             catch (Exception e)
@@ -56,29 +59,24 @@ namespace Metica.Unity
                 }
             }
         }
-
-        internal void Clear()
-        {
-            _cachedData.Clear();
-        }
         
-        internal void Save()
+        public void Save()
         {
             using StreamWriter writer = new StreamWriter(_cacheFilePath);
             writer.Write(JsonConvert.SerializeObject(_cachedData));
         }
 
-        public T? Read(string key)
+        public TValue? Read(TKey key)
         {
-            var result = (CachedValue<T>?)_cachedData[key];
+            var result = (CachedValue<TValue>?)_cachedData[key];
             return result?.ExpiresOn > MeticaAPI.TimeSource.EpochSeconds() ? result.Data : null;
         }
 
-        public void Write(string key, T data, long ttlSeconds)
+        public void Write(TKey key, TValue data, long ttlSeconds)
         {
             try
             {
-                var cachedValue =  new CachedValue<T>
+                var cachedValue =  new CachedValue<TValue>
                 {
                     Data = data,
                     ExpiresOn = MeticaAPI.TimeSource.EpochSeconds() + ttlSeconds
@@ -98,5 +96,11 @@ namespace Metica.Unity
                 MeticaLogger.LogError(() => $"Error while trying to save the cache {_name}", e);
             }
         }
+
+        public void Clear()
+        {
+            _cachedData.Clear();
+        }
+
     }
 }

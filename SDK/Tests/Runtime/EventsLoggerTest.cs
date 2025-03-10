@@ -112,7 +112,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         [Test]
         public void TestTheAttributesOfOfferPurchase()
         {
-            MeticaAPI.OffersCache.Write(Utils.testPlacementId, createOfferCache());
+            MeticaAPI.OffersCache.Write(Utils.testPlacementId, createOfferCache(), 60);
 
             var logger = new GameObject().AddComponent<EventsLogger>();
             logger.LogOfferPurchase(Utils.testOfferId, Utils.testPlacementId, 1.0, "USD");
@@ -132,7 +132,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         [Test]
         public void TestTheAttributesOfOfferDisplay()
         {
-            MeticaAPI.OffersCache.Write(Utils.testPlacementId, createOfferCache());
+            MeticaAPI.OffersCache.Write(Utils.testPlacementId, createOfferCache(), 60);
 
             var logger = new GameObject().AddComponent<EventsLogger>();
             logger.LogOfferDisplay(Utils.testOfferId, Utils.testPlacementId);
@@ -148,11 +148,22 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
             Assert.That(meticaAttributes[Constants.PlacementId], Is.EqualTo(Utils.testPlacementId));
         }
 
+        [Test]
+        public void TestTheAttributesOfOfferDisplayWithProductId()
+        {
+            var logger = new GameObject().AddComponent<EventsLogger>();
+            logger.LogOfferDisplayWithProductId("test_product_id");
+
+            var recordedEvent = logger.EventsQueue[0];
+
+            assertCommonAttributes(EventTypes.OfferImpression, recordedEvent);
+            Assert.That(recordedEvent[Constants.ProductId], Is.EqualTo("test_product_id"));
+        }
 
         [Test]
         public void TestTheAttributesOfOfferInteraction()
         {
-            MeticaAPI.OffersCache.Write(Utils.testPlacementId, createOfferCache());
+            MeticaAPI.OffersCache.Write(Utils.testPlacementId, createOfferCache(), 60);
 
             var logger = new GameObject().AddComponent<EventsLogger>();
             logger.LogOfferInteraction(Utils.testOfferId, Utils.testPlacementId, "click");
@@ -173,7 +184,7 @@ namespace MeticaUnitySDK.SDK.Tests.Runtime
         [Test]
         public void TestTheAttributesOfUserStateUpdate()
         {
-            MeticaAPI.OffersCache.Write(Utils.testPlacementId, new List<Offer>());
+            MeticaAPI.OffersCache.Write(Utils.testPlacementId, new List<Offer>(), 60);
 
             var logger = new GameObject().AddComponent<EventsLogger>();
             var userAttributes = new Dictionary<string, object>()

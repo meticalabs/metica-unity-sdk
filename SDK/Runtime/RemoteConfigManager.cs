@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace Metica.Unity
 {
@@ -31,6 +30,7 @@ namespace Metica.Unity
                 foreach (var key in configKeys)
                 {
                     var value = MeticaAPI.RemoteConfigCache.Read(key);
+                    MeticaLogger.LogDebug(() => $"RemoteConfigManager: cache {(value != null ? "HIT" : "MISS")}" );
                     if (value != null)
                     {
                         resultConfig.Add(key, value);

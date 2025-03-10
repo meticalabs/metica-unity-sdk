@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using UnityEngine;
 
 // ReSharper disable all NotAccessedField.Global
@@ -17,6 +16,7 @@ namespace Metica.Unity
 
     public class OffersManager : IOffersManager
     {
+        private const long CACHE_DURARION_SECONDS = 60;
         static readonly string[] FetchAllSentinel = Array.Empty<string>();
 
         public void GetOffers(string[] placements, MeticaSdkDelegate<OffersByPlacement> offersCallback,
@@ -30,12 +30,15 @@ namespace Metica.Unity
                 foreach (var p in placements)
                 {
                     var cachedResult = MeticaAPI.OffersCache.Read(p);
+
+                    MeticaLogger.LogDebug(() => $"OffersCache : cache {(cachedResult != null ? "HIT" : "MISS")}" );
                     if (cachedResult != null && cachedResult.Count > 0)
                     {
                         resultOffers.Add(p, cachedResult);
                     }
                 }
 
+                // select the placements that are requested but weren't found in the cache
                 pendingFetch = placements.Where(key => !resultOffers.ContainsKey(key)).ToArray();
                 if (!pendingFetch.Any())
                 {
@@ -63,7 +66,7 @@ namespace Metica.Unity
                             {
                                 resultOffers.Add(pair.Key, pair.Value);
                                 // persist the response and refresh the in-memory cache
-                                MeticaAPI.OffersCache.Write(pair.Key, pair.Value);
+                                MeticaAPI.OffersCache.Write(pair.Key, pair.Value, CACHE_DURARION_SECONDS);
                             }
                             
                             // filter out the offers that have exceeded their display limit
