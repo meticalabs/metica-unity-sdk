@@ -1,11 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.Pool;
 
 namespace Metica.Unity
 {
@@ -17,40 +14,40 @@ namespace Metica.Unity
         public DeviceInfo deviceInfo;
     }
 
-    [ExecuteAlways]
-    internal class CallEventsIngestionOperation : MonoBehaviour
-    {
-        public IObjectPool<CallEventsIngestionOperation> pool;
+    //[ExecuteAlways]
+    //internal class CallEventsIngestionOperation : MonoBehaviour
+    //{
+    //    public IObjectPool<CallEventsIngestionOperation> pool;
 
-        public ICollection<Dictionary<string, object>> Events { get; set; }
+    //    public ICollection<Dictionary<string, object>> Events { get; set; }
 
-        public MeticaSdkDelegate<String> EventsSubmitCallback { get; set; }
+    //    public MeticaSdkDelegate<String> EventsSubmitCallback { get; set; }
 
-        public void OnDestroyPoolObject()
-        {
-            pool.Release(this);
-            Destroy(this);
-        }
+    //    public void OnDestroyPoolObject()
+    //    {
+    //        pool.Release(this);
+    //        Destroy(this);
+    //    }
 
-        internal IEnumerator Start()
-        {
-            return PostRequestOperation.PostRequest<String>($"{MeticaAPI.Config.ingestionEndpoint}/ingest/v1/events",
-                null,
-                MeticaAPI.ApiKey,
-                CreateIngestionRequestBody(Events),
-                result =>
-                {
-                    EventsSubmitCallback(result.Error != null
-                        ? SdkResultImpl<string>.WithError(result.Error)
-                        : SdkResultImpl<string>.WithResult(result.Result?.Data ?? string.Empty));
-                });
-        }
+    //    internal IEnumerator Start()
+    //    {
+    //        return PostRequestOperation.PostRequest<String>($"{MeticaAPI.Config.ingestionEndpoint}/ingest/v1/events",
+    //            null,
+    //            MeticaAPI.ApiKey,
+    //            CreateIngestionRequestBody(Events),
+    //            result =>
+    //            {
+    //                EventsSubmitCallback(result.Error != null
+    //                    ? SdkResultImpl<string>.WithError(result.Error)
+    //                    : SdkResultImpl<string>.WithResult(result.Result?.Data ?? string.Empty));
+    //            });
+    //    }
 
-        private static object CreateIngestionRequestBody(ICollection<Dictionary<string, object>> events)
-        {
-            return new Dictionary<string, object> { { "events", events } };
-        }
-    }
+    //    private static object CreateIngestionRequestBody(ICollection<Dictionary<string, object>> events)
+    //    {
+    //        return new Dictionary<string, object> { { "events", events } };
+    //    }
+    //}
 
     //[ExecuteAlways]
     //internal class GetOffersOperation : MonoBehaviour

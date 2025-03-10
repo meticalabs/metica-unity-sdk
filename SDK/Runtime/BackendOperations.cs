@@ -264,27 +264,60 @@ namespace Metica.Unity
 
         #endregion OFFER REFACTOR
 
-        
-        private static readonly LinkedPool<CallEventsIngestionOperation> CallIngestionPool = new(
-            createFunc: () =>
-            {
-                var item = ScriptingObjects.AddComponent<CallEventsIngestionOperation>();
-                return item;
-            },
-            actionOnGet: item => item.gameObject.SetActive(true),
-            actionOnRelease: item => item.gameObject.SetActive(false),
-            actionOnDestroy: item => { item.OnDestroyPoolObject(); },
-            maxSize: 100
-        );
+
+        #region EVENT REFACTORING
+        //private static readonly LinkedPool<CallEventsIngestionOperation> CallIngestionPool = new(
+        //    createFunc: () =>
+        //    {
+        //        var item = ScriptingObjects.AddComponent<CallEventsIngestionOperation>();
+        //        return item;
+        //    },
+        //    actionOnGet: item => item.gameObject.SetActive(true),
+        //    actionOnRelease: item => item.gameObject.SetActive(false),
+        //    actionOnDestroy: item => { item.OnDestroyPoolObject(); },
+        //    maxSize: 100
+        //);
 
         public void CallSubmitEventsAPI(ICollection<Dictionary<string, object>> events,
             MeticaSdkDelegate<string> callback)
         {
-            var op = CallIngestionPool.Get();
-            op.pool = CallIngestionPool;
-            op.Events = events;
-            op.EventsSubmitCallback = callback;
+            //var op = CallIngestionPool.Get();
+            //op.pool = CallIngestionPool;
+            //op.Events = events;
+            //op.EventsSubmitCallback = callback;
+            MeticaScriptingRoot coroutineRunner = ScriptingObjects.GetComponent<MeticaScriptingRoot>();
+            coroutineRunner.AddCoroutine(CallEventsIngestionOperationStart(events, callback));
         }
+
+        internal IEnumerator CallEventsIngestionOperationStart(ICollection<Dictionary<string, object>> Events, MeticaSdkDelegate<String> EventsSubmitCallback)
+        {
+            return PostRequestOperation.PostRequest<String>($"{MeticaAPI.Config.ingestionEndpoint}/ingest/v1/events",
+                null,
+                MeticaAPI.ApiKey,
+                CreateIngestionRequestBody(Events),
+                result =>
+                {
+                    EventsSubmitCallback(result.Error != null
+                        ? SdkResultImpl<string>.WithError(result.Error)
+                        : SdkResultImpl<string>.WithResult(result.Result?.Data ?? string.Empty));
+                });
+        }
+
+        [Serializable]
+        internal class RequestWithUserDataAndDeviceInfo
+        {
+            public string userId;
+            public Dictionary<string, object> userData;
+            public DeviceInfo deviceInfo;
+        }
+
+        private static object CreateIngestionRequestBody(ICollection<Dictionary<string, object>> events)
+        {
+            return new Dictionary<string, object> { { "events", events } };
+        }
+
+
+        #endregion EVENT REFACTORING
 
         #region CONFIG REFACTOR
         //private static readonly LinkedPool<CallRemoteConfigOperation> CallRemoteConfigPool = new(
