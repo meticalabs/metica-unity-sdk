@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace Metica.Experimental
 {
-    public sealed class OffersManager : EndpointManager
+    public sealed class OfferManager : EndpointManager
     {
 
-        public OffersManager(IHttpService httpService, string offersEndpoint) : base(httpService, offersEndpoint)
+        public OfferManager(IHttpService httpService, string offersEndpoint) : base(httpService, offersEndpoint)
         {
         }
 
