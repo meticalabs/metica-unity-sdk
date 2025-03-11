@@ -5,23 +5,16 @@ using System.Threading.Tasks;
 
 namespace Metica.Experimental
 {
-    public class OffersManager
+    public sealed class OffersManager : EndpointManager
     {
-        private IHttpService _httpService;
-        private string _url;
 
-        public OffersManager(IHttpService httpService, string offersEndpoint)
+        public OffersManager(IHttpService httpService, string offersEndpoint) : base(httpService, offersEndpoint)
         {
-            {
-                _httpService = httpService;
-                _url = offersEndpoint;
-            }
         }
 
-        public struct OffersResult
+        public struct OffersResult : IMeticaSdkResult
         {
             public Dictionary<string, List<Metica.Unity.Offer>> placements { get; set; }
-
             [JsonIgnore] public HttpResponse.ResultStatus Status { get; set; }
             [JsonIgnore] public string Error { get; set; }
             [JsonIgnore] public string RawContent {  get; set; }
@@ -44,23 +37,8 @@ namespace Metica.Experimental
             settings.NullValueHandling = NullValueHandling.Ignore;
 
             var httpResponse = await _httpService.PostAsync(_url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
-            if (httpResponse.Status == HttpResponse.ResultStatus.Success)
-            {
-                string content = httpResponse.ResponseContent;
-                OffersResult offersResult = JsonConvert.DeserializeObject<OffersResult>(content);
-                offersResult.Status = httpResponse.Status;
-                offersResult.RawContent = httpResponse.ResponseContent;
-                return offersResult;
-            }
-            else
-            {
-                return new() {
-                    Status = httpResponse.Status,
-                    Error = httpResponse.ErrorMessage,
-                    RawContent = httpResponse.ResponseContent,
-                    placements = null
-                };
-            }
+            return ResponseToResult<OffersResult>(httpResponse);
         }
     }
+   
 }
