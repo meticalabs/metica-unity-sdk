@@ -13,7 +13,7 @@ namespace Metica.Experimental.Unity
         [SerializeField] private Metica.Unity.SdkConfigProvider _sdkConfigProvider = null;
         private Metica.Unity.SdkConfig Config { get => _sdkConfigProvider.SdkConfig; } // alias for above
         private IHttpService _http;
-        private OffersManager _offersManager;
+        private OfferManager _offersManager;
         
         #endregion Fields
 
@@ -25,7 +25,7 @@ namespace Metica.Experimental.Unity
             }
             CurrentUserId = _sdkConfigProvider.SdkConfig.initialUserId;
             _http = new HttpServiceDotnet().WithPersistentHeaders(new Dictionary<string, string> { { "X-API-Key", Config.apiKey } });
-            _offersManager = new OffersManager(_http, $"{Config.offersEndpoint}/offers/v1/apps/{Config.appId}");
+            _offersManager = new OfferManager(_http, $"{Config.offersEndpoint}/offers/v1/apps/{Config.appId}");
         }
 
         #region Unity Lifecycle
