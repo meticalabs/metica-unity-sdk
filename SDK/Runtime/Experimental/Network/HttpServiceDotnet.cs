@@ -91,6 +91,11 @@ namespace Metica.Experimental.Network
 
             try
             {
+                if (cts.IsCancellationRequested)
+                {
+                    return new HttpResponse(HttpResponse.ResultStatus.Cancelled, string.Empty, $"{nameof(HttpServiceDotnet)}/{nameof(GetAsync)}: Task was cancelled.");
+                }
+
                 using var response = await _http.SendAsync(request, cts.Token);
 
                 if (!response.IsSuccessStatusCode)
@@ -146,6 +151,10 @@ namespace Metica.Experimental.Network
 
             try
             {
+                if (cts.IsCancellationRequested)
+                {
+                    return new HttpResponse(HttpResponse.ResultStatus.Cancelled, string.Empty, $"{nameof(HttpServiceDotnet)}/{nameof(PostAsync)}: Task was cancelled.");
+                }
                 using var response = await _http.SendAsync(request, cts.Token);
 
                 if (!response.IsSuccessStatusCode)
