@@ -5,6 +5,8 @@ namespace Metica.Experimental
 {
     public interface IMeticaSdkResult
     {
+        // TODO : fields should be readonly or with private setter
+
         public HttpResponse.ResultStatus Status { get; set; }
         public string Error { get; set; }
         public string RawContent {  get; set; }

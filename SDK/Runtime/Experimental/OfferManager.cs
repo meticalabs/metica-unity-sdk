@@ -14,7 +14,9 @@ namespace Metica.Experimental
 
         public struct OfferResult : IMeticaSdkResult
         {
-            public Dictionary<string, List<Metica.Unity.Offer>> placements { get; set; }
+            // TODO : fields should be readonly or with private setter
+
+            public Dictionary<string, List<Metica.Unity.Offer>> Placements { get; set; }
 
             [JsonIgnore] public HttpResponse.ResultStatus Status { get; set; }
             [JsonIgnore] public string Error { get; set; }
@@ -22,7 +24,15 @@ namespace Metica.Experimental
 
             public override string ToString()
             {
-                return $"{nameof(OfferResult)}:\n Status: {Status}\n RawContent: {RawContent}\n Error: {Error}";
+                string placementsString = string.Empty;
+                if(Placements != null)
+                {
+                    foreach (var p in Placements)
+                    {
+                        placementsString = $"{placementsString}{p.Key}\n";
+                    }
+                }
+                return $"{nameof(OfferResult)}:\n{placementsString}\n Status: {Status}\n RawContent: {RawContent}\n Error: {Error}";
             }
         }
 
