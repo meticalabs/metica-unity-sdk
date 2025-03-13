@@ -12,6 +12,7 @@ namespace Metica.Experimental
         {
         }
 
+        [System.Serializable]
         public struct OfferResult : IMeticaSdkResult
         {
             // TODO : fields should be readonly or with private setter

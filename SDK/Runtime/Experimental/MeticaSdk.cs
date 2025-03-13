@@ -1,56 +1,57 @@
 using Metica.Experimental.Network;
+using Metica.Experimental.Core;
+using Metica.Unity;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Threading.Tasks;
 
-namespace Metica.Experimental.Unity
+namespace Metica.Experimental
 {
-    public class MeticaSdk : MonoBehaviour
+    public interface IMeticaSdk { }
+
+    public class MeticaSdk : IMeticaSdk
     {
         #region Fields
 
         public static string CurrentUserId {  get; set; }
 
-        [SerializeField] private Metica.Unity.SdkConfigProvider _sdkConfigProvider = null;
-        private Metica.Unity.SdkConfig Config { get => _sdkConfigProvider.SdkConfig; } // alias for above
-        private IHttpService _http;
-        private OfferManager _offersManager;
-        private ConfigManager _configManager;
-        
+        private readonly SdkConfig _sdkConfig;
+        private readonly IHttpService _http;
+        private readonly OfferManager _offerManager;
+        private readonly ConfigManager _configManager;
+
+        private Metica.Unity.SdkConfig Config { get => _sdkConfig; } // alias for above
+
         #endregion Fields
 
-        private void Initialize()
+        public MeticaSdk(SdkConfig config)
         {
-            if( _sdkConfigProvider == null)
-            {
-                Debug.LogError("Sdk Config Provider must be set");
-            }
-            CurrentUserId = _sdkConfigProvider.SdkConfig.initialUserId;
+            _sdkConfig = config;
+            // In the following code we compose our SDK
+
+            // Use the .NET based IHttpService implementation
             _http = new HttpServiceDotnet().WithPersistentHeaders(new Dictionary<string, string> { { "X-API-Key", Config.apiKey } });
-            _offersManager = new OfferManager(_http, $"{Config.offersEndpoint}/offers/v1/apps/{Config.appId}");
+            // Initialize an OfferManager
+            _offerManager = new OfferManager(_http, $"{Config.offersEndpoint}/offers/v1/apps/{Config.appId}");
+            // Initialize a ConfigManager
             _configManager = new ConfigManager(_http, $"{Config.remoteConfigEndpoint}/config/v1/apps/{Config.appId}");
+            // Set the current (mutable) CurrentUserId with the initial value given in the configuration
+            CurrentUserId = Config.initialUserId;
+
+            // Register this class as IMeticaSdk service in Registry
+            Registry.Register<IMeticaSdk>(this);
         }
 
-        #region Unity Lifecycle
+        public async Task<OfferManager.OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData = null, Metica.Unity.DeviceInfo deviceInfo = null)
+            => await _offerManager.GetOffersAsync(CurrentUserId, placements, userData, deviceInfo);
 
-        private void Awake()
-        {
-            Initialize();
-        }
+        public async Task<ConfigManager.ConfigResult> GetConfigsAsync(List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+            => await _configManager.GetConfigsAsync(CurrentUserId, configKeys, userProperties, deviceInfo);
 
-        private async void Start()
-        {
-            var offersResult = await _offersManager.GetOffersAsync(CurrentUserId, null);
-            Debug.Log($"Offers: {offersResult}");
+        
 
-            var configResult = await _configManager.GetConfigsAsync(CurrentUserId, null);
-            Debug.Log($"Configs: {configResult}");
-        }
-
-        private void OnDestroy()
+        public void Cleanup()
         {
             _http?.Dispose();
         }
-
-        #endregion Unity Lifecycle
     }
 }
