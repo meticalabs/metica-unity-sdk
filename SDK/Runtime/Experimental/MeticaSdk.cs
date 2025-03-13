@@ -41,10 +41,10 @@ namespace Metica.Experimental
             Registry.Register<IMeticaSdk>(this);
         }
 
-        public async Task<OfferManager.OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData = null, Metica.Unity.DeviceInfo deviceInfo = null)
+        public async Task<OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData = null, Metica.Unity.DeviceInfo deviceInfo = null)
             => await _offerManager.GetOffersAsync(CurrentUserId, placements, userData, deviceInfo);
 
-        public async Task<ConfigManager.ConfigResult> GetConfigsAsync(List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        public async Task<ConfigResult> GetConfigsAsync(List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
             => await _configManager.GetConfigsAsync(CurrentUserId, configKeys, userProperties, deviceInfo);
 
         
