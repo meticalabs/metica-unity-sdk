@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.Assertions;
 
-namespace Basalt.Core
+namespace Metica.Experimental.Core
 {
     public interface IRegistry
     {
