@@ -44,10 +44,22 @@ namespace Metica.Experimental
                 { nameof(deviceInfo), deviceInfo },
                 { nameof(userData), userData }
             };
+
+            var url = _url;
+            if(placements != null && placements.Length > 0)
+            {
+                url = $"{url}?placements=";
+                for (int i = 0; i < placements.Length; i++)
+                {
+                    var pl = placements[i];
+                    url = $"{url}{pl}{((i<placements.Length-1)?",":"")}";
+                }
+            }
+
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.NullValueHandling = NullValueHandling.Ignore;
 
-            var httpResponse = await _httpService.PostAsync(_url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
+            var httpResponse = await _httpService.PostAsync(url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
             return ResponseToResult<OfferResult>(httpResponse);
         }
     }
