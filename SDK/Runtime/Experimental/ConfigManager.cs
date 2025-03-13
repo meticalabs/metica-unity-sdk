@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 namespace Metica.Experimental
 {
     [System.Serializable]
-    public struct ConfigResult : IMeticaSdkResult
+    public class ConfigResult : IMeticaSdkResult
     {
         // TODO : fields should be readonly or with private setter
         [JsonExtensionData] // Needed when we want the root (anonymous dictionary in this case) to go in a specific field
@@ -47,8 +47,6 @@ namespace Metica.Experimental
                 { nameof(userProperties), userProperties },
                 { nameof(deviceInfo), deviceInfo },
             };
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.NullValueHandling = NullValueHandling.Ignore;
 
             var url = _url;
             if(configKeys != null && configKeys.Count > 0)
@@ -60,6 +58,9 @@ namespace Metica.Experimental
                     url = $"{url}{ck}{((i<configKeys.Count-1)?",":"")}";
                 }
             }
+
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.NullValueHandling = NullValueHandling.Ignore;
 
             var httpResponse = await _httpService.PostAsync(url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
             return ResponseToResult<ConfigResult>(httpResponse);
