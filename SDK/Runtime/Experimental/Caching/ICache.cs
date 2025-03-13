@@ -2,7 +2,7 @@ namespace Metica.Experimental.Caching
 {
     public interface ICache<TKey, TValue>
     {
-        TValue GetValue(TKey key);
-        void AddValue(TKey key, TValue value, long ttlSeconds);
+        TValue Get(TKey key);
+        void AddOrUpdate(TKey key, TValue value, long ttlSeconds);
     }
 }
