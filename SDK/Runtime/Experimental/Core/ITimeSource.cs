@@ -1,6 +1,6 @@
 namespace Metica.Experimental.Core
 {
-    internal interface ITimeSource
+    public interface ITimeSource
     {
         long EpochSeconds();
     }
