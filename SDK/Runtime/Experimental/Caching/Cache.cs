@@ -1,12 +1,11 @@
 using Metica.Experimental.Core;
 using System.Collections.Generic;
-using UnityEngine.UI;
 
 namespace Metica.Experimental.Caching
 {
-    internal abstract class CacheBase<TKey, TValue> : ICache<TKey, TValue> where TValue : class
+    public class Cache<TKey, TValue> : ICache<TKey, TValue> where TValue : class
     {
-        protected ITimeSource _timeSource;
+        public ITimeSource _timeSource;
 
         protected class CacheEntry
         {
@@ -34,14 +33,20 @@ namespace Metica.Experimental.Caching
 
         private Dictionary<TKey, CacheEntry> _data = new();
 
-        private const long GARBAGE_COLLECTION_INTERVAL_SECONDS = 10;
+        private const long GARBAGE_COLLECTION_INTERVAL_SECONDS = 10; // TODO : make this settable
         private long nextGarbageCollection = 0;
 
-        protected CacheBase(ITimeSource timeSource)
+        public Cache(ITimeSource timeSource)
         {
             _timeSource = timeSource;
         }
 
+        /// <summary>
+        /// Add or update a new cache entry.
+        /// </summary>
+        /// <param name="key">Key for the cache entry.</param>
+        /// <param name="value">Value for the cache entry.</param>
+        /// <param name="ttlSeconds">Time To Live for the cache entry in seconds.</param>
         public virtual void AddOrUpdate(TKey key, TValue value, long ttlSeconds)
         {
             GarbageCollect();
@@ -57,20 +62,40 @@ namespace Metica.Experimental.Caching
             }
         }
 
-        public virtual TValue Get(TKey key)
+        /// <summary>
+        /// Retrieves multiple values with multiple keys, ignoring keys that aren't found.
+        /// </summary>
+        /// <param name="keys">List of keys.</param>
+        /// <returns>A list of entries that correspond to the given keys, if found.</returns>
+        public virtual List<TValue> Get(TKey[] keys)
         {
             GarbageCollect();
-            TKey transformedKey = TransformKey(key);
-            if(_data.ContainsKey(transformedKey))
+            List<TValue> result = new List<TValue>();
+            for (int i = 0; i < keys.Length; i++)
             {
-                CacheEntry entry = _data[transformedKey];
-                if (!IsValid(entry))
+                TKey key = keys[i];
+                TKey transformedKey = TransformKey(key);
+                if(_data.ContainsKey(transformedKey))
                 {
-                    _data.Remove(transformedKey);
-                    return null;
+                    CacheEntry entry = _data[transformedKey];
+                    entry.hits++;
+                    result.Add(entry.value);
                 }
-                entry.hits++;
-                return entry.value;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Retrieves a single value.
+        /// </summary>
+        /// <param name="key">Key of the cache entry</param>
+        /// <returns>The value that corresponds to the key, if found.</returns>
+        public virtual TValue Get(TKey key)
+        {
+            List<TValue> results = Get(new TKey[] { key });
+            if (results.Count > 0)
+            {
+                return results[0];
             }
             return null;
         }
@@ -89,6 +114,12 @@ namespace Metica.Experimental.Caching
             }
         }
 
+        /// <summary>
+        /// Collects the garbage, deleting all <see cref="CacheEntry"/>s that are not valid (expired or else).
+        /// </summary>
+        /// <remarks>
+        /// This is user triggered when interacting with the cache but will only trigger when a specified time has elapsed.
+        /// </remarks>
         protected void GarbageCollect()
         {
             if(nextGarbageCollection > _timeSource.EpochSeconds())
