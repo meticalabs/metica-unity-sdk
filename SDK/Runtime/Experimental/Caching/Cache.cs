@@ -49,23 +49,81 @@ namespace Metica.Experimental.Caching
         /// <param name="ttlSeconds">Time To Live for the cache entry in seconds.</param>
         public virtual void AddOrUpdate(TKey key, TValue value, long ttlSeconds)
         {
+            // We call the version with multiple values to have better control on when the garbage collection is called.
+            Dictionary<TKey, TValue> entriesDictionary = new Dictionary<TKey, TValue> { {  key, value } };
+            AddOrUpdate(entriesDictionary, ttlSeconds);
+        }
+
+        /// <summary>
+        /// Add or update multiple new cache entries at once.
+        /// </summary>
+        /// <param name="keyValuePairs">Array of <see cref="KeyValuePair"/>s for the cache entries.</param>
+        /// <param name="ttlSeconds">Time To Live for all the cache entries in seconds.</param>
+        public virtual void AddOrUpdate(KeyValuePair<TKey,TValue>[] keyValuePairs, long ttlSeconds)
+        {
             GarbageCollect();
-            TKey transformedKey = TransformKey(key);
-            var entry = new CacheEntry { timeCreated = _timeSource.EpochSeconds(), ttl = ttlSeconds, hits = 0, value = value };
-            if (_data.ContainsKey(transformedKey))
+            foreach (KeyValuePair<TKey, TValue> kvp in keyValuePairs)
             {
-                _data[transformedKey] = entry;
+                TKey key = kvp.Key;
+                TValue value = kvp.Value;
+                TKey transformedKey = TransformKey(key);
+                var entry = new CacheEntry { timeCreated = _timeSource.EpochSeconds(), ttl = ttlSeconds, hits = 0, value = value };
+                if (_data.ContainsKey(transformedKey))
+                {
+                    _data[transformedKey] = entry;
+                }
+                else
+                {
+                    _data.Add(transformedKey, entry);
+                }
             }
-            else
+        }
+
+        /// <summary>
+        /// Add or update multiple new cache entries at once.
+        /// </summary>
+        /// <param name="entriesDictionary">Dictionary new entries for the cache.</param>
+        /// <param name="ttlSeconds">Time To Live for all the cache entries in seconds.</param>
+        public virtual void AddOrUpdate(Dictionary<TKey, TValue> entriesDictionary, long ttlSeconds)
+        {
+            GarbageCollect();
+            foreach (KeyValuePair<TKey, TValue> pair in entriesDictionary)
             {
-                _data.Add(transformedKey, entry);
+                TKey key = pair.Key;
+                TValue value = pair.Value;
+                TKey transformedKey = TransformKey(key);
+                var entry = new CacheEntry { timeCreated = _timeSource.EpochSeconds(), ttl = ttlSeconds, hits = 0, value = value };
+                if (_data.ContainsKey(transformedKey))
+                {
+                    _data[transformedKey] = entry;
+                }
+                else
+                {
+                    _data.Add(transformedKey, entry);
+                }
             }
+        }
+
+        /// <summary>
+        /// Retrieves a single value.
+        /// </summary>
+        /// <param name="key">Key of the cache entry</param>
+        /// <returns>The value that corresponds to the key, if found.</returns>
+        public virtual TValue Get(TKey key)
+        {
+            // We call the version with multiple values to have better control on when the garbage collection is called.
+            List<TValue> results = Get(new TKey[] { key });
+            if (results.Count > 0)
+            {
+                return results[0];
+            }
+            return null;
         }
 
         /// <summary>
         /// Retrieves multiple values with multiple keys, ignoring keys that aren't found.
         /// </summary>
-        /// <param name="keys">List of keys.</param>
+        /// <param name="keys">An array of keys.</param>
         /// <returns>A list of entries that correspond to the given keys, if found.</returns>
         public virtual List<TValue> Get(TKey[] keys)
         {
@@ -86,18 +144,27 @@ namespace Metica.Experimental.Caching
         }
 
         /// <summary>
-        /// Retrieves a single value.
+        /// Retrieves multiple values with multiple keys, ignoring those that aren't found.
         /// </summary>
-        /// <param name="key">Key of the cache entry</param>
-        /// <returns>The value that corresponds to the key, if found.</returns>
-        public virtual TValue Get(TKey key)
+        /// <param name="keys">An array of keys.</param>
+        /// <returns>A dictionary including keys and values of the found entries.</returns>
+        /// <remarks>Normally only the values would be returned but this method comes to rescue situations where maintaining the association between keys and values is useful.</remarks>
+        public virtual Dictionary<TKey, TValue> GetAsDictionary(TKey[] keys)
         {
-            List<TValue> results = Get(new TKey[] { key });
-            if (results.Count > 0)
+            GarbageCollect();
+            Dictionary<TKey, TValue> result = new Dictionary<TKey, TValue>();
+            for (int i = 0; i < keys.Length; i++)
             {
-                return results[0];
+                TKey key = keys[i];
+                TKey transformedKey = TransformKey(key);
+                if(_data.ContainsKey(transformedKey))
+                {
+                    CacheEntry entry = _data[transformedKey];
+                    entry.hits++;
+                    result.Add(key, entry.value);
+                }
             }
-            return null;
+            return result;
         }
 
         protected virtual bool IsValid(CacheEntry entry)
@@ -112,6 +179,24 @@ namespace Metica.Experimental.Caching
             {
                 return true;
             }
+        }
+
+        /// <summary>
+        /// Utility method to find what keys are absent in the current cached entries.
+        /// </summary>
+        /// <param name="keys">A list of keys to look up.</param>
+        /// <returns>A list of keys that weren't found.</returns>
+        public TKey[] GetAbsentKeys(TKey[] keys)
+        {
+            List<TKey> absents = new List<TKey>();
+            for (int i = 0; i < keys.Length; i++)
+            {
+                if (!_data.ContainsKey(keys[i]))
+                {
+                    absents.Add(keys[i]);
+                }
+            }
+            return absents.ToArray();
         }
 
         /// <summary>
