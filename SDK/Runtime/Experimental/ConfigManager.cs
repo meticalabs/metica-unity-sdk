@@ -2,7 +2,7 @@ using Metica.Experimental.Network;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using Metica.Unity;
+using Metica.Unity; // TODO : REMOVE DEPENDENCY
 using Newtonsoft.Json;
 
 namespace Metica.Experimental
@@ -43,24 +43,25 @@ namespace Metica.Experimental
             var requestBody = new Dictionary<string, object>
             {
                 { nameof(userId), userId },
+                { nameof(configKeys), configKeys },
                 { nameof(userProperties), userProperties },
                 { nameof(deviceInfo), deviceInfo },
             };
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.NullValueHandling = NullValueHandling.Ignore;
 
-            var urlWithQuery = _url;
+            var url = _url;
             if(configKeys != null && configKeys.Count > 0)
             {
-                urlWithQuery = $"{urlWithQuery}?keys=";
+                url = $"{url}?keys=";
                 for (int i = 0; i < configKeys.Count; i++)
                 {
                     var ck = configKeys[i];
-                    urlWithQuery = $"{urlWithQuery}{ck}{((i<configKeys.Count-1)?",":"")}";
+                    url = $"{url}{ck}{((i<configKeys.Count-1)?",":"")}";
                 }
             }
 
-            var httpResponse = await _httpService.PostAsync(urlWithQuery, JsonConvert.SerializeObject(requestBody, settings), "application/json");
+            var httpResponse = await _httpService.PostAsync(url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
             return ResponseToResult<ConfigResult>(httpResponse);
         }
     }
