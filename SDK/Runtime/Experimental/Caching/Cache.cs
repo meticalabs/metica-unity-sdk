@@ -62,6 +62,10 @@ namespace Metica.Experimental.Caching
         public virtual void AddOrUpdate(KeyValuePair<TKey,TValue>[] keyValuePairs, long ttlSeconds)
         {
             GarbageCollect();
+            if(keyValuePairs == null)
+            {
+                return;
+            }
             foreach (KeyValuePair<TKey, TValue> kvp in keyValuePairs)
             {
                 TKey key = kvp.Key;
@@ -87,6 +91,10 @@ namespace Metica.Experimental.Caching
         public virtual void AddOrUpdate(Dictionary<TKey, TValue> entriesDictionary, long ttlSeconds)
         {
             GarbageCollect();
+            if(entriesDictionary == null)
+            {
+                return;
+            }
             foreach (KeyValuePair<TKey, TValue> pair in entriesDictionary)
             {
                 TKey key = pair.Key;
@@ -128,6 +136,10 @@ namespace Metica.Experimental.Caching
         public virtual List<TValue> Get(TKey[] keys)
         {
             GarbageCollect();
+            if(keys ==  null)
+            {
+                return null;
+            }
             List<TValue> result = new List<TValue>();
             for (int i = 0; i < keys.Length; i++)
             {
@@ -152,6 +164,10 @@ namespace Metica.Experimental.Caching
         public virtual Dictionary<TKey, TValue> GetAsDictionary(TKey[] keys)
         {
             GarbageCollect();
+            if(keys == null)
+            {
+                return null;
+            }
             Dictionary<TKey, TValue> result = new Dictionary<TKey, TValue>();
             for (int i = 0; i < keys.Length; i++)
             {
@@ -188,6 +204,10 @@ namespace Metica.Experimental.Caching
         /// <returns>A list of keys that weren't found.</returns>
         public TKey[] GetAbsentKeys(TKey[] keys)
         {
+            if (keys == null)
+            {
+                return null;
+            }
             List<TKey> absents = new List<TKey>();
             for (int i = 0; i < keys.Length; i++)
             {
