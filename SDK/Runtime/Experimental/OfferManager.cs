@@ -1,3 +1,5 @@
+using Metica.Experimental.Caching;
+using Metica.Experimental.Core;
 using Metica.Experimental.Network;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -6,7 +8,7 @@ using System.Threading.Tasks;
 namespace Metica.Experimental
 {
     [System.Serializable]
-    public struct OfferResult : IMeticaSdkResult
+    public class OfferResult : IMeticaSdkResult
     {
         // TODO : fields should be readonly or with private setter
 
@@ -15,6 +17,14 @@ namespace Metica.Experimental
         [JsonIgnore] public HttpResponse.ResultStatus Status { get; set; }
         [JsonIgnore] public string Error { get; set; }
         [JsonIgnore] public string RawContent {  get; set; }
+
+        public void Append(Dictionary<string, List<Metica.Unity.Offer>> placements)
+        {
+            foreach (var k in placements.Keys)
+            {
+                Placements.Add(k, placements[k]); // TODO : manage possible key exception?
+            }
+        }
 
         public override string ToString()
         {
@@ -32,12 +42,19 @@ namespace Metica.Experimental
 
     public sealed class OfferManager : EndpointManager
     {
+        private readonly ITimeSource timeSource = new SystemDateTimeSource();
+        private readonly Cache<string, List<Metica.Unity.Offer>> placementCache;
+
         public OfferManager(IHttpService httpService, string offersEndpoint) : base(httpService, offersEndpoint)
         {
+            placementCache = new Cache<string, List<Metica.Unity.Offer>>(timeSource);
         }
 
         public async Task<OfferResult> GetOffersAsync(string userId, string[] placements, Dictionary<string, object> userData = null, Metica.Unity.DeviceInfo deviceInfo = null)
         {
+            var cachedPlacements = placementCache.GetAsDictionary(placements);
+            var pendingPlacementKeys = placementCache.GetAbsentKeys(placements);
+
             var requestBody = new Dictionary<string, object>
             {
                 { nameof(userId), userId },
@@ -45,14 +62,15 @@ namespace Metica.Experimental
                 { nameof(userData), userData }
             };
 
+            // We only retrieve via http the pending placements
             var url = _url;
-            if(placements != null && placements.Length > 0)
+            if(pendingPlacementKeys != null && pendingPlacementKeys.Length > 0)
             {
                 url = $"{url}?placements=";
-                for (int i = 0; i < placements.Length; i++)
+                for (int i = 0; i < pendingPlacementKeys.Length; i++)
                 {
-                    var pl = placements[i];
-                    url = $"{url}{pl}{((i<placements.Length-1)?",":"")}";
+                    var pl = pendingPlacementKeys[i];
+                    url = $"{url}{pl}{((i<pendingPlacementKeys.Length-1)?",":"")}";
                 }
             }
 
@@ -60,7 +78,12 @@ namespace Metica.Experimental
             settings.NullValueHandling = NullValueHandling.Ignore;
 
             var httpResponse = await _httpService.PostAsync(url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
-            return ResponseToResult<OfferResult>(httpResponse);
+            OfferResult offerResult = ResponseToResult<OfferResult>(httpResponse);
+            if (cachedPlacements != null)
+            {
+                offerResult.Append(cachedPlacements);
+            }
+            return offerResult;
         }
     }
    
