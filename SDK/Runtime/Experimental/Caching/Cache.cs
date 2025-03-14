@@ -64,31 +64,6 @@ namespace Metica.Experimental.Caching
         }
 
         /// <inheritdoc/>
-        public virtual void AddOrUpdate(KeyValuePair<TKey,TValue>[] keyValuePairs, long ttlSeconds = GARBAGE_COLLECTION_INTERVAL_SECONDS)
-        {
-            GarbageCollect();
-            if(keyValuePairs == null)
-            {
-                return;
-            }
-            foreach (KeyValuePair<TKey, TValue> kvp in keyValuePairs)
-            {
-                TKey key = kvp.Key;
-                TValue value = kvp.Value;
-                TKey transformedKey = TransformKey(key);
-                var entry = new CacheEntry { timeCreated = _timeSource.EpochSeconds(), ttl = ttlSeconds, hits = 0, value = value };
-                if (_data.ContainsKey(transformedKey))
-                {
-                    _data[transformedKey] = entry;
-                }
-                else
-                {
-                    _data.Add(transformedKey, entry);
-                }
-            }
-        }
-
-        /// <inheritdoc/>
         public virtual void AddOrUpdate(Dictionary<TKey, TValue> entriesDictionary, long ttlSeconds = GARBAGE_COLLECTION_INTERVAL_SECONDS)
         {
             GarbageCollect();

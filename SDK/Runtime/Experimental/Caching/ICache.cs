@@ -28,13 +28,6 @@ namespace Metica.Experimental.Caching
         /// <summary>
         /// Add or update multiple new cache entries at once.
         /// </summary>
-        /// <param name="keyValuePairs">Array of <see cref="KeyValuePair"/>s for the cache entries.</param>
-        /// <param name="ttlSeconds">Time To Live for all the cache entries in seconds.</param>
-        void AddOrUpdate(KeyValuePair<TKey, TValue>[] keyValuePairs, long ttlSeconds);
-
-        /// <summary>
-        /// Add or update multiple new cache entries at once.
-        /// </summary>
         /// <param name="entriesDictionary">Dictionary new entries for the cache.</param>
         /// <param name="ttlSeconds">Time To Live for all the cache entries in seconds.</param>
         void AddOrUpdate(Dictionary<TKey, TValue> entriesDictionary, long ttlSeconds);
