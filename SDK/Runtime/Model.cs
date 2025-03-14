@@ -171,6 +171,16 @@ namespace Metica.Unity
         public string? iap;
         public string? currencyId;
         public List<DisplayLimit>? displayLimits;
+
+        public object GetMeticaAttributesObject()
+        {
+            return new
+            {
+                offerId =   metrics.display.meticaAttributes.offer.offerId,
+                variantId = metrics.display.meticaAttributes.offer.variantId,
+                bundleId = metrics.display.meticaAttributes.offer.bundleId,
+            };
+        }
     }
 
     [Serializable]
