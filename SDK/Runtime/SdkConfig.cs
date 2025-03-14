@@ -89,9 +89,10 @@ namespace Metica.Unity
         {
             return new SdkConfig()
             {
-                initialUserId = string.Empty,
-                appId = string.Empty,
+                // Parameters for MeticaContext
                 apiKey = string.Empty,
+                appId = string.Empty,
+                initialUserId = string.Empty,
                 // - - - - - - - - - -
                 ingestionEndpoint = "https://api.prod-eu.metica.com",
                 offersEndpoint = "https://api.prod-eu.metica.com",
