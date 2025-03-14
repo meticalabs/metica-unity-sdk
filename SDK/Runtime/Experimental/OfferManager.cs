@@ -53,7 +53,7 @@ namespace Metica.Experimental
         public async Task<OfferResult> GetOffersAsync(string userId, string[] placements, Dictionary<string, object> userData = null, Metica.Unity.DeviceInfo deviceInfo = null)
         {
             var cachedPlacements = placementCache.GetAsDictionary(placements);
-            var pendingPlacementKeys = placementCache.GetAbsentKeys(placements);
+            var pendingPlacementKeys = placementCache.GetMissingKeys(placements);
 
             var requestBody = new Dictionary<string, object>
             {

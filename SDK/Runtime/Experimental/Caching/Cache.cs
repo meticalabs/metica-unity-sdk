@@ -5,7 +5,7 @@ namespace Metica.Experimental.Caching
 {
     public class Cache<TKey, TValue> : ICache<TKey, TValue> where TValue : class
     {
-        public ITimeSource _timeSource;
+        public ITimeSource _timeSource {  get; private set; }
 
         protected class CacheEntry
         {
@@ -18,7 +18,7 @@ namespace Metica.Experimental.Caching
             /// </summary>
             public long ttl;
             /// <summary>
-            /// How many time this entry was "hit",, meaning it was requested and it was valid.
+            /// How many times this entry was "hit", meaning it was requested and it was valid.
             /// </summary>
             public int hits;
             /// <summary>
@@ -198,11 +198,11 @@ namespace Metica.Experimental.Caching
         }
 
         /// <summary>
-        /// Utility method to find what keys are absent in the current cached entries.
+        /// Utility method to find what keys are missing in the current cached entries.
         /// </summary>
         /// <param name="keys">A list of keys to look up.</param>
         /// <returns>A list of keys that weren't found.</returns>
-        public TKey[] GetAbsentKeys(TKey[] keys)
+        public TKey[] GetMissingKeys(TKey[] keys)
         {
             if (keys == null)
             {
