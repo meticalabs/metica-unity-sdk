@@ -1,8 +1,10 @@
 using Metica.Experimental.Caching;
 using Metica.Experimental.Core;
 using Metica.Experimental.Network;
+using Metica.Unity;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Metica.Experimental
@@ -18,13 +20,13 @@ namespace Metica.Experimental
         [JsonIgnore] public string Error { get; set; }
         [JsonIgnore] public string RawContent {  get; set; }
 
-        public void Append(Dictionary<string, List<Metica.Unity.Offer>> placements)
-        {
-            foreach (var k in placements.Keys)
-            {
-                Placements.Add(k, placements[k]); // TODO : manage possible key exception?
-            }
-        }
+        //public void Append(Dictionary<string, List<Metica.Unity.Offer>> placements)
+        //{
+        //    foreach (var k in placements.Keys)
+        //    {
+        //        Placements.Add(k, placements[k]); // TODO : manage possible key exception?
+        //    }
+        //}
 
         public override string ToString()
         {
@@ -40,20 +42,83 @@ namespace Metica.Experimental
         }
     }
 
-    public sealed class OfferManager : EndpointManager
+    public interface IMeticaAttributesProvider
     {
-        private readonly ITimeSource timeSource = new SystemDateTimeSource();
-        private readonly Cache<string, List<Metica.Unity.Offer>> placementCache;
+        Task<object> GetMeticaAttributes(string userId, string offerId, string placementId);
+    }
+
+    /// <summary>
+    /// Manages calls to get offers and a storage to provide information for events.
+    /// </summary>
+    /// <remarks>
+    /// <b>Roadmap</b>
+    /// <ul>TODO - With <see cref="AddOrUpdateStorage(Dictionary{string, List{Offer}})"/> the <see cref="_sessionPlacementStorage"/> can grow indefinitely. Implement defence against this.</ul>
+    /// </remarks>
+    public sealed class OfferManager : EndpointManager, IMeticaAttributesProvider
+    {
+        private readonly Metica.Experimental.Core.ITimeSource timeSource = new SystemDateTimeSource();
+
+        /// <summary>
+        /// All placements stored and available for the entire session.
+        /// These are retrieved lazily and serve the purpose of providing the data that other parts of the SDK need (e.g. <see cref="EventManager"/>).
+        /// These generally remain the same for the whole session; only when specific placements are requested this storage is updated.
+        /// </summary>
+        private Dictionary<string, List<Metica.Unity.Offer>> _sessionPlacementStorage = null;
 
         public OfferManager(IHttpService httpService, string offersEndpoint) : base(httpService, offersEndpoint)
         {
-            placementCache = new Cache<string, List<Metica.Unity.Offer>>(timeSource);
+        }
+
+        public async Task<object> GetMeticaAttributes(string userId, string placementId, string offerId)
+        {
+            if(_sessionPlacementStorage == null)
+            {
+                // Lazy fetching of all placements into storage
+                var result = await GetAllOffersAsync(userId);
+                _sessionPlacementStorage = result.Placements;
+            }
+            if (_sessionPlacementStorage.ContainsKey(placementId) == false)
+            {
+                return null;
+            }
+            var offers = _sessionPlacementStorage[placementId].Where(o => o.offerId == offerId);
+            if(offers == null || offers.Count() == 0)
+            {
+                return null;
+            }
+            var meticaAttributesObject = offers.First().GetMeticaAttributesObject(); // at this point we always have 1+
+            return new {
+                placementId,
+                offer = meticaAttributesObject,
+            };
+        }
+
+        /// <summary>
+        /// Adds or updates the given placements to the storage.
+        /// We tolerate a side effect (mutating <see cref="_sessionPlacementStorage"/>) for optimization.
+        /// </summary>
+        /// <param name="placements">new placements to add or update.</param>
+        private void AddOrUpdateStorage(Dictionary<string, List<Offer>> placements)
+        {
+            foreach (var k in placements.Keys)
+            {
+                if(_sessionPlacementStorage.ContainsKey(k))
+                {
+                    _sessionPlacementStorage[k] = placements[k];
+                }
+                else
+                {
+                    _sessionPlacementStorage.Add(k, placements[k]);
+                }
+            }
         }
 
         public async Task<OfferResult> GetOffersAsync(string userId, string[] placements, Dictionary<string, object> userData = null, Metica.Unity.DeviceInfo deviceInfo = null)
         {
-            var cachedPlacements = placementCache.GetAsDictionary(placements);
-            var pendingPlacementKeys = placementCache.GetMissingKeys(placements);
+            if(placements == null || placements.Length == 0)
+            {
+                throw new System.ArgumentException($"{nameof(placements)} cannot be null nor with length = 0");
+            }
 
             var requestBody = new Dictionary<string, object>
             {
@@ -64,13 +129,13 @@ namespace Metica.Experimental
 
             // We only retrieve via http the pending placements
             var url = _url;
-            if(pendingPlacementKeys != null && pendingPlacementKeys.Length > 0)
+            if(placements != null && placements.Length > 0)
             {
                 url = $"{url}?placements=";
-                for (int i = 0; i < pendingPlacementKeys.Length; i++)
+                for (int i = 0; i < placements.Length; i++)
                 {
-                    var pl = pendingPlacementKeys[i];
-                    url = $"{url}{pl}{((i<pendingPlacementKeys.Length-1)?",":"")}";
+                    var pl = placements[i];
+                    url = $"{url}{pl}{((i<placements.Length-1)?",":"")}";
                 }
             }
 
@@ -79,12 +144,26 @@ namespace Metica.Experimental
 
             var httpResponse = await _httpService.PostAsync(url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
             OfferResult offerResult = ResponseToResult<OfferResult>(httpResponse);
-            if (cachedPlacements != null)
+            AddOrUpdateStorage(offerResult.Placements); // Add or update storage with the new received placements.
+            return offerResult;
+        }
+
+        private async Task<OfferResult> GetAllOffersAsync(string userId, Dictionary<string, object> userData = null, Metica.Unity.DeviceInfo deviceInfo = null)
+        {
+            var requestBody = new Dictionary<string, object>
             {
-                offerResult.Append(cachedPlacements);
-            }
+                { nameof(userId), userId },
+                { nameof(deviceInfo), deviceInfo },
+                { nameof(userData), userData }
+            };
+
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.NullValueHandling = NullValueHandling.Ignore;
+
+            var httpResponse = await _httpService.PostAsync(_url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
+            OfferResult offerResult = ResponseToResult<OfferResult>(httpResponse);
+
             return offerResult;
         }
     }
-   
 }
