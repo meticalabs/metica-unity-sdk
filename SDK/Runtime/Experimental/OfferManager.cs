@@ -44,7 +44,7 @@ namespace Metica.Experimental
 
     public interface IMeticaAttributesProvider
     {
-        Task<object> GetMeticaAttributes(string userId, string offerId, string placementId);
+        Task<object> GetMeticaAttributes(string offerId, string placementId);
     }
 
     /// <summary>
@@ -69,12 +69,13 @@ namespace Metica.Experimental
         {
         }
 
-        public async Task<object> GetMeticaAttributes(string userId, string placementId, string offerId)
+        public async Task<object> GetMeticaAttributes(string placementId, string offerId)
         {
             if(_sessionPlacementStorage == null)
             {
                 // Lazy fetching of all placements into storage
-                var result = await GetAllOffersAsync(userId);
+                // TODO - code duplication (see below)
+                var result = await GetAllOffersAsync(MeticaSdk.CurrentUserId);
                 _sessionPlacementStorage = result.Placements;
             }
             if (_sessionPlacementStorage.ContainsKey(placementId) == false)
@@ -98,8 +99,16 @@ namespace Metica.Experimental
         /// We tolerate a side effect (mutating <see cref="_sessionPlacementStorage"/>) for optimization.
         /// </summary>
         /// <param name="placements">new placements to add or update.</param>
-        private void AddOrUpdateStorage(Dictionary<string, List<Offer>> placements)
+        private async Task AddOrUpdateStorage(Dictionary<string, List<Offer>> placements)
         {
+            if(_sessionPlacementStorage == null)
+            {
+                // Lazy fetching of all placements into storage
+                // TODO - code duplication (see above)
+                var result = await GetAllOffersAsync(MeticaSdk.CurrentUserId);
+                _sessionPlacementStorage = result.Placements;
+            }
+
             foreach (var k in placements.Keys)
             {
                 if(_sessionPlacementStorage.ContainsKey(k))
@@ -144,7 +153,7 @@ namespace Metica.Experimental
 
             var httpResponse = await _httpService.PostAsync(url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
             OfferResult offerResult = ResponseToResult<OfferResult>(httpResponse);
-            AddOrUpdateStorage(offerResult.Placements); // Add or update storage with the new received placements.
+            await AddOrUpdateStorage(offerResult.Placements); // Add or update storage with the new received placements.
             return offerResult;
         }
 
