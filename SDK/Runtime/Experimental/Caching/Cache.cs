@@ -3,6 +3,17 @@ using System.Collections.Generic;
 
 namespace Metica.Experimental.Caching
 {
+    /// <summary>
+    /// Basic caching system with a set of methods to add and retrieve data. It also handles time-to-live and hit-counts.
+    /// <seealso cref="ICache{TKey, TValue}"/>
+    /// </summary>
+    /// <typeparam name="TKey">Key type.</typeparam>
+    /// <typeparam name="TValue">Value type.</typeparam>
+    /// <remarks>
+    /// <b>Roadmap</b>
+    /// <ul>TODO - Implement persistency</ul>
+    /// <ul>TODO - Implement tests</ul>
+    /// </remarks>
     public class Cache<TKey, TValue> : ICache<TKey, TValue> where TValue : class
     {
         public ITimeSource _timeSource {  get; private set; }
@@ -31,22 +42,17 @@ namespace Metica.Experimental.Caching
             public long ExpirationTime { get => timeCreated + ttl; }
         }
 
-        private Dictionary<TKey, CacheEntry> _data = new();
+        protected Dictionary<TKey, CacheEntry> _data = new();
 
-        private const long GARBAGE_COLLECTION_INTERVAL_SECONDS = 10; // TODO : make this settable
-        private long nextGarbageCollection = 0;
+        protected const long GARBAGE_COLLECTION_INTERVAL_SECONDS = 10; // TODO : make this settable
+        protected long nextGarbageCollection = 0;
 
         public Cache(ITimeSource timeSource)
         {
             _timeSource = timeSource;
         }
 
-        /// <summary>
-        /// Add or update a new cache entry.
-        /// </summary>
-        /// <param name="key">Key for the cache entry.</param>
-        /// <param name="value">Value for the cache entry.</param>
-        /// <param name="ttlSeconds">Time To Live for the cache entry in seconds.</param>
+        /// <inheritdoc/>
         public virtual void AddOrUpdate(TKey key, TValue value, long ttlSeconds)
         {
             // We call the version with multiple values to have better control on when the garbage collection is called.
@@ -54,11 +60,7 @@ namespace Metica.Experimental.Caching
             AddOrUpdate(entriesDictionary, ttlSeconds);
         }
 
-        /// <summary>
-        /// Add or update multiple new cache entries at once.
-        /// </summary>
-        /// <param name="keyValuePairs">Array of <see cref="KeyValuePair"/>s for the cache entries.</param>
-        /// <param name="ttlSeconds">Time To Live for all the cache entries in seconds.</param>
+        /// <inheritdoc/>
         public virtual void AddOrUpdate(KeyValuePair<TKey,TValue>[] keyValuePairs, long ttlSeconds)
         {
             GarbageCollect();
@@ -83,11 +85,7 @@ namespace Metica.Experimental.Caching
             }
         }
 
-        /// <summary>
-        /// Add or update multiple new cache entries at once.
-        /// </summary>
-        /// <param name="entriesDictionary">Dictionary new entries for the cache.</param>
-        /// <param name="ttlSeconds">Time To Live for all the cache entries in seconds.</param>
+        /// <inheritdoc/>
         public virtual void AddOrUpdate(Dictionary<TKey, TValue> entriesDictionary, long ttlSeconds)
         {
             GarbageCollect();
@@ -112,11 +110,7 @@ namespace Metica.Experimental.Caching
             }
         }
 
-        /// <summary>
-        /// Retrieves a single value.
-        /// </summary>
-        /// <param name="key">Key of the cache entry</param>
-        /// <returns>The value that corresponds to the key, if found.</returns>
+        /// <inheritdoc/>
         public virtual TValue Get(TKey key)
         {
             // We call the version with multiple values to have better control on when the garbage collection is called.
@@ -128,11 +122,7 @@ namespace Metica.Experimental.Caching
             return null;
         }
 
-        /// <summary>
-        /// Retrieves multiple values with multiple keys, ignoring keys that aren't found.
-        /// </summary>
-        /// <param name="keys">An array of keys.</param>
-        /// <returns>A list of entries that correspond to the given keys, if found.</returns>
+        /// <inheritdoc/>
         public virtual List<TValue> Get(TKey[] keys)
         {
             GarbageCollect();
@@ -155,13 +145,8 @@ namespace Metica.Experimental.Caching
             return result;
         }
 
-        /// <summary>
-        /// Retrieves multiple values with multiple keys, ignoring those that aren't found.
-        /// </summary>
-        /// <param name="keys">An array of keys.</param>
-        /// <returns>A dictionary including keys and values of the found entries.</returns>
-        /// <remarks>Normally only the values would be returned but this method comes to rescue situations where maintaining the association between keys and values is useful.</remarks>
-        public virtual Dictionary<TKey, TValue> GetAsDictionary(TKey[] keys)
+        /// <inheritdoc/>
+       public virtual Dictionary<TKey, TValue> GetAsDictionary(TKey[] keys)
         {
             GarbageCollect();
             if(keys == null)
@@ -181,20 +166,6 @@ namespace Metica.Experimental.Caching
                 }
             }
             return result;
-        }
-
-        protected virtual bool IsValid(CacheEntry entry)
-        {
-            bool hasHitMax = entry.maxHits > 0 && (entry.hits > entry.maxHits);
-            bool hasExpired = entry.ExpirationTime < _timeSource.EpochSeconds();
-            if (hasExpired || hasHitMax)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
         }
 
         /// <summary>
@@ -217,6 +188,25 @@ namespace Metica.Experimental.Caching
                 }
             }
             return absents.ToArray();
+        }
+
+        /// <summary>
+        /// Checks validity of a <see cref="CacheEntry"/>.
+        /// </summary>
+        /// <param name="entry">Checked entry.</param>
+        /// <returns><c>true</c> if the <paramref name="entry"/> is valid, <c>false</c> otherwise.</returns>
+        protected virtual bool IsValid(CacheEntry entry)
+        {
+            bool hasHitMax = entry.maxHits > 0 && (entry.hits > entry.maxHits);
+            bool hasExpired = entry.ExpirationTime < _timeSource.EpochSeconds();
+            if (hasExpired || hasHitMax)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         /// <summary>
