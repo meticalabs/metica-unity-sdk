@@ -53,5 +53,22 @@ namespace Metica.Experimental.Caching
         /// <returns>A dictionary including keys and values of the found entries.</returns>
         /// <remarks>Normally only the values would be returned but this method comes to rescue situations where maintaining the association between keys and values is useful.</remarks>
         Dictionary<TKey, TValue> GetAsDictionary(TKey[] keys);
+
+        /// <summary>
+        /// Gets all currently cached values.
+        /// </summary>
+        /// <returns>List of all currently cached values.</returns>
+        Dictionary<TKey, TValue> GetAllAsDictionary();
+
+        /// <summary>
+        /// Gets all currently cached values.
+        /// </summary>
+        /// <returns>List of all currently cached values.</returns>
+        List<TValue> GetAll();
+
+        /// <summary>
+        /// Clears all data.
+        /// </summary>
+        void Clear();
     }
 }

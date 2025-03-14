@@ -1,5 +1,7 @@
 using Metica.Experimental.Core;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace Metica.Experimental.Caching
 {
@@ -13,6 +15,7 @@ namespace Metica.Experimental.Caching
     /// <b>Roadmap</b>
     /// <ul>TODO - Implement persistency</ul>
     /// <ul>TODO - Implement tests</ul>
+    /// <ul>TODO - Some methods may be inefficient. Decide whether to optimize or warn users.</ul>
     /// </remarks>
     public class Cache<TKey, TValue> : ICache<TKey, TValue> where TValue : class
     {
@@ -53,7 +56,7 @@ namespace Metica.Experimental.Caching
         }
 
         /// <inheritdoc/>
-        public virtual void AddOrUpdate(TKey key, TValue value, long ttlSeconds)
+        public virtual void AddOrUpdate(TKey key, TValue value, long ttlSeconds = GARBAGE_COLLECTION_INTERVAL_SECONDS)
         {
             // We call the version with multiple values to have better control on when the garbage collection is called.
             Dictionary<TKey, TValue> entriesDictionary = new Dictionary<TKey, TValue> { {  key, value } };
@@ -61,7 +64,7 @@ namespace Metica.Experimental.Caching
         }
 
         /// <inheritdoc/>
-        public virtual void AddOrUpdate(KeyValuePair<TKey,TValue>[] keyValuePairs, long ttlSeconds)
+        public virtual void AddOrUpdate(KeyValuePair<TKey,TValue>[] keyValuePairs, long ttlSeconds = GARBAGE_COLLECTION_INTERVAL_SECONDS)
         {
             GarbageCollect();
             if(keyValuePairs == null)
@@ -86,7 +89,7 @@ namespace Metica.Experimental.Caching
         }
 
         /// <inheritdoc/>
-        public virtual void AddOrUpdate(Dictionary<TKey, TValue> entriesDictionary, long ttlSeconds)
+        public virtual void AddOrUpdate(Dictionary<TKey, TValue> entriesDictionary, long ttlSeconds = GARBAGE_COLLECTION_INTERVAL_SECONDS)
         {
             GarbageCollect();
             if(entriesDictionary == null)
@@ -141,6 +144,30 @@ namespace Metica.Experimental.Caching
                     entry.hits++;
                     result.Add(entry.value);
                 }
+            }
+            return result;
+        }
+
+        /// <inheritdoc/>
+        public virtual List<TValue> GetAll()
+        {
+            GarbageCollect();
+            List <TValue> result = new List<TValue>();
+            foreach (var entry in _data.Values)
+            {
+                result.Add(entry.value);
+            }
+            return result;
+        }
+
+        /// <inheritdoc/>
+        public virtual Dictionary<TKey, TValue> GetAllAsDictionary()
+        {
+            GarbageCollect();
+            Dictionary<TKey,TValue> result = new Dictionary<TKey, TValue>();
+            foreach (var k in _data.Keys)
+            {
+                result.Add(k, _data[k].value);
             }
             return result;
         }
@@ -235,6 +262,12 @@ namespace Metica.Experimental.Caching
                 _data.Remove(marked[i]);
             }
             marked.Clear();
+        }
+
+        /// <inheritdoc/>
+        public void Clear()
+        {
+            _data.Clear();
         }
 
         protected virtual TKey TransformKey(TKey key)
