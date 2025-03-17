@@ -135,7 +135,7 @@ namespace Metica.Experimental
             var requestBody = new Dictionary<string, object>
             {
                 { nameof(userId), userId },
-                { nameof(deviceInfo), deviceInfo },
+                { nameof(deviceInfo), deviceInfo }, // TODO
                 { nameof(userData), userData }
             };
 
@@ -165,7 +165,7 @@ namespace Metica.Experimental
             var requestBody = new Dictionary<string, object>
             {
                 { nameof(userId), userId },
-                { nameof(deviceInfo), deviceInfo },
+                { nameof(deviceInfo), deviceInfo }, // TODO
                 { nameof(userData), userData }
             };
 
