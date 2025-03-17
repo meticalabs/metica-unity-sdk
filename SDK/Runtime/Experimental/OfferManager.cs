@@ -48,7 +48,8 @@ namespace Metica.Experimental
     }
 
     /// <summary>
-    /// Manages calls to get offers and a storage to provide information for events.
+    /// 1. Manages calls to get offers.
+    /// 2. Manages a storage to provide information for events.
     /// </summary>
     /// <remarks>
     /// <b>Roadmap</b>
@@ -95,10 +96,12 @@ namespace Metica.Experimental
         }
 
         /// <summary>
-        /// Adds or updates the given placements to the storage.
+        /// Adds or updates the given placements to the storage. This <i>always</i> retrieves the latest placement by design.
         /// We tolerate a side effect (mutating <see cref="_sessionPlacementStorage"/>) for optimization.
         /// </summary>
-        /// <param name="placements">new placements to add or update.</param>
+        /// <param name="placements">New placements to add or update.</param>
+        /// <remarks>This method was created to achieve availability of information that is needed for sending the events.
+        /// It is and should remain private as the management of this auxiliary storage should be hidden to client-code.</remarks>
         private async Task AddOrUpdateStorage(Dictionary<string, List<Offer>> placements)
         {
             if(_sessionPlacementStorage == null)
