@@ -30,7 +30,11 @@ namespace Metica.Experimental
             if (response.Status == HttpResponse.ResultStatus.Success)
             {
                 string content = response.ResponseContent;
-                TResult result = JsonConvert.DeserializeObject<TResult>(content);
+                TResult result;
+                if (string.IsNullOrEmpty(content) == false)
+                    result = JsonConvert.DeserializeObject<TResult>(content);
+                else
+                    result = new TResult();
                 result.Status = response.Status;
                 result.RawContent = response.ResponseContent;
                 return result;
