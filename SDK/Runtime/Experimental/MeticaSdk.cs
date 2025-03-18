@@ -84,7 +84,7 @@ namespace Metica.Experimental
                 customPayload);
 
 
-        public void LogPurchaseEventWithProductId(string productId, string currencyCode, double totalAmount, Dictionary<string, object> customPayload = null)
+        public void LogOfferPurchaseEventWithProductId(string productId, string currencyCode, double totalAmount, Dictionary<string, object> customPayload = null)
             => _eventManager.QueueEventWithProductIdAsync(
                 CurrentUserId,
                 Config.appId,
