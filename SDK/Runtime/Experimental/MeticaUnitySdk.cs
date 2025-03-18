@@ -25,8 +25,21 @@ namespace Metica.Experimental.Unity
             configResult = await _meticaSdk.GetConfigsAsync(new List<string> { "dynamic_difficulty" });
             Debug.Log($"Configs: {configResult}");
 
-            _meticaSdk.LogPurchaseEventWithProductId("mega_offer_123", "EUR", 1.99);
+            _meticaSdk.LogInstallEvent();
+            _meticaSdk.LogLoginEvent();
+
+            _meticaSdk.LogOfferPurchaseEventWithProductId("mega_offer_123", "EUR", 1.99);
             _meticaSdk.LogOfferPurchaseEvent("generic", "23851", "EUR", 9.99);
+
+            _meticaSdk.LogAdRevenueEvent("top_slot", "popup", "MadAds", 1.50);
+            _meticaSdk.LogAdRevenueEvent("top_slot", "popup", "MadAds", 1.50);
+            _meticaSdk.LogAdRevenueEvent("top_slot", "popup", "MadAds", 1.50);
+
+            _meticaSdk.LogOfferImpressionEventWithProductId("mega_offer_456", "click");
+            _meticaSdk.LogOfferImpressionEventWithProductId("mega_offer_456", "dismiss");
+
+            _meticaSdk.LogOfferInteractionEvent("generic", "23851", "click", new() { { "custom_stuff", "custom_content" } });
+            _meticaSdk.LogOfferInteractionEvent("generic", "23851", "scroll", new() { { "custom_stuff", "custom_content" } });
 
             _meticaSdk.LogFullStateUserUpdateEvent(
                 new()
