@@ -3,14 +3,12 @@ using Metica.Unity;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Metica.Experimental
 {
     [System.Serializable]
-    public class EventResult : IMeticaSdkResult
+    public class EventDispatchResult : IMeticaSdkResult
     {
         [JsonIgnore] public HttpResponse.ResultStatus Status { get; set; }
         [JsonIgnore] public string Error { get; set; }
@@ -18,16 +16,39 @@ namespace Metica.Experimental
 
         public override string ToString()
         {
-            return $"{nameof(EventResult)}:\n Status: {Status}\n RawContent: {RawContent}\n Error: {Error}";
+            return $"{nameof(EventDispatchResult)}:\n Status: {Status}\n RawContent: {RawContent}\n Error: {Error}";
         }
-
     }
 
+    /// <summary>
+    /// Endpoint Manager has the following responsibilities:
+    /// - Expose all methods to log events
+    /// - Accumulate events and dispatch them
+    /// - For the events that are relative to offers, this class takes care of retrieving the necessary information from the <see cref="OfferManager"/>.
+    ///   This though happens behind the scenes so it shouldn't be a concern for the calling code.
+    /// - If the client-code must be informed on when the dispatch takes place, a delegate can be given to handle an <see cref="EventDispatchResult"/>.
+    /// </summary>
+    /// <remarks>Note that whenever a Log- method is called, the event is not immediately sent,
+    /// instead, the get stored and sent in group when certain conditions are met.
+    /// ROADMAP:
+    /// - TODO : unify QueueEvent- methods where possible
+    /// - TODO : dispatch events based on a timer
+    /// - TODO : proper finalization of the object to flush/dispatch the events and other cleanup.
+    /// - TODO : use a model to manage parameters more consistently to reduce chances of human errors in passing all strings.
+    /// - TODO : improve async/await calls and don't bubble up warnings when we fire&forget.
+    /// - TODO : device info
+    /// - TODO : use constants for eventTypes
+    /// </remarks>
     internal class EventManager : EndpointManager
     {
+        public delegate void OnEventsDispatchDelegate(EventDispatchResult eventResult);
+        public event OnEventsDispatchDelegate OnEventsDispatch;
+
         private readonly IMeticaAttributesProvider _meticaAttributesProvider;
         private readonly Metica.Experimental.Core.ITimeSource _timeSource = new SystemDateTimeSource();
         private readonly SdkConfig _sdkConfig;
+
+        private const int DISPATCH_TRIGGER_COUNT = 2;
 
         private List<object> _events;
 
@@ -35,28 +56,49 @@ namespace Metica.Experimental
         {
             _meticaAttributesProvider = meticaAttributesProvider;
             _events = new List<object>();
+            OnEventsDispatch -= DispatchHandler;
+            OnEventsDispatch += DispatchHandler;
         }
 
-        public async Task<EventResult> SendEventWithMeticaAttributesAsync(string userId, string appId, string placementId, string offerId, string eventType, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
+        internal async Task QueueEventAsync(string userId, string appId, string eventType, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
+        {
+            var requestBody = new Dictionary<string, object>
+            {
+                { nameof(eventType), eventType },
+                { "eventId", Guid.NewGuid().ToString() },
+                { "eventTime", _timeSource.EpochSeconds() },
+                { nameof(appId), appId },
+                { nameof(userId), userId },
+                //{ nameof(deviceInfo), deviceInfo }, // TODO
+                { nameof(customPayload), customPayload }
+            };
+
+            if(eventFields != null)
+            {
+                requestBody.AddDictionary(eventFields, overwriteExistingKeys: true);
+            }
+
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.NullValueHandling = NullValueHandling.Ignore;
+
+            _events.Add(requestBody);
+
+            if(_events.Count >= DISPATCH_TRIGGER_COUNT)
+            {
+                Dispatch();
+            }
+        }
+
+        internal async Task QueueEventWithMeticaAttributesAsync(string userId, string appId, string placementId, string offerId, string eventType, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
         {
             if (_meticaAttributesProvider == null)
             {
-                return new()
-                {
-                    Status = HttpResponse.ResultStatus.Failure,
-                    RawContent = string.Empty,
-                    Error = $"There was an initialization problem. To use this method an {nameof(IMeticaAttributesProvider)} nmust be provided."
-                };
+                return; // TODO : raise error
             }
             object meticaAttributes = await _meticaAttributesProvider.GetMeticaAttributes(placementId, offerId);
             if (meticaAttributes == null)
             {
-                return new()
-                {
-                    Status = HttpResponse.ResultStatus.Failure,
-                    RawContent = string.Empty,
-                    Error = $"Placement with name \"{placementId}\"or offer with name \"{offerId}\" wasn't found."
-                };
+                return; // TODO : raise error
             }
             
             var requestBody = new Dictionary<string, object>
@@ -73,7 +115,7 @@ namespace Metica.Experimental
 
             if(eventFields != null)
             {
-                requestBody.Concat(eventFields);
+                requestBody.AddDictionary(eventFields, overwriteExistingKeys: true);
             }
 
             JsonSerializerSettings settings = new JsonSerializerSettings();
@@ -81,14 +123,13 @@ namespace Metica.Experimental
 
             _events.Add(requestBody);
 
-            var httpResponse = await _httpService.PostAsync(_url, JsonConvert.SerializeObject(new Dictionary<string, object> { { "events", _events } }, settings), "application/json");
-
-            _events.Clear();
-
-            return ResponseToResult<EventResult>(httpResponse);
+            if(_events.Count >= DISPATCH_TRIGGER_COUNT)
+            {
+                Dispatch();
+            }
         }
 
-        public async Task<EventResult> SendEventWithProductId(string userId, string appId, string productId, string eventType, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
+        internal async Task QueueEventWithProductIdAsync(string userId, string appId, string productId, string eventType, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
         {
             var requestBody = new Dictionary<string, object>
             {
@@ -104,26 +145,67 @@ namespace Metica.Experimental
 
             if(eventFields != null)
             {
-                requestBody.Concat(eventFields);
+                requestBody.AddDictionary(eventFields, overwriteExistingKeys: true);
             }
-
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.NullValueHandling = NullValueHandling.Ignore;
 
             _events.Add(requestBody);
 
-            //UnityEngine.Debug.Log(JsonConvert.SerializeObject(new Dictionary<string, object> { { "events", _events } }, settings));
+            if(_events.Count >= DISPATCH_TRIGGER_COUNT)
+            {
+                Dispatch(); // fire and forget, no need to await
+            }
 
-            var httpResponse = await _httpService.PostAsync(_url, JsonConvert.SerializeObject(new Dictionary<string, object> { { "events", _events } }, settings), "application/json");
-
-            _events.Clear();
-
-            return ResponseToResult<EventResult>(httpResponse);
+            return;
         }
 
-        //public async Task<EventResult> LogPurchaseEvent(string userId, string appId, string placementId, string offerId, string eventType, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
-        //{
-            
-        //}
+        private async Task Dispatch()
+        {
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.NullValueHandling = NullValueHandling.Ignore;
+
+            var httpResponse = await _httpService.PostAsync(_url, JsonConvert.SerializeObject(new Dictionary<string, object> { { "events", _events } }, settings), "application/json");
+            _events.Clear();
+            EventDispatchResult result = ResponseToResult<EventDispatchResult>(httpResponse);
+            OnEventsDispatch?.Invoke(result);
+        }
+
+        private void DispatchHandler(EventDispatchResult result)
+        {
+            UnityEngine.Debug.Log($"Events Dispatched.\n{result}");
+        }
+
+
+        //public void LogInstallEvent(string userId, string appId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
+        //    => QueueEventAsync(userId, appId, "install", eventFields, customPayload);
+
+        //public void LogLoginEvent(string userId, string appId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
+        //    => QueueEventAsync(userId, appId, "login", eventFields, customPayload);
+
+        //public void LogOfferPurchaseEvent(string userId, string appId, string placementId, string offerId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
+        //    => QueueEventWithMeticaAttributesAsync(userId, appId, placementId, offerId, "purchase", eventFields, customPayload);
+
+        //public void LogPurchaseEventWithProductId(string userId, string appId, string productId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
+        //    => QueueEventWithProductIdAsync(userId, appId, productId, "purchase", eventFields, customPayload);
+
+        //public void LogOfferInteractionEvent(string userId, string appId, string placementId, string offerId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
+        //    => QueueEventWithMeticaAttributesAsync(userId, appId, placementId, offerId, "interaction", eventFields, customPayload);
+
+        //public void LogOfferInteractionEventWithProductId(string userId, string appId, string productId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
+        //    => QueueEventWithProductIdAsync(userId, appId, productId, "interaction", eventFields, customPayload);
+
+        //public void LogOfferImpressionEvent(string userId, string appId, string placementId, string offerId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
+        //    => QueueEventWithMeticaAttributesAsync(userId, appId, placementId, offerId, "impression", eventFields, customPayload);
+
+        //public void LogOfferImpressionEventWithProductId(string userId, string appId, string productId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
+        //    => QueueEventWithProductIdAsync(userId, appId, productId, "impression", eventFields, customPayload);
+
+        //public void LogAdRevenueEvent(string userId, string appId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
+        //    => QueueEventAsync(userId, appId, "adRevenue", eventFields, customPayload);
+
+        //public void LogFullStateUserUpdate(string userId, string appId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
+        //    => QueueEventAsync(userId, appId, "fullStateUpdate", eventFields, customPayload);
+
+        //public void LogPartialStateUserUpdate(string userId, string appId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
+        //    => QueueEventAsync(userId, appId, "partialStateUpdate", eventFields, customPayload);
     }
 }

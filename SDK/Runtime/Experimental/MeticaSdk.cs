@@ -47,10 +47,128 @@ namespace Metica.Experimental
         public async Task<OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData = null, Metica.Unity.DeviceInfo deviceInfo = null)
             => await _offerManager.GetOffersAsync(CurrentUserId, placements, userData, deviceInfo);
 
+
         public async Task<ConfigResult> GetConfigsAsync(List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
             => await _configManager.GetConfigsAsync(CurrentUserId, configKeys, userProperties, deviceInfo);
 
-        
+
+        public void LogLoginEvent(Dictionary<string, object> customPayload = null)
+            => _eventManager.QueueEventAsync(
+                CurrentUserId,
+                Config.appId,
+                "login",
+                null,
+                customPayload);
+
+
+        public void LogInstallEvent(Dictionary<string, object> customPayload = null)
+            => _eventManager.QueueEventAsync(
+                CurrentUserId,
+                Config.appId,
+                "install",
+                null,
+                customPayload);
+
+
+        public void LogOfferPurchaseEvent(string placementId, string offerId, string currencyCode, double totalAmount, Dictionary<string, object> customPayload = null)
+            => _eventManager.QueueEventWithMeticaAttributesAsync(
+                CurrentUserId,
+                Config.appId,
+                placementId,
+                offerId,
+                "purchase",
+                new() {
+                    { nameof(currencyCode), currencyCode },
+                    { nameof(totalAmount), totalAmount },
+                },
+                customPayload);
+
+
+        public void LogPurchaseEventWithProductId(string productId, string currencyCode, double totalAmount, Dictionary<string, object> customPayload = null)
+            => _eventManager.QueueEventWithProductIdAsync(
+                CurrentUserId,
+                Config.appId,
+                productId,
+                "purchase",
+                new() {
+                    { nameof(currencyCode), currencyCode },
+                    { nameof(totalAmount), totalAmount },
+                },
+                customPayload);
+
+
+        public void LogOfferInteractionEvent(string placementId, string offerId, string interactionType, Dictionary<string, object> customPayload = null)
+            => _eventManager.QueueEventWithMeticaAttributesAsync(
+                CurrentUserId,
+                Config.appId,
+                placementId,
+                offerId,
+                "interaction",
+                new() { { nameof(interactionType), interactionType } },
+                customPayload);
+
+
+        public void LogOfferInteractionEventWithProductId(string productId, string interactionType, Dictionary<string, object> customPayload = null)
+            => _eventManager.QueueEventWithProductIdAsync(
+                CurrentUserId,
+                Config.appId,
+                productId,
+                "interaction",
+                new() { { nameof(interactionType), interactionType} },
+                customPayload);
+
+
+        public void LogOfferImpressionEvent(string placementId, string offerId, Dictionary<string, object> customPayload = null)
+            => _eventManager.QueueEventWithMeticaAttributesAsync(
+                CurrentUserId,
+                Config.appId,
+                placementId,
+                offerId,
+                "impression",
+                null,
+                customPayload);
+
+
+        public void LogOfferImpressionEventWithProductId(string productId, string interactionType, Dictionary<string, object> customPayload = null)
+            => _eventManager.QueueEventWithProductIdAsync(
+                CurrentUserId,
+                Config.appId,
+                productId,
+                "impression",
+                null,
+                customPayload);
+
+
+        public void LogAdRevenueEvent(string placement, string type, string source, double totalAmount, Dictionary<string, object> customPayload = null)
+            => _eventManager.QueueEventAsync(
+                CurrentUserId,
+                Config.appId,
+                "adRevenue",
+                new() {
+                    { nameof (placement), placement },
+                    { nameof (type), type },
+                    { nameof (source), source },
+                    { nameof (totalAmount), totalAmount },
+                },
+                customPayload);
+
+
+        public void LogFullStateUserUpdateEvent(Dictionary<string, object> userStateAttributes, Dictionary<string, object> customPayload = null)
+            => _eventManager.QueueEventAsync(
+                CurrentUserId,
+                Config.appId,
+                "fullStateUpdate",
+                new() { { nameof (userStateAttributes), userStateAttributes }, },
+                customPayload);
+
+
+        public void LogPartialStateUserUpdateEvent(Dictionary<string, object> userStateAttributes, Dictionary<string, object> customPayload = null)
+            => _eventManager.QueueEventAsync(
+                CurrentUserId,
+                Config.appId,
+                "partialStateUpdate",
+                new() { { nameof(userStateAttributes), userStateAttributes } },
+                customPayload);
 
         public void Cleanup()
         {

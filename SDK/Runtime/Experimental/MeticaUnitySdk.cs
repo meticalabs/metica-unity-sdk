@@ -27,6 +27,16 @@ namespace Metica.Experimental.Unity
 
             configResult = await _meticaSdk.GetConfigsAsync(new List<string> { "dynamic_difficulty" });
             Debug.Log($"Configs: {configResult}");
+
+            _meticaSdk.LogPurchaseEventWithProductId("mega_offer_123", "EUR", 1.99);
+            _meticaSdk.LogOfferPurchaseEvent("generic", "23851", "EUR", 9.99);
+
+            _meticaSdk.LogPartialStateUserUpdateEvent(
+                new()
+                {
+                    { "level", 100.0 },
+                    { "faction", "Dragoons" },
+                });
         }
     }
 }

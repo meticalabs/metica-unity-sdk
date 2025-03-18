@@ -5,7 +5,7 @@ namespace Metica.Unity
 {
     public static class DictionaryExtensionMethods
     {
-        public static void Concat<T, S>(this Dictionary<T,S> dictionary, Dictionary<T,S> additionalDictionary, bool overwriteExistingKeys = false)
+        public static void AddDictionary<T, S>(this Dictionary<T,S> dictionary, Dictionary<T,S> additionalDictionary, bool overwriteExistingKeys = false)
         {
             if(additionalDictionary == null)
             {
