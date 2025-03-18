@@ -16,9 +16,6 @@ namespace Metica.Experimental.Unity
 
         private async void Start()
         {
-            //var offersResult = await _meticaSdk.GetOffersAsync(null);
-            //Debug.Log($"Offers: {offersResult}");
-
             var offersResult = await _meticaSdk.GetOffersAsync(new string[] { "generic" });
             Debug.Log($"Offers: {offersResult}");
 

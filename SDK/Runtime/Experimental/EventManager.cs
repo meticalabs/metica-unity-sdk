@@ -31,7 +31,6 @@ namespace Metica.Experimental
     /// <remarks>Note that whenever a Log- method is called, the event is not immediately sent,
     /// instead, the get stored and sent in group when certain conditions are met.
     /// ROADMAP:
-    /// - TODO : unify QueueEvent- methods where possible
     /// - TODO : dispatch events based on a timer
     /// - TODO : proper finalization of the object to flush/dispatch the events and other cleanup.
     /// - TODO : use a model to manage parameters more consistently to reduce chances of human errors in passing all strings.
@@ -100,62 +99,100 @@ namespace Metica.Experimental
             {
                 return; // TODO : raise error
             }
+
+            if (eventFields == null)
+            {
+                eventFields = new Dictionary<string, object>();
+            }
+
+            eventFields.AddDictionary(
+                new()
+                {
+                    { nameof(meticaAttributes), meticaAttributes }
+                });
+
+            QueueEventAsync(
+                userId,
+                appId,
+                eventType,
+                eventFields,
+                customPayload
+                );
             
-            var requestBody = new Dictionary<string, object>
-            {
-                { nameof(eventType), eventType },
-                { "eventId", Guid.NewGuid().ToString() },
-                { "eventTime", _timeSource.EpochSeconds() },
-                { nameof(appId), appId },
-                { nameof(userId), userId },
-                { nameof(meticaAttributes), meticaAttributes },
-                //{ nameof(deviceInfo), deviceInfo }, // TODO
-                { nameof(customPayload), customPayload }
-            };
+            //var requestBody = new Dictionary<string, object>
+            //{
+            //    { nameof(eventType), eventType },
+            //    { "eventId", Guid.NewGuid().ToString() },
+            //    { "eventTime", _timeSource.EpochSeconds() },
+            //    { nameof(appId), appId },
+            //    { nameof(userId), userId },
+            //    { nameof(meticaAttributes), meticaAttributes },
+            //    //{ nameof(deviceInfo), deviceInfo }, // TODO
+            //    { nameof(customPayload), customPayload }
+            //};
 
-            if(eventFields != null)
-            {
-                requestBody.AddDictionary(eventFields, overwriteExistingKeys: true);
-            }
+            //if(eventFields != null)
+            //{
+            //    requestBody.AddDictionary(eventFields, overwriteExistingKeys: true);
+            //}
 
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.NullValueHandling = NullValueHandling.Ignore;
+            //JsonSerializerSettings settings = new JsonSerializerSettings();
+            //settings.NullValueHandling = NullValueHandling.Ignore;
 
-            _events.Add(requestBody);
+            //_events.Add(requestBody);
 
-            if(_events.Count >= DISPATCH_TRIGGER_COUNT)
-            {
-                Dispatch();
-            }
+            //if(_events.Count >= DISPATCH_TRIGGER_COUNT)
+            //{
+            //    Dispatch();
+            //}
         }
 
         internal async Task QueueEventWithProductIdAsync(string userId, string appId, string productId, string eventType, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
         {
-            var requestBody = new Dictionary<string, object>
+            if (eventFields == null)
             {
-                { nameof(userId), userId },
-                { nameof(appId), appId },
-                { nameof(productId), productId },
-                { nameof(eventType), eventType },
-                { "eventId", Guid.NewGuid().ToString() },
-                { "eventTime", _timeSource.EpochSeconds() },
-                //{ nameof(deviceInfo), deviceInfo }, // TODO
-                { nameof(customPayload), customPayload }
-            };
-
-            if(eventFields != null)
-            {
-                requestBody.AddDictionary(eventFields, overwriteExistingKeys: true);
+                eventFields = new Dictionary<string, object>();
             }
 
-            _events.Add(requestBody);
+            eventFields.AddDictionary(
+                new()
+                {
+                    { nameof(productId), productId }
+                });
 
-            if(_events.Count >= DISPATCH_TRIGGER_COUNT)
-            {
-                Dispatch(); // fire and forget, no need to await
-            }
+            QueueEventAsync(
+                userId,
+                appId,
+                eventType,
+                eventFields,
+                customPayload
+                );
 
-            return;
+            //var requestBody = new Dictionary<string, object>
+            //{
+            //    { nameof(userId), userId },
+            //    { nameof(appId), appId },
+            //    { nameof(productId), productId },
+            //    { nameof(eventType), eventType },
+            //    { "eventId", Guid.NewGuid().ToString() },
+            //    { "eventTime", _timeSource.EpochSeconds() },
+            //    //{ nameof(deviceInfo), deviceInfo }, // TODO
+            //    { nameof(customPayload), customPayload }
+            //};
+
+            //if(eventFields != null)
+            //{
+            //    requestBody.AddDictionary(eventFields, overwriteExistingKeys: true);
+            //}
+
+            //_events.Add(requestBody);
+
+            //if(_events.Count >= DISPATCH_TRIGGER_COUNT)
+            //{
+            //    Dispatch(); // fire and forget, no need to await
+            //}
+
+            //return;
         }
 
         private async Task Dispatch()
@@ -173,39 +210,5 @@ namespace Metica.Experimental
         {
             UnityEngine.Debug.Log($"Events Dispatched.\n{result}");
         }
-
-
-        //public void LogInstallEvent(string userId, string appId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
-        //    => QueueEventAsync(userId, appId, "install", eventFields, customPayload);
-
-        //public void LogLoginEvent(string userId, string appId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
-        //    => QueueEventAsync(userId, appId, "login", eventFields, customPayload);
-
-        //public void LogOfferPurchaseEvent(string userId, string appId, string placementId, string offerId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
-        //    => QueueEventWithMeticaAttributesAsync(userId, appId, placementId, offerId, "purchase", eventFields, customPayload);
-
-        //public void LogPurchaseEventWithProductId(string userId, string appId, string productId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
-        //    => QueueEventWithProductIdAsync(userId, appId, productId, "purchase", eventFields, customPayload);
-
-        //public void LogOfferInteractionEvent(string userId, string appId, string placementId, string offerId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
-        //    => QueueEventWithMeticaAttributesAsync(userId, appId, placementId, offerId, "interaction", eventFields, customPayload);
-
-        //public void LogOfferInteractionEventWithProductId(string userId, string appId, string productId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
-        //    => QueueEventWithProductIdAsync(userId, appId, productId, "interaction", eventFields, customPayload);
-
-        //public void LogOfferImpressionEvent(string userId, string appId, string placementId, string offerId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
-        //    => QueueEventWithMeticaAttributesAsync(userId, appId, placementId, offerId, "impression", eventFields, customPayload);
-
-        //public void LogOfferImpressionEventWithProductId(string userId, string appId, string productId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
-        //    => QueueEventWithProductIdAsync(userId, appId, productId, "impression", eventFields, customPayload);
-
-        //public void LogAdRevenueEvent(string userId, string appId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
-        //    => QueueEventAsync(userId, appId, "adRevenue", eventFields, customPayload);
-
-        //public void LogFullStateUserUpdate(string userId, string appId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
-        //    => QueueEventAsync(userId, appId, "fullStateUpdate", eventFields, customPayload);
-
-        //public void LogPartialStateUserUpdate(string userId, string appId, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
-        //    => QueueEventAsync(userId, appId, "partialStateUpdate", eventFields, customPayload);
     }
 }
