@@ -37,6 +37,7 @@ namespace Metica.Experimental
     /// - TODO : improve async/await calls and don't bubble up warnings when we fire&forget.
     /// - TODO : device info
     /// - TODO : use constants for eventTypes
+    /// - TODO : (low priority) create an event queue processing system that processes the queue right before sending (for exampe to aggregate certain events)
     /// </remarks>
     internal class EventManager : EndpointManager
     {
@@ -47,7 +48,7 @@ namespace Metica.Experimental
         private readonly Metica.Experimental.Core.ITimeSource _timeSource = new SystemDateTimeSource();
         private readonly SdkConfig _sdkConfig;
 
-        private const int DISPATCH_TRIGGER_COUNT = 2;
+        private const int DISPATCH_TRIGGER_COUNT = 2; // TODO : temporarily hardcoded
 
         private List<object> _events;
 
@@ -118,33 +119,6 @@ namespace Metica.Experimental
                 eventFields,
                 customPayload
                 );
-            
-            //var requestBody = new Dictionary<string, object>
-            //{
-            //    { nameof(eventType), eventType },
-            //    { "eventId", Guid.NewGuid().ToString() },
-            //    { "eventTime", _timeSource.EpochSeconds() },
-            //    { nameof(appId), appId },
-            //    { nameof(userId), userId },
-            //    { nameof(meticaAttributes), meticaAttributes },
-            //    //{ nameof(deviceInfo), deviceInfo }, // TODO
-            //    { nameof(customPayload), customPayload }
-            //};
-
-            //if(eventFields != null)
-            //{
-            //    requestBody.AddDictionary(eventFields, overwriteExistingKeys: true);
-            //}
-
-            //JsonSerializerSettings settings = new JsonSerializerSettings();
-            //settings.NullValueHandling = NullValueHandling.Ignore;
-
-            //_events.Add(requestBody);
-
-            //if(_events.Count >= DISPATCH_TRIGGER_COUNT)
-            //{
-            //    Dispatch();
-            //}
         }
 
         internal async Task QueueEventWithProductIdAsync(string userId, string appId, string productId, string eventType, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
@@ -167,32 +141,6 @@ namespace Metica.Experimental
                 eventFields,
                 customPayload
                 );
-
-            //var requestBody = new Dictionary<string, object>
-            //{
-            //    { nameof(userId), userId },
-            //    { nameof(appId), appId },
-            //    { nameof(productId), productId },
-            //    { nameof(eventType), eventType },
-            //    { "eventId", Guid.NewGuid().ToString() },
-            //    { "eventTime", _timeSource.EpochSeconds() },
-            //    //{ nameof(deviceInfo), deviceInfo }, // TODO
-            //    { nameof(customPayload), customPayload }
-            //};
-
-            //if(eventFields != null)
-            //{
-            //    requestBody.AddDictionary(eventFields, overwriteExistingKeys: true);
-            //}
-
-            //_events.Add(requestBody);
-
-            //if(_events.Count >= DISPATCH_TRIGGER_COUNT)
-            //{
-            //    Dispatch(); // fire and forget, no need to await
-            //}
-
-            //return;
         }
 
         private async Task Dispatch()
