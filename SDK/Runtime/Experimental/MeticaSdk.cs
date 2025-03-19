@@ -149,7 +149,7 @@ namespace Metica.Experimental
                 customPayload);
 
 
-        public void LogAdRevenueEvent(string placement, string type, string source, double totalAmount, Dictionary<string, object> customPayload = null)
+        public void LogAdRevenueEvent(string placement, string type, string source, string currencyCode, double totalAmount, Dictionary<string, object> customPayload = null)
             => _eventManager.QueueEventAsync(
                 CurrentUserId,
                 Config.appId,
@@ -158,6 +158,7 @@ namespace Metica.Experimental
                     { nameof (placement), placement },
                     { nameof (type), type },
                     { nameof (source), source },
+                    { nameof (currencyCode), currencyCode },
                     { nameof (totalAmount), totalAmount },
                 },
                 customPayload);
