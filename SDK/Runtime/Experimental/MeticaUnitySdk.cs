@@ -32,9 +32,9 @@ namespace Metica.Experimental.Unity
             _meticaSdk.LogOfferPurchaseEventWithProductId("mega_offer_123", "EUR", 1.99);
             _meticaSdk.LogOfferPurchaseEvent("generic", "23851", "EUR", 9.99);
 
-            _meticaSdk.LogAdRevenueEvent("top_slot", "popup", "MadAds", 1.50);
-            _meticaSdk.LogAdRevenueEvent("top_slot", "popup", "AdLads", 1.10);
-            _meticaSdk.LogAdRevenueEvent("top_slot", "popup", "AdLads", 1.10);
+            _meticaSdk.LogAdRevenueEvent("top_slot", "popup", "MadAds", "GBP", 1.50);
+            _meticaSdk.LogAdRevenueEvent("top_slot", "popup", "AdLads", "GBP", 1.10);
+            _meticaSdk.LogAdRevenueEvent("top_slot", "popup", "AdLads", "GBP", 1.10);
 
             _meticaSdk.LogOfferImpressionEventWithProductId("mega_offer_456", "click");
             _meticaSdk.LogOfferImpressionEventWithProductId("mega_offer_456", "dismiss");
