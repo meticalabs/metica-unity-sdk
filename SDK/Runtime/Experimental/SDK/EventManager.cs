@@ -1,3 +1,4 @@
+using Metica.Experimental.Core;
 using Metica.Experimental.Network;
 using Metica.Unity;
 using Newtonsoft.Json;
@@ -44,6 +45,7 @@ namespace Metica.Experimental
         public event OnEventsDispatchDelegate OnEventsDispatch;
 
         private readonly IMeticaAttributesProvider _meticaAttributesProvider;
+        private readonly IDeviceInfoProvider _deviceInfoProvider;
         private readonly Metica.Experimental.Core.ITimeSource _timeSource = new SystemDateTimeSource();
         private readonly SdkConfig _sdkConfig;
 
@@ -51,9 +53,15 @@ namespace Metica.Experimental
 
         private List<object> _events;
 
-        public EventManager(IHttpService httpService, string endpoint, IMeticaAttributesProvider meticaAttributesProvider) : base(httpService, endpoint)
+        public EventManager(
+            IHttpService httpService,
+            string endpoint,
+            IMeticaAttributesProvider meticaAttributesProvider,
+            IDeviceInfoProvider deviceInfoProvider
+            ) : base(httpService, endpoint)
         {
             _meticaAttributesProvider = meticaAttributesProvider;
+            _deviceInfoProvider = deviceInfoProvider;
             _events = new List<object>();
             OnEventsDispatch -= DispatchHandler;
             OnEventsDispatch += DispatchHandler;

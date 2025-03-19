@@ -4,6 +4,7 @@ using Metica.Unity;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
+using Metica.Experimental.Unity;
 
 namespace Metica.Experimental
 {
@@ -17,6 +18,7 @@ namespace Metica.Experimental
 
         private readonly SdkConfig _sdkConfig;
         private readonly IHttpService _http;
+        private readonly DeviceInfoProvider _deviceInfoProvider;
         private readonly OfferManager _offerManager;
         private readonly ConfigManager _configManager;
         private readonly EventManager _eventManager;
@@ -42,11 +44,12 @@ namespace Metica.Experimental
             // Use the .NET based IHttpService implementation
             _http = new HttpServiceDotnet().WithPersistentHeaders(new Dictionary<string, string> { { "X-API-Key", Config.apiKey } });
             // Initialize an OfferManager
+            _deviceInfoProvider = new DeviceInfoProvider();
             _offerManager = new OfferManager(_http, $"{Config.offersEndpoint}/offers/v1/apps/{Config.appId}");
             // Initialize a ConfigManager
             _configManager = new ConfigManager(_http, $"{Config.remoteConfigEndpoint}/config/v1/apps/{Config.appId}");
             // Initialize an EventManager with _offerManager as IMeticaAttributesProvider
-            _eventManager = new EventManager(_http, $"{Config.ingestionEndpoint}/ingest/v1/events", _offerManager);
+            _eventManager = new EventManager(_http, $"{Config.ingestionEndpoint}/ingest/v1/events", _offerManager, _deviceInfoProvider);
             // Set the current (mutable) CurrentUserId with the initial value given in the configuration
             CurrentUserId = Config.initialUserId;
 
