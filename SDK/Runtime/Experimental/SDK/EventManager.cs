@@ -85,9 +85,6 @@ namespace Metica.Experimental
                 requestBody.AddDictionary(eventFields, overwriteExistingKeys: true);
             }
 
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.NullValueHandling = NullValueHandling.Ignore;
-
             _events.Add(requestBody);
 
             if(_events.Count >= DISPATCH_TRIGGER_COUNT)
