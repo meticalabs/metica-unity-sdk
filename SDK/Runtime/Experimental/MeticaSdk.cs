@@ -3,12 +3,13 @@ using Metica.Experimental.Core;
 using Metica.Unity;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
 
 namespace Metica.Experimental
 {
     public interface IMeticaSdk { }
 
-    public class MeticaSdk : IMeticaSdk
+    public class MeticaSdk : IMeticaSdk, IAsyncDisposable
     {
         #region Fields
 
@@ -179,8 +180,11 @@ namespace Metica.Experimental
                 new() { { nameof(userStateAttributes), userStateAttributes } },
                 customPayload);
 
-        public void Finalize()
+        public async ValueTask DisposeAsync()
         {
+            await _eventManager.DisposeAsync();
+            await _offerManager.DisposeAsync();
+            await _configManager.DisposeAsync();
             _http?.Dispose();
         }
     }

@@ -37,7 +37,7 @@ namespace Metica.Experimental
         public ConfigManager(IHttpService httpService, string endpoint) : base(httpService, endpoint)
         {
         }
-        
+
         public async Task<ConfigResult> GetConfigsAsync(string userId, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
             var requestBody = new Dictionary<string, object>
@@ -64,6 +64,11 @@ namespace Metica.Experimental
 
             var httpResponse = await _httpService.PostAsync(url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
             return ResponseToResult<ConfigResult>(httpResponse);
+        }
+
+        public override ValueTask DisposeAsync()
+        {
+            return default;
         }
     }
 }
