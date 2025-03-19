@@ -14,10 +14,11 @@ namespace Metica.Experimental
         [JsonIgnore] public HttpResponse.ResultStatus Status { get; set; }
         [JsonIgnore] public string Error { get; set; }
         [JsonIgnore] public string RawContent { get; set; }
+        [JsonIgnore] public string OriginalRequestBody { get; set; }
 
         public override string ToString()
         {
-            return $"{nameof(EventDispatchResult)}:\n Status: {Status}\n RawContent: {RawContent}\n Error: {Error}";
+            return $"{nameof(EventDispatchResult)}:\n Status: {Status}\n RawContent: {RawContent}\n Error: {Error}\n Orig. Request Body: {OriginalRequestBody}";
         }
     }
 
@@ -173,9 +174,11 @@ namespace Metica.Experimental
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.NullValueHandling = NullValueHandling.Ignore;
 
-            var httpResponse = await _httpService.PostAsync(_url, JsonConvert.SerializeObject(new Dictionary<string, object> { { "events", _events } }, settings), "application/json");
+            var body = JsonConvert.SerializeObject(new Dictionary<string, object> { { "events", _events } }, settings);
+            var httpResponse = await _httpService.PostAsync(_url, body, "application/json");
             _events.Clear();
             EventDispatchResult result = ResponseToResult<EventDispatchResult>(httpResponse);
+            result.OriginalRequestBody = body;
             OnEventsDispatch?.Invoke(result);
         }
 
