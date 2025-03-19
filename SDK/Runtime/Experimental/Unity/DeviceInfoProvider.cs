@@ -18,7 +18,7 @@ namespace Metica.Experimental.Unity
             string locale = Thread.CurrentThread.CurrentCulture.Name;
             var appVersion = Application.version;
 
-            return new() {
+            return new DeviceInfo() {
                 store = MapRuntimePlatformToStoreType(Application.platform)?.ToString(),
                 timezone = timezone,
                 locale = locale,
