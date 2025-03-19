@@ -24,9 +24,18 @@ namespace Metica.Experimental
 
         #endregion Fields
 
+        /// <summary>
+        /// Metica SDK, engine and platform independent, control room.
+        /// </summary>
+        /// <param name="config">Metica SDK configuration object.</param>
+        /// <remarks>
+        /// <h2>ROADMAP</h2>
+        /// - Swap inline strings like "purchase" with constants.
+        /// </remarks>
         public MeticaSdk(SdkConfig config)
         {
             _sdkConfig = config;
+
             // In the following code we compose our SDK
 
             // Use the .NET based IHttpService implementation
@@ -71,7 +80,7 @@ namespace Metica.Experimental
 
 
         public void LogOfferPurchaseEvent(string placementId, string offerId, string currencyCode, double totalAmount, Dictionary<string, object> customPayload = null)
-            => _eventManager.QueueEventWithMeticaAttributesAsync(
+            => _ = _eventManager.QueueEventWithMeticaAttributesAsync(
                 CurrentUserId,
                 Config.appId,
                 placementId,
@@ -85,7 +94,7 @@ namespace Metica.Experimental
 
 
         public void LogOfferPurchaseEventWithProductId(string productId, string currencyCode, double totalAmount, Dictionary<string, object> customPayload = null)
-            => _eventManager.QueueEventWithProductIdAsync(
+            => _eventManager.QueueEventWithProductId(
                 CurrentUserId,
                 Config.appId,
                 productId,
@@ -98,7 +107,7 @@ namespace Metica.Experimental
 
 
         public void LogOfferInteractionEvent(string placementId, string offerId, string interactionType, Dictionary<string, object> customPayload = null)
-            => _eventManager.QueueEventWithMeticaAttributesAsync(
+            => _ = _eventManager.QueueEventWithMeticaAttributesAsync(
                 CurrentUserId,
                 Config.appId,
                 placementId,
@@ -109,7 +118,7 @@ namespace Metica.Experimental
 
 
         public void LogOfferInteractionEventWithProductId(string productId, string interactionType, Dictionary<string, object> customPayload = null)
-            => _eventManager.QueueEventWithProductIdAsync(
+            => _eventManager.QueueEventWithProductId(
                 CurrentUserId,
                 Config.appId,
                 productId,
@@ -119,7 +128,7 @@ namespace Metica.Experimental
 
 
         public void LogOfferImpressionEvent(string placementId, string offerId, Dictionary<string, object> customPayload = null)
-            => _eventManager.QueueEventWithMeticaAttributesAsync(
+            => _ = _eventManager.QueueEventWithMeticaAttributesAsync(
                 CurrentUserId,
                 Config.appId,
                 placementId,
@@ -130,7 +139,7 @@ namespace Metica.Experimental
 
 
         public void LogOfferImpressionEventWithProductId(string productId, string interactionType, Dictionary<string, object> customPayload = null)
-            => _eventManager.QueueEventWithProductIdAsync(
+            => _eventManager.QueueEventWithProductId(
                 CurrentUserId,
                 Config.appId,
                 productId,
@@ -170,7 +179,7 @@ namespace Metica.Experimental
                 new() { { nameof(userStateAttributes), userStateAttributes } },
                 customPayload);
 
-        public void Cleanup()
+        public void Finalize()
         {
             _http?.Dispose();
         }

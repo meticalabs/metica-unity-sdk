@@ -34,7 +34,6 @@ namespace Metica.Experimental
     /// - TODO : dispatch events based on a timer
     /// - TODO : proper finalization of the object to flush/dispatch the events and other cleanup.
     /// - TODO : use a model to manage parameters more consistently to reduce chances of human errors in passing all strings.
-    /// - TODO : improve async/await calls and don't bubble up warnings when we fire&forget.
     /// - TODO : device info
     /// - TODO : use constants for eventTypes
     /// - TODO : (low priority) create an event queue processing system that processes the queue right before sending (for exampe to aggregate certain events)
@@ -60,7 +59,15 @@ namespace Metica.Experimental
             OnEventsDispatch += DispatchHandler;
         }
 
-        internal async Task QueueEventAsync(string userId, string appId, string eventType, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
+        /// <summary>
+        /// Use this method for simple events without specific fields.
+        /// <see cref="QueueEventWithMeticaAttributesAsync(string, string, string, string, string, Dictionary{string, object}, Dictionary{string, object})"/>
+        /// and
+        /// <see cref="QueueEventWithProductId(string, string, string, string, Dictionary{string, object}, Dictionary{string, object})"/>
+        /// both use this method but it's perfectly fine to use it directly.
+        /// This method also calls the <see cref="DispatchEvents"/> with a fire and forget style call <code>_ = Dispatch();</code>.
+        /// </summary>
+        internal void QueueEventAsync(string userId, string appId, string eventType, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
         {
             var requestBody = new Dictionary<string, object>
             {
@@ -85,10 +92,15 @@ namespace Metica.Experimental
 
             if(_events.Count >= DISPATCH_TRIGGER_COUNT)
             {
-                Dispatch();
+                _ = DispatchEvents();
             }
         }
 
+        /// <summary>
+        /// Queues an event for later sending in bulk. Note that this method is asynchronous but it doesn't need to be awaited.
+        /// It's only asynchronous because it's retrieving some information before queuing the event.
+        /// To avoid the "method is not awaited" warning, you can use the <code>_ =</code> discard operator.
+        /// </summary>
         internal async Task QueueEventWithMeticaAttributesAsync(string userId, string appId, string placementId, string offerId, string eventType, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
         {
             if (_meticaAttributesProvider == null)
@@ -121,7 +133,11 @@ namespace Metica.Experimental
                 );
         }
 
-        internal async Task QueueEventWithProductIdAsync(string userId, string appId, string productId, string eventType, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
+        /// <summary>
+        /// Queues an event for later sending in bulk. (<see cref="DispatchEvents"/>)
+        /// </summary>
+        /// <remarks>This doesn't return anything because it's only adding an event to the queue.</remarks>
+        internal void QueueEventWithProductId(string userId, string appId, string productId, string eventType, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
         {
             if (eventFields == null)
             {
@@ -143,7 +159,11 @@ namespace Metica.Experimental
                 );
         }
 
-        private async Task Dispatch()
+        /// <summary>
+        /// Dispatches events in bulk and clears the list/queue.
+        /// </summary>
+        /// <returns></returns>
+        private async Task DispatchEvents()
         {
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.NullValueHandling = NullValueHandling.Ignore;
