@@ -2,8 +2,9 @@ using Metica.Experimental.Network;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using Metica.Unity; // TODO : REMOVE DEPENDENCY
 using Newtonsoft.Json;
+using Metica.Experimental.Core;
+using Metica.Experimental.SDK.Model;
 
 namespace Metica.Experimental
 {
@@ -34,8 +35,11 @@ namespace Metica.Experimental
 
     public sealed class ConfigManager : EndpointManager
     {
-        public ConfigManager(IHttpService httpService, string endpoint) : base(httpService, endpoint)
+        private readonly IDeviceInfoProvider _deviceInfoProvider;
+
+        public ConfigManager(IHttpService httpService, string endpoint, IDeviceInfoProvider deviceInfoProvider) : base(httpService, endpoint)
         {
+            _deviceInfoProvider = deviceInfoProvider;
         }
 
         public async Task<ConfigResult> GetConfigsAsync(string userId, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
@@ -45,7 +49,7 @@ namespace Metica.Experimental
                 { nameof(userId), userId },
                 { nameof(configKeys), configKeys },
                 { nameof(userProperties), userProperties },
-                { nameof(deviceInfo), deviceInfo },
+                { nameof(deviceInfo), deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
             };
 
             var url = _url;

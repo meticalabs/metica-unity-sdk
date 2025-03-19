@@ -1,7 +1,6 @@
-using Metica.Experimental.Caching;
 using Metica.Experimental.Core;
 using Metica.Experimental.Network;
-using Metica.Unity;
+using Metica.Experimental.SDK.Model;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +11,7 @@ namespace Metica.Experimental
     [System.Serializable]
     public class OfferResult : IMeticaSdkResult
     {
-        public Dictionary<string, List<Metica.Unity.Offer>> Placements { get; set; }
+        public Dictionary<string, List<Offer>> Placements { get; set; }
 
         [JsonIgnore] public HttpResponse.ResultStatus Status { get; set; }
         [JsonIgnore] public string Error { get; set; }
@@ -48,16 +47,18 @@ namespace Metica.Experimental
     public sealed class OfferManager : EndpointManager, IMeticaAttributesProvider
     {
         private readonly Metica.Experimental.Core.ITimeSource timeSource = new SystemDateTimeSource();
+        private readonly IDeviceInfoProvider _deviceInfoProvider;
 
         /// <summary>
         /// All placements stored and available for the entire session.
         /// These are retrieved lazily and serve the purpose of providing the data that other parts of the SDK need (e.g. <see cref="EventManager"/>).
         /// These generally remain the same for the whole session; only when specific placements are requested this storage is updated.
         /// </summary>
-        private Dictionary<string, List<Metica.Unity.Offer>> _sessionPlacementStorage = null;
+        private Dictionary<string, List<Offer>> _sessionPlacementStorage = null;
 
-        public OfferManager(IHttpService httpService, string offersEndpoint) : base(httpService, offersEndpoint)
+        public OfferManager(IHttpService httpService, string offersEndpoint, IDeviceInfoProvider deviceInfoProvider) : base(httpService, offersEndpoint)
         {
+            _deviceInfoProvider = deviceInfoProvider;
         }
 
         public async Task<object> GetMeticaAttributes(string placementId, string offerId)
@@ -113,7 +114,7 @@ namespace Metica.Experimental
             }
         }
 
-        public async Task<OfferResult> GetOffersAsync(string userId, string[] placements, Dictionary<string, object> userData = null, Metica.Unity.DeviceInfo deviceInfo = null)
+        public async Task<OfferResult> GetOffersAsync(string userId, string[] placements, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
         {
             if(placements == null || placements.Length == 0)
             {
@@ -123,7 +124,7 @@ namespace Metica.Experimental
             var requestBody = new Dictionary<string, object>
             {
                 { nameof(userId), userId },
-                { nameof(deviceInfo), deviceInfo }, // TODO
+                { nameof(deviceInfo), deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
                 { nameof(userData), userData }
             };
 
@@ -148,12 +149,12 @@ namespace Metica.Experimental
             return offerResult;
         }
 
-        private async Task<OfferResult> GetAllOffersAsync(string userId, Dictionary<string, object> userData = null, Metica.Unity.DeviceInfo deviceInfo = null)
+        private async Task<OfferResult> GetAllOffersAsync(string userId, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
         {
             var requestBody = new Dictionary<string, object>
             {
                 { nameof(userId), userId },
-                { nameof(deviceInfo), deviceInfo }, // TODO
+                { nameof(deviceInfo), deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
                 { nameof(userData), userData }
             };
 

@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Metica.Experimental.Unity
 {
     /// <summary>
-    /// Unity implementation of <see cref="IDeviceInfoProvider"/>
+    /// Unity implementation of <see cref="IDeviceInfoProvider"/>.
     /// </summary>
     public class DeviceInfoProvider : IDeviceInfoProvider
     {
