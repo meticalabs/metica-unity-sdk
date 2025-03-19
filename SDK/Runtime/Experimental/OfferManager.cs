@@ -12,21 +12,11 @@ namespace Metica.Experimental
     [System.Serializable]
     public class OfferResult : IMeticaSdkResult
     {
-        // TODO : fields should be readonly or with private setter
-
         public Dictionary<string, List<Metica.Unity.Offer>> Placements { get; set; }
 
         [JsonIgnore] public HttpResponse.ResultStatus Status { get; set; }
         [JsonIgnore] public string Error { get; set; }
         [JsonIgnore] public string RawContent {  get; set; }
-
-        //public void Append(Dictionary<string, List<Metica.Unity.Offer>> placements)
-        //{
-        //    foreach (var k in placements.Keys)
-        //    {
-        //        Placements.Add(k, placements[k]); // TODO : manage possible key exception?
-        //    }
-        //}
 
         public override string ToString()
         {
@@ -75,7 +65,6 @@ namespace Metica.Experimental
             if(_sessionPlacementStorage == null)
             {
                 // Lazy fetching of all placements into storage
-                // TODO - code duplication (see below)
                 var result = await GetAllOffersAsync(MeticaSdk.CurrentUserId);
                 _sessionPlacementStorage = result.Placements;
             }
@@ -107,7 +96,6 @@ namespace Metica.Experimental
             if(_sessionPlacementStorage == null)
             {
                 // Lazy fetching of all placements into storage
-                // TODO - code duplication (see above)
                 var result = await GetAllOffersAsync(MeticaSdk.CurrentUserId);
                 _sessionPlacementStorage = result.Placements;
             }
@@ -176,6 +164,11 @@ namespace Metica.Experimental
             OfferResult offerResult = ResponseToResult<OfferResult>(httpResponse);
 
             return offerResult;
+        }
+
+        public override ValueTask DisposeAsync()
+        {
+            return default; // no-op
         }
     }
 }

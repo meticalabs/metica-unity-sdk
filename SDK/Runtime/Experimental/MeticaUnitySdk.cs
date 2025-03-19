@@ -1,5 +1,6 @@
 using Metica.Unity;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Metica.Experimental.Unity
@@ -74,6 +75,11 @@ namespace Metica.Experimental.Unity
                     { "level", 101.0 },
                     { "totalDeaths", 983 }
                 });
+        }
+
+        private async void OnDestroy()
+        {
+            await _meticaSdk.DisposeAsync();
         }
     }
 }

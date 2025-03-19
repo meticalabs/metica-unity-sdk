@@ -1,5 +1,7 @@
 using Metica.Experimental.Network;
 using Newtonsoft.Json;
+using System;
+using System.Threading.Tasks;
 
 namespace Metica.Experimental
 {
@@ -12,7 +14,7 @@ namespace Metica.Experimental
         public string RawContent {  get; set; }
     }
 
-    public abstract class EndpointManager
+    public abstract class EndpointManager: IAsyncDisposable
     {
         protected readonly IHttpService _httpService;
         protected readonly string _url;
@@ -49,5 +51,6 @@ namespace Metica.Experimental
             }
         }
 
+        public abstract ValueTask DisposeAsync();
     }
 }

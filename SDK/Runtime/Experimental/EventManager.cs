@@ -178,5 +178,10 @@ namespace Metica.Experimental
         {
             UnityEngine.Debug.Log($"Events Dispatched.\n{result}");
         }
+
+        public override async ValueTask DisposeAsync()
+        {
+            await DispatchEvents();
+        }
     }
 }
