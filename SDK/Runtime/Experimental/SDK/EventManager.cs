@@ -171,6 +171,10 @@ namespace Metica.Experimental
         /// <returns></returns>
         private async Task DispatchEvents()
         {
+            if( _events == null || _events.Count == 0 )
+            {
+                return;
+            }
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.NullValueHandling = NullValueHandling.Ignore;
 
