@@ -32,8 +32,8 @@ namespace Metica.Experimental.Unity
             _meticaSdk.LogOfferPurchaseEvent("generic", "23851", "EUR", 9.99);
 
             _meticaSdk.LogAdRevenueEvent("top_slot", "popup", "MadAds", 1.50);
-            _meticaSdk.LogAdRevenueEvent("top_slot", "popup", "MadAds", 1.50);
-            _meticaSdk.LogAdRevenueEvent("top_slot", "popup", "MadAds", 1.50);
+            _meticaSdk.LogAdRevenueEvent("top_slot", "popup", "AdLads", 1.10);
+            _meticaSdk.LogAdRevenueEvent("top_slot", "popup", "AdLads", 1.10);
 
             _meticaSdk.LogOfferImpressionEventWithProductId("mega_offer_456", "click");
             _meticaSdk.LogOfferImpressionEventWithProductId("mega_offer_456", "dismiss");
@@ -66,6 +66,13 @@ namespace Metica.Experimental.Unity
                     { "level", 100.0 },
                     { "faction", "Dragoons" },
                     { "totalDeaths", 982 }
+                });
+
+            _meticaSdk.LogPartialStateUserUpdateEvent(
+                new()
+                {
+                    { "level", 101.0 },
+                    { "totalDeaths", 983 }
                 });
         }
     }
