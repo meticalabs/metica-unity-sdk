@@ -167,4 +167,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3987cce43df407c438e277162cf4f150, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sdkConfigProvider: {fileID: 11400000, guid: 59a32d4188b93d040965b32ca080573f, type: 2}
+  _sdkConfigProvider: {fileID: 11400000, guid: b7dc2839fbbb6d644bba5c1e65dfa295, type: 2}
