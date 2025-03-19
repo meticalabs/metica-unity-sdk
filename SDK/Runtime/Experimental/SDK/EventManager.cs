@@ -84,7 +84,7 @@ namespace Metica.Experimental
                 { "eventTime", _timeSource.EpochSeconds() },
                 { nameof(appId), appId },
                 { nameof(userId), userId },
-                //{ nameof(deviceInfo), deviceInfo }, // TODO
+                { "deviceInfo", _deviceInfoProvider.GetDeviceInfo() }, // TODO, leave possibility to override DeviceInfo by passing one.
                 { nameof(customPayload), customPayload }
             };
 

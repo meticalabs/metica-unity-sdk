@@ -1,10 +1,11 @@
 using Metica.Experimental.Network;
 using Metica.Experimental.Core;
-using Metica.Unity;
+using Metica.Experimental.SDK;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using Metica.Experimental.Unity;
+using Metica.Experimental.SDK.Model;
 
 namespace Metica.Experimental
 {
@@ -23,7 +24,7 @@ namespace Metica.Experimental
         private readonly ConfigManager _configManager;
         private readonly EventManager _eventManager;
 
-        private Metica.Unity.SdkConfig Config { get => _sdkConfig; } // alias for above
+        private SdkConfig Config { get => _sdkConfig; } // alias for above
 
         #endregion Fields
 
@@ -45,9 +46,9 @@ namespace Metica.Experimental
             _http = new HttpServiceDotnet().WithPersistentHeaders(new Dictionary<string, string> { { "X-API-Key", Config.apiKey } });
             // Initialize an OfferManager
             _deviceInfoProvider = new DeviceInfoProvider();
-            _offerManager = new OfferManager(_http, $"{Config.offersEndpoint}/offers/v1/apps/{Config.appId}");
+            _offerManager = new OfferManager(_http, $"{Config.offersEndpoint}/offers/v1/apps/{Config.appId}", _deviceInfoProvider);
             // Initialize a ConfigManager
-            _configManager = new ConfigManager(_http, $"{Config.remoteConfigEndpoint}/config/v1/apps/{Config.appId}");
+            _configManager = new ConfigManager(_http, $"{Config.remoteConfigEndpoint}/config/v1/apps/{Config.appId}", _deviceInfoProvider);
             // Initialize an EventManager with _offerManager as IMeticaAttributesProvider
             _eventManager = new EventManager(_http, $"{Config.ingestionEndpoint}/ingest/v1/events", _offerManager, _deviceInfoProvider);
             // Set the current (mutable) CurrentUserId with the initial value given in the configuration
@@ -57,7 +58,7 @@ namespace Metica.Experimental
             Registry.Register<IMeticaSdk>(this);
         }
 
-        public async Task<OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData = null, Metica.Unity.DeviceInfo deviceInfo = null)
+        public async Task<OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
             => await _offerManager.GetOffersAsync(CurrentUserId, placements, userData, deviceInfo);
 
 
