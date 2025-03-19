@@ -72,6 +72,11 @@ namespace Metica.Experimental.SDK.Model
         public string timezone;
         public string locale;
         public string appVersion;
+
+        public override string ToString()
+        {
+            return $"Store: {store}\nTimezone: {timezone}\nLocale: {locale}\nAppVersion: {appVersion}";
+        }
     }
 
     [Serializable]
