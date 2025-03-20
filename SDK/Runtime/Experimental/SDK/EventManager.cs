@@ -178,7 +178,7 @@ namespace Metica.Experimental
             settings.NullValueHandling = NullValueHandling.Ignore;
 
             var body = JsonConvert.SerializeObject(new Dictionary<string, object> { { "events", _events } }, settings);
-            var httpResponse = await _httpService.PostAsync(_url, body, "application/json");
+            var httpResponse = await _httpService.PostAsync(_url, body, "application/json", useCache: false);
             _events.Clear();
             EventDispatchResult result = ResponseToResult<EventDispatchResult>(httpResponse);
             result.OriginalRequestBody = body;

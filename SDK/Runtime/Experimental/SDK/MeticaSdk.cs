@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using Metica.Experimental.SDK.Model;
+using UnityEngine;
+using Metica.Experimental.Caching;
 
 namespace Metica.Experimental
 {
@@ -41,7 +43,6 @@ namespace Metica.Experimental
 
             // In the following code we compose our SDK
 
-            // Use the .NET based IHttpService implementation
             _http = new HttpServiceDotnet().WithPersistentHeaders(new Dictionary<string, string> { { "X-API-Key", Config.apiKey } });
             // Initialize an OfferManager
             _offerManager = new OfferManager(_http, $"{Config.offersEndpoint}/offers/v1/apps/{Config.appId}");
@@ -54,6 +55,16 @@ namespace Metica.Experimental
 
             // Register this class as IMeticaSdk service in Registry
             Registry.Register<IMeticaSdk>(this);
+        }
+
+        private string CacheKeyHashingFunction(List<string> key)
+        {
+            string hash = string.Empty;
+            foreach (string keyItem in key)
+            {
+                HashCode.Combine(hash, keyItem);
+            }
+            return hash;
         }
 
         public async Task<OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)

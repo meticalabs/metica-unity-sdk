@@ -1,9 +1,10 @@
-using Metica.Experimental.Caching;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Metica.Experimental.Caching;
 
 namespace Metica.Experimental.Network
 {
@@ -27,17 +28,38 @@ namespace Metica.Experimental.Network
     /// </remarks>
     public class HttpServiceDotnet : IHttpService
     {
+        /// <summary>
+        /// Utility class for caching
+        /// </summary>
+        private class CacheKey
+        {
+            public string method { get; set; }
+            public string url { get; set; }
+            public string body { get; set; }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(method ?? string.Empty, url ?? string.Empty, body ?? string.Empty);
+            }
+        }
+
         // TODO: improve constructor
         private readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(30) };
         private readonly CancellationTokenSource cts = new();
 
-        private ICache<string, HttpResponse> _cache { get; set; } = null;
+        private ICache<CacheKey, HttpResponse> _cache { get; set; } = null;
 
-        IHttpService IHttpService.WithCache(ICache<string, HttpResponse> cache)
+        public HttpServiceDotnet()
         {
-            _cache = cache;
-            return this;
+            _cache = new Cache<CacheKey, HttpResponse>(new SystemDateTimeSource());
         }
+
+        //IHttpService IHttpService.WithCache(ICache<List<string>, HttpResponse> cache)
+        //{
+        //    // TODO : signal error if cache is already initialized.
+        //    _cache = cache;
+        //    return this;
+        //}
 
         /// <summary>
         /// Sets the client's persistent headers. All the existing ones will be cleared.
@@ -62,13 +84,20 @@ namespace Metica.Experimental.Network
 
         /// <inheritdoc/>
         /// <param name="requestHeaders">This field can be null.</param>
-        public async Task<HttpResponse> GetAsync(string url, Dictionary<string,string> requestHeaders = null)
+        public async Task<HttpResponse> GetAsync(string url, Dictionary<string,string> requestHeaders = null, bool useHttpCache = true)
         {
-            if(_cache != null)
+            // Preventively build a cache key for this request
+            CacheKey cacheKey = new () { method = nameof(GetAsync), url = url };
+            // .. and check for cached resutls.
+            if(_cache != null && useHttpCache)
             {
-                HttpResponse cachedResponse = _cache.Get(url);
-                return cachedResponse;
+                HttpResponse cachedResponse = _cache.Get(cacheKey);
+                if (cachedResponse != null)
+                {
+                    return cachedResponse;
+                }
             }
+
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             if (requestHeaders != null)
             {
@@ -102,7 +131,12 @@ namespace Metica.Experimental.Network
                 }
 
                 var content = await response.Content.ReadAsStringAsync();
-                return new HttpResponse(HttpResponse.ResultStatus.Success, content);
+                var httpResponse = new HttpResponse(HttpResponse.ResultStatus.Success, content);
+                if (useHttpCache)
+                {
+                    _cache?.AddOrUpdate(cacheKey, httpResponse, 10);
+                }
+                return httpResponse;
             }
             catch (TaskCanceledException ex)
             {
@@ -117,8 +151,20 @@ namespace Metica.Experimental.Network
         /// <inheritdoc/>
         /// <param name="requestHeaders">This field can be null.</param>
         /// <param name="entityHeaders">This field can be null.</param>
-        public async Task<HttpResponse> PostAsync(string url, string body, string bodyContentType = "application/json", Dictionary<string, string> requestHeaders = null, Dictionary<string,string> entityHeaders = null)
+        public async Task<HttpResponse> PostAsync(string url, string body, string bodyContentType = "application/json", Dictionary<string, string> requestHeaders = null, Dictionary<string,string> entityHeaders = null, bool useHttpCache = true)
         {
+            // Preventively build a cache key for this request
+            CacheKey cacheKey = new () { method = nameof(PostAsync), url = url, body = body };
+            // ..and check for cached results.
+            if(_cache != null && useHttpCache)
+            {
+                HttpResponse cachedResponse = _cache.Get(cacheKey);
+                if (cachedResponse != null)
+                {
+                    return cachedResponse;
+                }
+            }
+
             using var request = new HttpRequestMessage(HttpMethod.Post, url)
             {
                 Content = new StringContent(body, System.Text.Encoding.UTF8, bodyContentType)
@@ -161,7 +207,12 @@ namespace Metica.Experimental.Network
                 }
 
                 var responseContent = await response.Content.ReadAsStringAsync();
-                return new HttpResponse(HttpResponse.ResultStatus.Success, responseContent);
+                var httpResponse = new HttpResponse(HttpResponse.ResultStatus.Success, responseContent);
+                if (useHttpCache)
+                {
+                    _cache?.AddOrUpdate(cacheKey, httpResponse, 10);
+                }
+                return httpResponse;
             }
             catch (TaskCanceledException ex)
             {
