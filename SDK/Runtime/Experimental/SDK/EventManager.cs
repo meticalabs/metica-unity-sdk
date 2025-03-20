@@ -1,6 +1,6 @@
 using Metica.Experimental.Core;
 using Metica.Experimental.Network;
-using Metica.Unity;
+using Metica.Experimental.SDK;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Metica.Experimental
 {
-    [System.Serializable]
+    [Serializable]
     public class EventDispatchResult : IMeticaSdkResult
     {
         [JsonIgnore] public HttpResponse.ResultStatus Status { get; set; }
@@ -47,7 +47,7 @@ namespace Metica.Experimental
 
         private readonly IMeticaAttributesProvider _meticaAttributesProvider;
         private readonly IDeviceInfoProvider _deviceInfoProvider;
-        private readonly Metica.Experimental.Core.ITimeSource _timeSource = new SystemDateTimeSource();
+        private readonly ITimeSource _timeSource = new SystemDateTimeSource();
         private readonly SdkConfig _sdkConfig;
 
         private const int DISPATCH_TRIGGER_COUNT = 2; // TODO : temporarily hardcoded
@@ -57,12 +57,11 @@ namespace Metica.Experimental
         public EventManager(
             IHttpService httpService,
             string endpoint,
-            IMeticaAttributesProvider meticaAttributesProvider,
-            IDeviceInfoProvider deviceInfoProvider
+            IMeticaAttributesProvider meticaAttributesProvider
             ) : base(httpService, endpoint)
         {
             _meticaAttributesProvider = meticaAttributesProvider;
-            _deviceInfoProvider = deviceInfoProvider;
+            _deviceInfoProvider = Registry.Resolve<IDeviceInfoProvider>();
             _events = new List<object>();
             OnEventsDispatch -= DispatchHandler;
             OnEventsDispatch += DispatchHandler;
