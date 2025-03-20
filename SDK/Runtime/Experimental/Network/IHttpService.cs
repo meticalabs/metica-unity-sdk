@@ -38,10 +38,11 @@ namespace Metica.Experimental.Network
     {
         /// <summary>
         /// Injects a simple cache implementation for internal use.
+        /// The key is a combination of strings that are automatically combined to get a unique hash.
         /// </summary>
         /// <param name="cache">An implementation of a cache with string keys and <see cref="HttpResponse"/> values.</param>
         /// <returns>The same object in fluent fashion.</returns>
-        protected IHttpService WithCache(ICache<string, HttpResponse> cache);
+        //IHttpService WithCache(ICache<List<string>, HttpResponse> cache);
 
         /// <summary>
         /// Gets a resource from <see cref="url"/>.
@@ -49,7 +50,7 @@ namespace Metica.Experimental.Network
         /// <param name="url">Endpoint.</param>
         /// <param name="headers">Request or content headers.</param>
         /// <returns>A <see cref="HttpResponse"/> object.</returns>
-        Task<HttpResponse> GetAsync(string url, Dictionary<string, string> requestHeaders);
+        Task<HttpResponse> GetAsync(string url, Dictionary<string, string> requestHeaders, bool useCache = true);
 
         /// <summary>
         /// Sends a POST request.
@@ -60,7 +61,7 @@ namespace Metica.Experimental.Network
         /// <param name="requestHeaders">Request headers.</param>
         /// <param name="contentHeaders">Content headers.</param>
         /// <returns>A <see cref="HttpResponse"/> object.</returns>
-        Task<HttpResponse> PostAsync(string url, string body, string bodyContentType = "application/json", Dictionary<string, string> requestHeaders = null, Dictionary<string, string> contentHeaders = null);
+        Task<HttpResponse> PostAsync(string url, string body, string bodyContentType = "application/json", Dictionary<string, string> requestHeaders = null, Dictionary<string, string> contentHeaders = null, bool useCache = true);
 
         /*
          CancelPendingRequests()	

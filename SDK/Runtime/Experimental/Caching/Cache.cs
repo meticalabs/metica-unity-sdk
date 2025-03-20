@@ -1,4 +1,5 @@
 using Metica.Experimental.Core;
+using System;
 using System.Collections.Generic;
 
 namespace Metica.Experimental.Caching
@@ -43,11 +44,16 @@ namespace Metica.Experimental.Caching
             public long ExpirationTime { get => timeCreated + ttl; }
         }
 
-        protected Dictionary<TKey, CacheEntry> _data = new();
+        protected Dictionary<int, CacheEntry> _data = new();
 
         protected const long GARBAGE_COLLECTION_INTERVAL_SECONDS = 10; // TODO : make this settable
         protected long nextGarbageCollection = 0;
 
+        /// <summary>
+        /// Create an instance of <see cref="Cache{TKey, TValue}"/>.
+        /// </summary>
+        /// <param name="timeSource">An implementation of <see cref="ITimeSource"/></param>
+        /// <param name="hashingFunction">A function that turns any given key into a hash (string). Uses <see cref="System.HashCode"/> behind the scenes.</param>
         public Cache(ITimeSource timeSource)
         {
             _timeSource = timeSource;
@@ -73,15 +79,15 @@ namespace Metica.Experimental.Caching
             {
                 TKey key = pair.Key;
                 TValue value = pair.Value;
-                TKey transformedKey = TransformKey(key);
+                int hash = key.GetHashCode();
                 var entry = new CacheEntry { timeCreated = _timeSource.EpochSeconds(), ttl = ttlSeconds, hits = 0, value = value };
-                if (_data.ContainsKey(transformedKey))
+                if (_data.ContainsKey(hash))
                 {
-                    _data[transformedKey] = entry;
+                    _data[hash] = entry;
                 }
                 else
                 {
-                    _data.Add(transformedKey, entry);
+                    _data.Add(hash, entry);
                 }
             }
         }
@@ -90,7 +96,7 @@ namespace Metica.Experimental.Caching
         public virtual TValue Get(TKey key)
         {
             // We call the version with multiple values to have better control on when the garbage collection is called.
-            List<TValue> results = Get(new TKey[] { key });
+            List<TValue> results = GetMultiple(new TKey[] { key });
             if (results.Count > 0)
             {
                 return results[0];
@@ -99,7 +105,7 @@ namespace Metica.Experimental.Caching
         }
 
         /// <inheritdoc/>
-        public virtual List<TValue> Get(TKey[] keys)
+        public virtual List<TValue> GetMultiple(TKey[] keys)
         {
             GarbageCollect();
             if(keys ==  null)
@@ -110,10 +116,10 @@ namespace Metica.Experimental.Caching
             for (int i = 0; i < keys.Length; i++)
             {
                 TKey key = keys[i];
-                TKey transformedKey = TransformKey(key);
-                if(_data.ContainsKey(transformedKey))
+                int hash = key.GetHashCode();
+                if(_data.ContainsKey(hash))
                 {
-                    CacheEntry entry = _data[transformedKey];
+                    CacheEntry entry = _data[hash];
                     entry.hits++;
                     result.Add(entry.value);
                 }
@@ -134,39 +140,39 @@ namespace Metica.Experimental.Caching
         }
 
         /// <inheritdoc/>
-        public virtual Dictionary<TKey, TValue> GetAllAsDictionary()
-        {
-            GarbageCollect();
-            Dictionary<TKey,TValue> result = new Dictionary<TKey, TValue>();
-            foreach (var k in _data.Keys)
-            {
-                result.Add(k, _data[k].value);
-            }
-            return result;
-        }
+        //public virtual Dictionary<TKey, TValue> GetAllAsDictionary()
+        //{
+        //    GarbageCollect();
+        //    Dictionary<TKey,TValue> result = new Dictionary<TKey, TValue>();
+        //    foreach (var k in _data.Keys)
+        //    {
+        //        result.Add(k, _data[k].value);
+        //    }
+        //    return result;
+        //}
 
         /// <inheritdoc/>
-       public virtual Dictionary<TKey, TValue> GetAsDictionary(TKey[] keys)
-        {
-            GarbageCollect();
-            if(keys == null)
-            {
-                return null;
-            }
-            Dictionary<TKey, TValue> result = new Dictionary<TKey, TValue>();
-            for (int i = 0; i < keys.Length; i++)
-            {
-                TKey key = keys[i];
-                TKey transformedKey = TransformKey(key);
-                if(_data.ContainsKey(transformedKey))
-                {
-                    CacheEntry entry = _data[transformedKey];
-                    entry.hits++;
-                    result.Add(key, entry.value);
-                }
-            }
-            return result;
-        }
+       //public virtual Dictionary<TKey, TValue> GetAsDictionary(TKey[] keys)
+       // {
+       //     GarbageCollect();
+       //     if(keys == null)
+       //     {
+       //         return null;
+       //     }
+       //     Dictionary<TKey, TValue> result = new Dictionary<TKey, TValue>();
+       //     for (int i = 0; i < keys.Length; i++)
+       //     {
+       //         TKey key = keys[i];
+       //         TKey transformedKey = TransformKey(key);
+       //         if(_data.ContainsKey(transformedKey))
+       //         {
+       //             CacheEntry entry = _data[transformedKey];
+       //             entry.hits++;
+       //             result.Add(key, entry.value);
+       //         }
+       //     }
+       //     return result;
+       // }
 
         /// <summary>
         /// Utility method to find what keys are missing in the current cached entries.
@@ -183,7 +189,7 @@ namespace Metica.Experimental.Caching
             List<TKey> missing = new List<TKey>();
             for (int i = 0; i < keys.Length; i++)
             {
-                if (!_data.ContainsKey(keys[i]))
+                if (!_data.ContainsKey(keys[i].GetHashCode()))
                 {
                     missing.Add(keys[i]);
                 }
@@ -223,8 +229,8 @@ namespace Metica.Experimental.Caching
                 return;
             }
             nextGarbageCollection = _timeSource.EpochSeconds() + GARBAGE_COLLECTION_INTERVAL_SECONDS;
-            List<TKey> expired = new List<TKey>();
-            foreach (TKey k in _data.Keys)
+            List<int> expired = new List<int>();
+            foreach (int k in _data.Keys)
             {
                 if (!IsValid(_data[k]))
                 {
@@ -243,11 +249,5 @@ namespace Metica.Experimental.Caching
         {
             _data.Clear();
         }
-
-        protected virtual TKey TransformKey(TKey key)
-        {
-            return key; // equality transform
-        }
-
     }
 }
