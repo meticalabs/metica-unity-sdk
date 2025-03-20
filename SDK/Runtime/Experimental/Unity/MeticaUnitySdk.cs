@@ -14,19 +14,23 @@ namespace Metica.Experimental.Unity
         {
             // Register implementations before anything else. These are Unity implementations.
             Registry.Register<IDeviceInfoProvider>(new DeviceInfoProvider());
+            MeticaLogger meticaLogger = new MeticaLogger();
+            meticaLogger.CurrentLogLevel = _sdkConfigProvider.SdkConfig.logLevel;
+            Registry.Register<ILog>(meticaLogger);
+
             _meticaSdk = new MeticaSdk(_sdkConfigProvider.SdkConfig);
         }
 
         private async void Start()
         {
             var offersResult = await _meticaSdk.GetOffersAsync(new string[] { "generic" });
-            Debug.Log($"Offers: {offersResult}");
+            Log.Debug(() => $"Offers: {offersResult}");
 
             var configResult = await _meticaSdk.GetConfigsAsync(null);
-            Debug.Log($"Configs: {configResult}");
+            Log.Debug(() => $"Configs: {configResult}");
 
             configResult = await _meticaSdk.GetConfigsAsync(new List<string> { "dynamic_difficulty" });
-            Debug.Log($"Configs: {configResult}");
+            Log.Debug(() => $"Configs: {configResult}");
 
             _meticaSdk.LogInstallEvent();
             _meticaSdk.LogLoginEvent();

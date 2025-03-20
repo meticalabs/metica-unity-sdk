@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Metica.Unity
+namespace Metica.Experimental.SDK
 {
     public static class DictionaryExtensionMethods
     {
