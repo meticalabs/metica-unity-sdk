@@ -183,11 +183,26 @@ namespace Metica.Experimental
                 new() { { nameof(userStateAttributes), userStateAttributes } },
                 customPayload);
 
+        public void LogCustomEvent(string customEventType, Dictionary<string, object> customPayload = null)
+        {
+            if (EventTypes.IsEventType(customEventType))
+            {
+                Log.Error(() => $"{customEventType} cannot be used with {nameof(LogCustomEvent)}. Please use an event type that is not a core event. See documentation at https://docs.metica.com/integration#core-events.");
+                return;
+            }
+            _eventManager.QueueEventAsync(
+            CurrentUserId,
+            Config.appId,
+            customEventType,
+            null,
+            customPayload);
+        }
+
         public async ValueTask DisposeAsync()
         {
-            await _eventManager.DisposeAsync();
-            await _offerManager.DisposeAsync();
-            await _configManager.DisposeAsync();
+            if (_eventManager != null) await _eventManager.DisposeAsync();
+            if (_offerManager != null) await _offerManager.DisposeAsync();
+            if (_configManager != null) await _configManager.DisposeAsync();
             _http?.Dispose();
         }
     }
