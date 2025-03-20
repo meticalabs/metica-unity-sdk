@@ -1,24 +1,39 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
 
 namespace Metica.Experimental.SDK.Model
 {
-    internal abstract class EventTypes
+    internal static class EventTypes
     {
         internal static readonly string Install = "install";
         internal static readonly string Login = "login";
         internal static readonly string OfferImpression = "impression";
         internal static readonly string OfferInteraction = "interaction";
         internal static readonly string OfferInAppPurchase = "purchase";
-        [Obsolete("Use EventTypes.FullStateUpdate")]
-        internal static readonly string UserStateUpdate = "fullStateUpdate";
         internal static readonly string FullStateUpdate = "fullStateUpdate";
         internal static readonly string PartialStateUpdate = "partialStateUpdate";
         internal static readonly string AdRevenue = "adRevenue";
+        // When adding new EventTypes, make sure they are added to IsEventType below.
+
+        /// <summary>
+        /// Checks if a string is one of the 
+        /// </summary>
+        /// <param name="eventType"></param>
+        /// <returns></returns>
+        internal static bool IsEventType(string eventType)
+        {
+            return eventType == Install ||
+                   eventType == Login ||
+                   eventType == OfferImpression ||
+                   eventType == OfferInteraction ||
+                   eventType == OfferInAppPurchase ||
+                   eventType == FullStateUpdate ||
+                   eventType == PartialStateUpdate ||
+                   eventType == AdRevenue;
+        }
     }
 
-    internal abstract class Constants
+    internal static class Constants
     {
         internal static readonly string MeticaAttributes = "meticaAttributes";
         internal static readonly string CustomPayload = "customPayload";
@@ -41,12 +56,12 @@ namespace Metica.Experimental.SDK.Model
         internal static readonly string InteractionType = "interactionType";
         internal static readonly string UserStateAttributes = "userStateAttributes";
         internal static readonly string Offer = "offer";
+    }
+
+    internal static class Defaults
+    {
         internal static readonly string DefaultLocale = "en-US";
         internal static readonly string DefaultAppVersion = "1.0.0";
-
-        internal static readonly string[] ReservedEventNames = new string[] {
-            "purchase", "impression", "interaction", "adRevenue", "fullStateUpdate", "partialStateUpdate", "login", "install"
-        };
     }
 
     [Serializable]
