@@ -8,7 +8,7 @@ namespace Metica.Experimental.Network
     /// <summary>
     /// A universal http response wrapper that all implementations can fill and return.
     /// </summary>
-    public struct HttpResponse
+    public class HttpResponse
     {
         public enum ResultStatus { Success, Failure, Cancelled }
 

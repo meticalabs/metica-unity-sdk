@@ -66,11 +66,8 @@ namespace Metica.Experimental.Network
         {
             if(_cache != null)
             {
-                HttpResponse? cachedResponse = _cache.Get(url);
-                if (cachedResponse.HasValue)
-                {
-                    return cachedResponse.Value;
-                }
+                HttpResponse cachedResponse = _cache.Get(url);
+                return cachedResponse;
             }
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             if (requestHeaders != null)
