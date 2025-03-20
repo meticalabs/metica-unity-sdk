@@ -46,7 +46,7 @@ namespace Metica.Experimental
     /// </remarks>
     public sealed class OfferManager : EndpointManager, IMeticaAttributesProvider
     {
-        private readonly Metica.Experimental.Core.ITimeSource timeSource = new SystemDateTimeSource();
+        private readonly ITimeSource timeSource = new SystemDateTimeSource();
         private readonly IDeviceInfoProvider _deviceInfoProvider;
 
         /// <summary>
@@ -56,9 +56,9 @@ namespace Metica.Experimental
         /// </summary>
         private Dictionary<string, List<Offer>> _sessionPlacementStorage = null;
 
-        public OfferManager(IHttpService httpService, string offersEndpoint, IDeviceInfoProvider deviceInfoProvider) : base(httpService, offersEndpoint)
+        public OfferManager(IHttpService httpService, string offersEndpoint) : base(httpService, offersEndpoint)
         {
-            _deviceInfoProvider = deviceInfoProvider;
+            _deviceInfoProvider = Registry.Resolve<IDeviceInfoProvider>();
         }
 
         public async Task<object> GetMeticaAttributes(string placementId, string offerId)

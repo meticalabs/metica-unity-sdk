@@ -37,9 +37,9 @@ namespace Metica.Experimental
     {
         private readonly IDeviceInfoProvider _deviceInfoProvider;
 
-        public ConfigManager(IHttpService httpService, string endpoint, IDeviceInfoProvider deviceInfoProvider) : base(httpService, endpoint)
+        public ConfigManager(IHttpService httpService, string endpoint) : base(httpService, endpoint)
         {
-            _deviceInfoProvider = deviceInfoProvider;
+            _deviceInfoProvider = Registry.Resolve<IDeviceInfoProvider>();
         }
 
         public async Task<ConfigResult> GetConfigsAsync(string userId, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)

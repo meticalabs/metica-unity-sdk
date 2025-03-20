@@ -1,4 +1,5 @@
-using Metica.Unity;
+using Metica.Experimental.Core;
+using Metica.Experimental.SDK;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +12,8 @@ namespace Metica.Experimental.Unity
 
         private void Awake()
         {
+            // Register implementations before anything else. These are Unity implementations.
+            Registry.Register<IDeviceInfoProvider>(new DeviceInfoProvider());
             _meticaSdk = new MeticaSdk(_sdkConfigProvider.SdkConfig);
         }
 
