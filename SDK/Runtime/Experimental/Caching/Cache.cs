@@ -1,7 +1,5 @@
 using Metica.Experimental.Core;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 
 namespace Metica.Experimental.Caching
 {
@@ -181,15 +179,16 @@ namespace Metica.Experimental.Caching
             {
                 return null;
             }
-            List<TKey> absents = new List<TKey>();
+
+            List<TKey> missing = new List<TKey>();
             for (int i = 0; i < keys.Length; i++)
             {
                 if (!_data.ContainsKey(keys[i]))
                 {
-                    absents.Add(keys[i]);
+                    missing.Add(keys[i]);
                 }
             }
-            return absents.ToArray();
+            return missing.ToArray();
         }
 
         /// <summary>
@@ -224,19 +223,19 @@ namespace Metica.Experimental.Caching
                 return;
             }
             nextGarbageCollection = _timeSource.EpochSeconds() + GARBAGE_COLLECTION_INTERVAL_SECONDS;
-            List<TKey> marked = new List<TKey>();
+            List<TKey> expired = new List<TKey>();
             foreach (TKey k in _data.Keys)
             {
                 if (!IsValid(_data[k]))
                 {
-                    marked.Add(k);
+                    expired.Add(k);
                 }
             }
-            for (int i = 0; i < marked.Count; i++)
+            for (int i = 0; i < expired.Count; i++)
             {
-                _data.Remove(marked[i]);
+                _data.Remove(expired[i]);
             }
-            marked.Clear();
+            expired.Clear();
         }
 
         /// <inheritdoc/>
