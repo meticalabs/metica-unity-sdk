@@ -9,7 +9,7 @@ namespace Metica.Experimental.SDK.Model
         internal static readonly string Login = "login";
         internal static readonly string OfferImpression = "impression";
         internal static readonly string OfferInteraction = "interaction";
-        internal static readonly string OfferInAppPurchase = "purchase";
+        internal static readonly string OfferPurchase = "purchase";
         internal static readonly string FullStateUpdate = "fullStateUpdate";
         internal static readonly string PartialStateUpdate = "partialStateUpdate";
         internal static readonly string AdRevenue = "adRevenue";
@@ -26,7 +26,7 @@ namespace Metica.Experimental.SDK.Model
                    eventType == Login ||
                    eventType == OfferImpression ||
                    eventType == OfferInteraction ||
-                   eventType == OfferInAppPurchase ||
+                   eventType == OfferPurchase ||
                    eventType == FullStateUpdate ||
                    eventType == PartialStateUpdate ||
                    eventType == AdRevenue;
@@ -141,7 +141,7 @@ namespace Metica.Experimental.SDK.Model
     [Serializable]
     public class PurchaseMetric
     {
-        public String eventType = EventTypes.OfferInAppPurchase;
+        public String eventType = EventTypes.OfferPurchase;
         public String userId;
         public String appId;
         public MeticaAttributes meticaAttributes;
