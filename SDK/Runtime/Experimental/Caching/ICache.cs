@@ -40,20 +40,6 @@ namespace Metica.Experimental.Caching
         List<TValue> GetMultiple(TKey[] keys);
         
         /// <summary>
-        /// Retrieves multiple values with multiple keys, ignoring those that aren't found.
-        /// </summary>
-        /// <param name="keys">An array of keys.</param>
-        /// <returns>A dictionary including keys and values of the found entries.</returns>
-        /// <remarks>Normally only the values would be returned but this method comes to rescue situations where maintaining the association between keys and values is useful.</remarks>
-        //Dictionary<TKey, TValue> GetAsDictionary(TKey[] keys);
-
-        /// <summary>
-        /// Gets all currently cached values.
-        /// </summary>
-        /// <returns>List of all currently cached values.</returns>
-        //Dictionary<TKey, TValue> GetAllAsDictionary();
-
-        /// <summary>
         /// Gets all currently cached values.
         /// </summary>
         /// <returns>List of all currently cached values.</returns>

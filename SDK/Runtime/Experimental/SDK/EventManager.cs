@@ -1,6 +1,7 @@
 using Metica.Experimental.Core;
 using Metica.Experimental.Network;
 using Metica.Experimental.SDK;
+using Metica.Experimental.SDK.Model;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 namespace Metica.Experimental
 {
     [Serializable]
-    public class EventDispatchResult : IMeticaSdkResult
+    public class EventDispatchResult : IMeticaHttpResult
     {
         [JsonIgnore] public HttpResponse.ResultStatus Status { get; set; }
         [JsonIgnore] public string Error { get; set; }
@@ -35,14 +36,15 @@ namespace Metica.Experimental
     /// ROADMAP:
     /// - TODO : dispatch events based on a timer
     /// - TODO : proper finalization of the object to flush/dispatch the events and other cleanup.
-    /// - TODO : use a model to manage parameters more consistently to reduce chances of human errors in passing all strings.
-    /// - TODO : device info
     /// - TODO : use constants for eventTypes
     /// - TODO : (low priority) create an event queue processing system that processes the queue right before sending (for exampe to aggregate certain events)
     /// </remarks>
     internal class EventManager : EndpointManager
     {
         public delegate void OnEventsDispatchDelegate(EventDispatchResult eventResult);
+        /// <summary>
+        /// Callback to process an <see cref="EventDispatchResult"/> when the events are effectively sent.
+        /// </summary>
         public event OnEventsDispatchDelegate OnEventsDispatch;
 
         private readonly IMeticaAttributesProvider _meticaAttributesProvider;
@@ -50,21 +52,23 @@ namespace Metica.Experimental
         private readonly ITimeSource _timeSource = new SystemDateTimeSource();
         private readonly SdkConfig _sdkConfig;
 
-        private const int DISPATCH_TRIGGER_COUNT = 2; // TODO : temporarily hardcoded
+        public const int DefaultEventQueueCountTrigger = 8;
+        private readonly int _eventQueueCountTrigger;
 
         private List<object> _events;
 
         public EventManager(
             IHttpService httpService,
             string endpoint,
-            IMeticaAttributesProvider meticaAttributesProvider
+            IMeticaAttributesProvider meticaAttributesProvider,
+            int eventQueueCountTrigger = DefaultEventQueueCountTrigger
             ) : base(httpService, endpoint)
         {
             _meticaAttributesProvider = meticaAttributesProvider;
             _deviceInfoProvider = Registry.Resolve<IDeviceInfoProvider>();
             _events = new List<object>();
-            OnEventsDispatch -= DispatchHandler;
             OnEventsDispatch += DispatchHandler;
+            _eventQueueCountTrigger = eventQueueCountTrigger;
         }
 
         /// <summary>
@@ -79,13 +83,13 @@ namespace Metica.Experimental
         {
             var requestBody = new Dictionary<string, object>
             {
-                { nameof(eventType), eventType },
-                { "eventId", Guid.NewGuid().ToString() },
-                { "eventTime", _timeSource.EpochSeconds() },
-                { nameof(appId), appId },
-                { nameof(userId), userId },
-                { "deviceInfo", _deviceInfoProvider.GetDeviceInfo() }, // TODO, leave possibility to override DeviceInfo by passing one.
-                { nameof(customPayload), customPayload }
+                { FieldNames.EventType, eventType },
+                { FieldNames.EventId, Guid.NewGuid().ToString() },
+                { FieldNames.EventTime, _timeSource.EpochSeconds() },
+                { FieldNames.AppId, appId },
+                { FieldNames.UserId, userId },
+                { FieldNames.DeviceInfo, _deviceInfoProvider.GetDeviceInfo() }, // TODO, leave possibility to override DeviceInfo by passing one.
+                { FieldNames.CustomPayload, customPayload }
             };
 
             if(eventFields != null)
@@ -95,7 +99,7 @@ namespace Metica.Experimental
 
             _events.Add(requestBody);
 
-            if(_events.Count >= DISPATCH_TRIGGER_COUNT)
+            if(_events.Count >= _eventQueueCountTrigger)
             {
                 _ = DispatchEvents();
             }
@@ -126,7 +130,7 @@ namespace Metica.Experimental
             eventFields.AddDictionary(
                 new()
                 {
-                    { nameof(meticaAttributes), meticaAttributes }
+                    { FieldNames.MeticaAttributes, meticaAttributes }
                 });
 
             QueueEventAsync(
@@ -152,7 +156,7 @@ namespace Metica.Experimental
             eventFields.AddDictionary(
                 new()
                 {
-                    { nameof(productId), productId }
+                    { FieldNames.ProductId, productId }
                 });
 
             QueueEventAsync(

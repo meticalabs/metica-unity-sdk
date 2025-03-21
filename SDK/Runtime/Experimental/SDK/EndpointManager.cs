@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Metica.Experimental
 {
-    public interface IMeticaSdkResult
+    public interface IMeticaHttpResult
     {
-        // TODO : fields should be readonly or with private setter
+        // TODO : fields should preferrably be readonly or with private setter
 
         public HttpResponse.ResultStatus Status { get; set; }
         public string Error { get; set; }
@@ -27,7 +27,7 @@ namespace Metica.Experimental
             }
         }
 
-        protected TResult ResponseToResult<TResult>(HttpResponse response) where TResult : IMeticaSdkResult, new()
+        protected TResult ResponseToResult<TResult>(HttpResponse response) where TResult : IMeticaHttpResult, new()
         {
             if (response.Status == HttpResponse.ResultStatus.Success)
             {

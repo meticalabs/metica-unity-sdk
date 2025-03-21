@@ -26,10 +26,12 @@ namespace Metica.Experimental.Network
     /// - https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient
     /// - https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-net-http-httpclient
     /// </remarks>
-    public class HttpServiceDotnet : IHttpService
+    public sealed class HttpServiceDotnet : IHttpService
     {
         /// <summary>
-        /// Utility class for caching
+        /// Utility class for caching that represents a cache key.
+        /// The main reason for this to exist is to methodically create a hash based on some fields.
+        /// Here we use some fields taken from the request and use an override of <see cref="System.HashCode.GetHashCode"/> to build the hash.
         /// </summary>
         private class CacheKey
         {
@@ -43,23 +45,17 @@ namespace Metica.Experimental.Network
             }
         }
 
-        // TODO: improve constructor
-        private readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(30) };
+        private readonly HttpClient _http;
         private readonly CancellationTokenSource cts = new();
-
         private ICache<CacheKey, HttpResponse> _cache { get; set; } = null;
 
-        public HttpServiceDotnet()
+        public HttpServiceDotnet(double timeoutSeconds = 10)
         {
+            _http = new() {
+                Timeout = TimeSpan.FromSeconds(timeoutSeconds)
+            };
             _cache = new Cache<CacheKey, HttpResponse>(new SystemDateTimeSource());
         }
-
-        //IHttpService IHttpService.WithCache(ICache<List<string>, HttpResponse> cache)
-        //{
-        //    // TODO : signal error if cache is already initialized.
-        //    _cache = cache;
-        //    return this;
-        //}
 
         /// <summary>
         /// Sets the client's persistent headers. All the existing ones will be cleared.
@@ -78,8 +74,8 @@ namespace Metica.Experimental.Network
 
         public void Dispose()
         {
-            cts.Cancel();
-            _http.Dispose();
+            cts?.Cancel();
+            _http?.Dispose();
         }
 
         /// <inheritdoc/>
@@ -142,10 +138,6 @@ namespace Metica.Experimental.Network
             {
                 return new HttpResponse(HttpResponse.ResultStatus.Cancelled, null, ex.Message);
             }
-            //catch (Exception ex)
-            //{
-                //return new HttpResponse(HttpResponse.ResultStatus.Failure, null, ex.Message);
-            //}
         }
 
         /// <inheritdoc/>
@@ -218,10 +210,6 @@ namespace Metica.Experimental.Network
             {
                 return new HttpResponse(HttpResponse.ResultStatus.Cancelled, responseContent: null, errorMessage: ex.Message);
             }
-            //catch (Exception ex)
-            //{
-                //return new HttpResponse(HttpResponse.ResultStatus.Failure, null, ex.Message);
-            //}
         }
 
     }
