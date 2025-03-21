@@ -13,6 +13,9 @@ namespace Metica.Experimental.SDK
 
     public interface ILog
     {
+        /// <summary>
+        /// The current log level can be changed at runtime.
+        /// </summary>
         LogLevel CurrentLogLevel { get; set; }
         void LogDebug(Func<string> messageSupplier);
         void LogError(Func<string> messageSupplier, Exception error = null);

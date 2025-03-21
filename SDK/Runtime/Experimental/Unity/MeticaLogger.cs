@@ -8,6 +8,11 @@ namespace Metica.Experimental.Unity
     {
         public LogLevel CurrentLogLevel { get; set; } = LogLevel.Error;
 
+        public MeticaLogger(LogLevel initialLogLevel)
+        {
+            CurrentLogLevel = initialLogLevel;
+        }
+
         public void LogInfo(Func<string> messageSupplier)
         {
             if (CurrentLogLevel >= LogLevel.Info)

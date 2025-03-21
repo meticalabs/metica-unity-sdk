@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using Metica.Experimental.SDK.Model;
-using UnityEngine;
-using Metica.Experimental.Caching;
 
 namespace Metica.Experimental
 {
@@ -79,7 +77,7 @@ namespace Metica.Experimental
             => _eventManager.QueueEventAsync(
                 CurrentUserId,
                 Config.appId,
-                "login",
+                EventTypes.Login,
                 null,
                 customPayload);
 
@@ -88,7 +86,7 @@ namespace Metica.Experimental
             => _eventManager.QueueEventAsync(
                 CurrentUserId,
                 Config.appId,
-                "install",
+                EventTypes.Install,
                 null,
                 customPayload);
 
@@ -99,7 +97,7 @@ namespace Metica.Experimental
                 Config.appId,
                 placementId,
                 offerId,
-                "purchase",
+                EventTypes.OfferPurchase,
                 new() {
                     { nameof(currencyCode), currencyCode },
                     { nameof(totalAmount), totalAmount },
@@ -112,7 +110,7 @@ namespace Metica.Experimental
                 CurrentUserId,
                 Config.appId,
                 productId,
-                "purchase",
+                EventTypes.OfferPurchase,
                 new() {
                     { nameof(currencyCode), currencyCode },
                     { nameof(totalAmount), totalAmount },
@@ -126,7 +124,7 @@ namespace Metica.Experimental
                 Config.appId,
                 placementId,
                 offerId,
-                "interaction",
+                EventTypes.OfferInteraction,
                 new() { { nameof(interactionType), interactionType } },
                 customPayload);
 
@@ -136,7 +134,7 @@ namespace Metica.Experimental
                 CurrentUserId,
                 Config.appId,
                 productId,
-                "interaction",
+                EventTypes.OfferInteraction,
                 new() { { nameof(interactionType), interactionType} },
                 customPayload);
 
@@ -147,7 +145,7 @@ namespace Metica.Experimental
                 Config.appId,
                 placementId,
                 offerId,
-                "impression",
+                EventTypes.OfferImpression,
                 null,
                 customPayload);
 
@@ -157,7 +155,7 @@ namespace Metica.Experimental
                 CurrentUserId,
                 Config.appId,
                 productId,
-                "impression",
+                EventTypes.OfferImpression,
                 null,
                 customPayload);
 
@@ -166,7 +164,7 @@ namespace Metica.Experimental
             => _eventManager.QueueEventAsync(
                 CurrentUserId,
                 Config.appId,
-                "adRevenue",
+                EventTypes.AdRevenue,
                 new() {
                     { nameof (placement), placement },
                     { nameof (type), type },
@@ -181,7 +179,7 @@ namespace Metica.Experimental
             => _eventManager.QueueEventAsync(
                 CurrentUserId,
                 Config.appId,
-                "fullStateUpdate",
+                EventTypes.FullStateUpdate,
                 new() { { nameof (userStateAttributes), userStateAttributes }, },
                 customPayload);
 
@@ -190,7 +188,7 @@ namespace Metica.Experimental
             => _eventManager.QueueEventAsync(
                 CurrentUserId,
                 Config.appId,
-                "partialStateUpdate",
+                EventTypes.PartialStateUpdate,
                 new() { { nameof(userStateAttributes), userStateAttributes } },
                 customPayload);
 
