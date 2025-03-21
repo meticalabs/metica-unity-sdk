@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Metica.Experimental
 {
     [System.Serializable]
-    public class OfferResult : IMeticaSdkResult
+    public class OfferResult : IMeticaHttpResult
     {
         public Dictionary<string, List<Offer>> Placements { get; set; }
 
@@ -123,9 +123,9 @@ namespace Metica.Experimental
 
             var requestBody = new Dictionary<string, object>
             {
-                { nameof(userId), userId },
-                { nameof(deviceInfo), deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
-                { nameof(userData), userData }
+                { FieldNames.UserId, userId },
+                { FieldNames.DeviceInfo, deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
+                { FieldNames.UserData, userData }
             };
 
             // We only retrieve via http the pending placements
@@ -153,9 +153,9 @@ namespace Metica.Experimental
         {
             var requestBody = new Dictionary<string, object>
             {
-                { nameof(userId), userId },
-                { nameof(deviceInfo), deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
-                { nameof(userData), userData }
+                { FieldNames.UserId, userId },
+                { FieldNames.DeviceInfo, deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
+                { FieldNames.UserData, userData }
             };
 
             JsonSerializerSettings settings = new JsonSerializerSettings();

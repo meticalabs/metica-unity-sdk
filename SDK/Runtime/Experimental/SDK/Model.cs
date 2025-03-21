@@ -33,7 +33,7 @@ namespace Metica.Experimental.SDK.Model
         }
     }
 
-    internal static class Constants
+    internal static class FieldNames
     {
         internal static readonly string MeticaAttributes = "meticaAttributes";
         internal static readonly string CustomPayload = "customPayload";
@@ -49,13 +49,16 @@ namespace Metica.Experimental.SDK.Model
         internal static readonly string BundleId = "bundleId";
         internal static readonly string UserId = "userId";
         internal static readonly string AppId = "appId";
+        internal static readonly string ConfigKeys = "configKeys";
         internal static readonly string EventType = "eventType";
         internal static readonly string EventId = "eventId";
         internal static readonly string EventTime = "eventTime";
         internal static readonly string MeticaUnitySdk = "meticaUnitySdk";
         internal static readonly string InteractionType = "interactionType";
         internal static readonly string UserStateAttributes = "userStateAttributes";
+        internal static readonly string UserData = "userData";
         internal static readonly string Offer = "offer";
+        internal static readonly string DeviceInfo = "deviceInfo";
     }
 
     internal static class Defaults

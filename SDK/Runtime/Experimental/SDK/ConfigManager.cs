@@ -9,9 +9,10 @@ using Metica.Experimental.SDK.Model;
 namespace Metica.Experimental
 {
     [System.Serializable]
-    public class ConfigResult : IMeticaSdkResult
+    public class ConfigResult : IMeticaHttpResult
     {
-        // TODO : fields should be readonly or with private setter
+        // TODO : ideally fields should be readonly or with private setter
+
         [JsonExtensionData] // Needed when we want the root (anonymous dictionary in this case) to go in a specific field
         public Dictionary<string, object> Configs { get; set; }
 
@@ -42,14 +43,14 @@ namespace Metica.Experimental
             _deviceInfoProvider = Registry.Resolve<IDeviceInfoProvider>();
         }
 
-        public async Task<ConfigResult> GetConfigsAsync(string userId, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        public async Task<ConfigResult> GetConfigsAsync(string userId, List<string> configKeys = null, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
         {
             var requestBody = new Dictionary<string, object>
             {
-                { nameof(userId), userId },
-                { nameof(configKeys), configKeys },
-                { nameof(userProperties), userProperties },
-                { nameof(deviceInfo), deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
+                { FieldNames.UserId, userId },
+                { FieldNames.ConfigKeys, configKeys },
+                { FieldNames.UserData, userData },
+                { FieldNames.DeviceInfo, deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
             };
 
             var url = _url;

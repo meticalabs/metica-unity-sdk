@@ -1,6 +1,6 @@
 using Metica.Experimental.Core;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Metica.Experimental.Caching
 {
@@ -14,12 +14,9 @@ namespace Metica.Experimental.Caching
     /// <b>Roadmap</b>
     /// <ul>TODO - Implement persistency</ul>
     /// <ul>TODO - Implement tests</ul>
-    /// <ul>TODO - Some methods may be inefficient. Decide whether to optimize or warn users.</ul>
     /// </remarks>
-    public class Cache<TKey, TValue> : ICache<TKey, TValue> where TValue : class
+    internal class Cache<TKey, TValue> : ICache<TKey, TValue> where TValue : class
     {
-        public ITimeSource _timeSource {  get; private set; }
-
         protected class CacheEntry
         {
             /// <summary>
@@ -44,23 +41,28 @@ namespace Metica.Experimental.Caching
             public long ExpirationTime { get => timeCreated + ttl; }
         }
 
+        public ITimeSource _timeSource {  get; private set; }
         protected Dictionary<int, CacheEntry> _data = new();
 
-        protected const long GARBAGE_COLLECTION_INTERVAL_SECONDS = 10; // TODO : make this settable
-        protected long nextGarbageCollection = 0;
+        protected const long DefaultTTLSeconds = 60;
+
+        protected readonly long _garbageCollectionIntervalSeconds; // TODO : make this settable
+        protected long _nextGarbageCollection = 0;
 
         /// <summary>
         /// Create an instance of <see cref="Cache{TKey, TValue}"/>.
         /// </summary>
         /// <param name="timeSource">An implementation of <see cref="ITimeSource"/></param>
-        /// <param name="hashingFunction">A function that turns any given key into a hash (string). Uses <see cref="System.HashCode"/> behind the scenes.</param>
-        public Cache(ITimeSource timeSource)
+        /// <param name="gcTimeoutSeconds">Minimum time interval between garbage collection.
+        /// Note that in this case garbage collection means clearing the cache from expired/invalid cache entries.</param>
+        public Cache(ITimeSource timeSource, long gcTimeoutSeconds = 10)
         {
             _timeSource = timeSource;
+            _garbageCollectionIntervalSeconds = gcTimeoutSeconds;
         }
 
         /// <inheritdoc/>
-        public virtual void AddOrUpdate(TKey key, TValue value, long ttlSeconds = GARBAGE_COLLECTION_INTERVAL_SECONDS)
+        public virtual void AddOrUpdate(TKey key, TValue value, long ttlSeconds = DefaultTTLSeconds)
         {
             // We call the version with multiple values to have better control on when the garbage collection is called.
             Dictionary<TKey, TValue> entriesDictionary = new Dictionary<TKey, TValue> { {  key, value } };
@@ -68,7 +70,7 @@ namespace Metica.Experimental.Caching
         }
 
         /// <inheritdoc/>
-        public virtual void AddOrUpdate(Dictionary<TKey, TValue> entriesDictionary, long ttlSeconds = GARBAGE_COLLECTION_INTERVAL_SECONDS)
+        public virtual void AddOrUpdate(Dictionary<TKey, TValue> entriesDictionary, long ttlSeconds = DefaultTTLSeconds)
         {
             GarbageCollect();
             if(entriesDictionary == null)
@@ -108,7 +110,7 @@ namespace Metica.Experimental.Caching
         public virtual List<TValue> GetMultiple(TKey[] keys)
         {
             GarbageCollect();
-            if(keys ==  null)
+            if(keys == null)
             {
                 return null;
             }
@@ -138,41 +140,6 @@ namespace Metica.Experimental.Caching
             }
             return result;
         }
-
-        /// <inheritdoc/>
-        //public virtual Dictionary<TKey, TValue> GetAllAsDictionary()
-        //{
-        //    GarbageCollect();
-        //    Dictionary<TKey,TValue> result = new Dictionary<TKey, TValue>();
-        //    foreach (var k in _data.Keys)
-        //    {
-        //        result.Add(k, _data[k].value);
-        //    }
-        //    return result;
-        //}
-
-        /// <inheritdoc/>
-       //public virtual Dictionary<TKey, TValue> GetAsDictionary(TKey[] keys)
-       // {
-       //     GarbageCollect();
-       //     if(keys == null)
-       //     {
-       //         return null;
-       //     }
-       //     Dictionary<TKey, TValue> result = new Dictionary<TKey, TValue>();
-       //     for (int i = 0; i < keys.Length; i++)
-       //     {
-       //         TKey key = keys[i];
-       //         TKey transformedKey = TransformKey(key);
-       //         if(_data.ContainsKey(transformedKey))
-       //         {
-       //             CacheEntry entry = _data[transformedKey];
-       //             entry.hits++;
-       //             result.Add(key, entry.value);
-       //         }
-       //     }
-       //     return result;
-       // }
 
         /// <summary>
         /// Utility method to find what keys are missing in the current cached entries.
@@ -224,11 +191,11 @@ namespace Metica.Experimental.Caching
         /// </remarks>
         protected void GarbageCollect()
         {
-            if(nextGarbageCollection > _timeSource.EpochSeconds())
+            if(_nextGarbageCollection > _timeSource.EpochSeconds())
             {
                 return;
             }
-            nextGarbageCollection = _timeSource.EpochSeconds() + GARBAGE_COLLECTION_INTERVAL_SECONDS;
+            _nextGarbageCollection = _timeSource.EpochSeconds() + _garbageCollectionIntervalSeconds;
             List<int> expired = new List<int>();
             foreach (int k in _data.Keys)
             {
