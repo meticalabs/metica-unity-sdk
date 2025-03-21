@@ -64,7 +64,7 @@ namespace Metica.Experimental.SDK.Model
     internal static class Defaults
     {
         internal static readonly string DefaultLocale = "en-US";
-        internal static readonly string DefaultAppVersion = "1.0.0";
+        internal static readonly string DefaultAppVersion = "0.0.0";
     }
 
     [Serializable]

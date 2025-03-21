@@ -88,7 +88,8 @@ namespace Metica.Experimental
                 { FieldNames.EventTime, _timeSource.EpochSeconds() },
                 { FieldNames.AppId, appId },
                 { FieldNames.UserId, userId },
-                { FieldNames.DeviceInfo, _deviceInfoProvider.GetDeviceInfo() }, // TODO, leave possibility to override DeviceInfo by passing one.
+                { FieldNames.DeviceInfo, _deviceInfoProvider.GetDeviceInfo() },
+                { FieldNames.MeticaUnitySdk, "NEW_SDK" }, // TODO : set to package version like in old SDK.
                 { FieldNames.CustomPayload, customPayload }
             };
 
