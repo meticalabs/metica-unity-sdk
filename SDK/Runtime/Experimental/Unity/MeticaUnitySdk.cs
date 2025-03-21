@@ -14,10 +14,9 @@ namespace Metica.Experimental.Unity
         {
             // Register implementations before anything else. These are Unity implementations.
             Registry.Register<IDeviceInfoProvider>(new DeviceInfoProvider());
-            MeticaLogger meticaLogger = new MeticaLogger();
-            meticaLogger.CurrentLogLevel = _sdkConfigProvider.SdkConfig.logLevel;
-            Registry.Register<ILog>(meticaLogger);
+            Registry.Register<ILog>(new MeticaLogger(_sdkConfigProvider.SdkConfig.logLevel));
 
+            // Initialize Metica SDK.
             _meticaSdk = new MeticaSdk(_sdkConfigProvider.SdkConfig);
         }
 
@@ -37,6 +36,9 @@ namespace Metica.Experimental.Unity
 
             _meticaSdk.LogOfferPurchaseEventWithProductId("mega_offer_123", "EUR", 1.99);
             _meticaSdk.LogOfferPurchaseEvent("generic", "23851", "EUR", 9.99);
+
+            _meticaSdk.LogOfferPurchaseEvent("none", "0000", "EUR", 9.99); // expected failure
+            _meticaSdk.LogOfferPurchaseEvent("none", "0000", "EUR", 9.99); //expected failure
 
             _meticaSdk.LogAdRevenueEvent("top_slot", "popup", "MadAds", "GBP", 1.50);
             _meticaSdk.LogAdRevenueEvent("top_slot", "popup", "AdLads", "GBP", 1.10);

@@ -114,12 +114,14 @@ namespace Metica.Experimental
         {
             if (_meticaAttributesProvider == null)
             {
-                return; // TODO : raise error
+                Log.Error(() => $"{nameof(IMeticaAttributesProvider)} is not initialized.");
+                return;
             }
             object meticaAttributes = await _meticaAttributesProvider.GetMeticaAttributes(placementId, offerId);
             if (meticaAttributes == null)
             {
-                return; // TODO : raise error
+                Log.Error(() => $"Failed to retrieve information for placementId '{placementId}' and offerId '{offerId}'.");
+                return;
             }
 
             if (eventFields == null)
