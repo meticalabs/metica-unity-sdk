@@ -458,7 +458,7 @@ namespace Metica.Unity
         /// Editor utility to write an SdkInfo json file in Unity's StreamingAssets folder.
         /// If StreamingAssets doesn't exist, it will be created.
         /// </summary>
-        private static void WriteJsonSdkInfo()
+        internal static void WriteJsonSdkInfo()
         {
             string sdkInfoFolder = SdkInfo.SdkInfoFolder;
 
