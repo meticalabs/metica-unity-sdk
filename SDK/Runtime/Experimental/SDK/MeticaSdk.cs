@@ -31,6 +31,8 @@ namespace Metica.Experimental
         #region Fields
 
         public static string CurrentUserId {  get; set; }
+        public static string ApiKey { get; private set; }
+        public static string AppId { get; private set; }
 
         private readonly SdkConfig _sdkConfig;
         private readonly IHttpService _http;
@@ -66,19 +68,11 @@ namespace Metica.Experimental
             _eventManager = new EventManager(_http, $"{Config.ingestionEndpoint}/ingest/v1/events", _offerManager);
             // Set the current (mutable) CurrentUserId with the initial value given in the configuration
             CurrentUserId = Config.initialUserId;
+            ApiKey = Config.apiKey;
+            AppId = Config.appId;
 
             // Register this class as IMeticaSdk service in Registry
             Registry.Register<IMeticaSdk>(this);
-        }
-
-        private string CacheKeyHashingFunction(List<string> key)
-        {
-            string hash = string.Empty;
-            foreach (string keyItem in key)
-            {
-                HashCode.Combine(hash, keyItem);
-            }
-            return hash;
         }
 
         public async Task<OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
@@ -166,7 +160,7 @@ namespace Metica.Experimental
                 customPayload);
 
 
-        public void LogOfferImpressionEventWithProductId(string productId, string interactionType, Dictionary<string, object> customPayload = null)
+        public void LogOfferImpressionEventWithProductId(string productId, Dictionary<string, object> customPayload = null)
             => _eventManager.QueueEventWithProductId(
                 CurrentUserId,
                 Config.appId,
