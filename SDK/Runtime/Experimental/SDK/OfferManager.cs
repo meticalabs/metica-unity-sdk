@@ -1,10 +1,12 @@
-using Metica.Experimental.Core;
-using Metica.Experimental.Network;
-using Metica.Experimental.SDK.Model;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Metica.Experimental.Core;
+using Metica.Experimental.Network;
+using Metica.Experimental.SDK;
+using Metica.Experimental.SDK.Model;
 
 namespace Metica.Experimental
 {

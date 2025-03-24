@@ -1,9 +1,10 @@
-using Metica.Experimental.Core;
-using Metica.Experimental.SDK;
-using Metica.Experimental.SDK.Model;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
+using Metica.Experimental.Core;
+using Metica.Experimental.SDK;
+using Metica.Experimental.SDK.Model;
 
 namespace Metica.Experimental.Unity
 {

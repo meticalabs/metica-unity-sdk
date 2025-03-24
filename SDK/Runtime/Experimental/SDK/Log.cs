@@ -1,6 +1,7 @@
+using System;
+
 using Metica.Experimental.Core;
 using Metica.Experimental.SDK;
-using System;
 
 /// <summary>
 /// Facade class for logging.

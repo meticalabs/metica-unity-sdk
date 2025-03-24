@@ -1,7 +1,8 @@
-using Metica.Experimental.Core;
-using Metica.Experimental.SDK;
 using System.Collections.Generic;
 using UnityEngine;
+
+using Metica.Experimental.Core;
+using Metica.Experimental.SDK;
 
 namespace Metica.Experimental.Unity
 {

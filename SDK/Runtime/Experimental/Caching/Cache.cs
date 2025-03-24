@@ -1,6 +1,6 @@
-using Metica.Experimental.Core;
 using System.Collections.Generic;
-using System.Linq;
+
+using Metica.Experimental.Core;
 
 namespace Metica.Experimental.Caching
 {

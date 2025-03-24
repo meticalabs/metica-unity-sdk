@@ -1,6 +1,6 @@
 using Metica.Experimental.SDK.Model;
 
-namespace Metica.Experimental.Core
+namespace Metica.Experimental.SDK
 {
     public interface IDeviceInfoProvider
     {

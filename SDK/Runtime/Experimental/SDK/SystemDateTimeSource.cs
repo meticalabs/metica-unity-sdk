@@ -1,5 +1,6 @@
-using Metica.Experimental.Core;
 using System;
+
+using Metica.Experimental.Core;
 
 namespace Metica.Experimental
 {

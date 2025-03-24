@@ -1,6 +1,5 @@
 using System.IO;
 using UnityEngine;
-using Metica.Unity;
 
 namespace Metica.Experimental.SDK
 {
@@ -83,8 +82,6 @@ namespace Metica.Experimental.SDK
         /// The log level for the SDK.
         /// </summary>
         public LogLevel logLevel;
-
-        public EventsSubmissionResultDelegate eventsSubmissionDelegate;
 
         public static SdkConfig Default()
         {
