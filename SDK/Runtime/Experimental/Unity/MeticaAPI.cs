@@ -46,23 +46,27 @@ namespace Metica.Experimental.Unity
             => Log.Info(() => "There is no need to manually call 'Initialize'.");
 
         /// <summary>
-        /// TODO : complete
+        /// Gets all or the StartConfigs with the given keys.
         /// </summary>
-        /// <param name="responseCallback"></param>
-        /// <param name="configKeys"></param>
-        /// <param name="userProperties"></param>
-        /// <param name="deviceInfo"></param>
-        /// <remarks>
-        /// 
-        /// </remarks>
-        public static void GetConfig(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        /// <param name="responseCallback">Callback method to process the result as a dictionary.</param>
+        /// <param name="configKeys">List of keys of required SmartConfigs. Leave to null or empty to get all SmartConfigs.</param>
+        /// <param name="userData">Real-time user state data to override pre-ingested user state attributes, conforms to userStateAttributes.</param>
+        /// <param name="deviceInfo">A <see cref="DeviceInfo"/> object. If null, one will be automatically created to retrieve information about the device.</param>
+        public static void GetConfig(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
         {
             Task.Run(async () =>
             {
-                var result = await _sdk.GetConfigsAsync(configKeys = null, userProperties = null, deviceInfo);
+                var result = await _sdk.GetConfigsAsync(configKeys = null, userData = null, deviceInfo);
                 responseCallback?.Invoke(new SdkResultImpl<Dictionary<string, object>>().WithResult(result.Configs));
             });
         }
+        /// <summary>
+        /// Gets all or the StartConfigs with the given keys.
+        /// </summary>
+        /// <param name="responseCallback">Callback method to process the result as a <see cref="ConfigResult"/> object.</param>
+        /// <param name="configKeys">List of keys of required SmartConfigs. Leave to null or empty to get all SmartConfigs.</param>
+        /// <param name="userData">Real-time user state data to override pre-ingested user state attributes, conforms to userStateAttributes.</param>
+        /// <param name="deviceInfo">A <see cref="DeviceInfo"/> object. If null, one will be automatically created to retrieve information about the device.</param>
         public static void GetConfig(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
             Task.Run(async () =>
@@ -73,15 +77,13 @@ namespace Metica.Experimental.Unity
         }
 
         /// <summary>
-        /// TODO : copmplete
+        /// Gets all or 
         /// </summary>
         /// <param name="placements"></param>
         /// <param name="responseCallback"></param>
         /// <param name="userProperties"></param>
         /// <param name="deviceInfo"></param>
         /// <remarks>
-        /// ## HOW TO UPGRADE
-        /// The only difference for this call from version < 1.3.1 is the result type which is <code>Dictionary<string, List<Offer>></code> and not 'OffersByPlacement'.
         /// Example call:
         /// <code>
         /// // Get all placements:
@@ -126,7 +128,7 @@ namespace Metica.Experimental.Unity
                 var result = await _sdk.GetOffersAsync(placements, userProperties, deviceInfo);
                 var offersByPlacement = new OffersByPlacement();
                 offersByPlacement.placements = result.Placements;
-                responseCallback?.Invoke(new SdkResultImpl<OffersByPlacement>().WithResult(offersByPlacement)); // TODO
+                responseCallback?.Invoke(new SdkResultImpl<OffersByPlacement>().WithResult(offersByPlacement));
             });
         }
 

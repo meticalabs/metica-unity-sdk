@@ -22,6 +22,7 @@ namespace Metica.Experimental.Unity
             DontDestroyOnLoad(this);
         }
 
+        // TODO : move example
         private async void Example()
         {
             var offersResult = await _meticaSdk.GetOffersAsync(new string[] { "generic" });
