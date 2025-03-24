@@ -8,7 +8,23 @@ using Metica.Experimental.SDK.Model;
 
 namespace Metica.Experimental
 {
-    public interface IMeticaSdk { }
+    public interface IMeticaSdk
+    {
+        Task<ConfigResult> GetConfigsAsync(List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null);
+        Task<OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null);
+        void LogAdRevenueEvent(string placement, string type, string source, string currencyCode, double totalAmount, Dictionary<string, object> customPayload = null);
+        void LogCustomEvent(string customEventType, Dictionary<string, object> customPayload = null);
+        void LogInstallEvent(Dictionary<string, object> customPayload = null);
+        void LogLoginEvent(Dictionary<string, object> customPayload = null);
+        void LogOfferImpressionEvent(string placementId, string offerId, Dictionary<string, object> customPayload = null);
+        void LogOfferImpressionEventWithProductId(string productId, Dictionary<string, object> customPayload = null);
+        void LogOfferInteractionEvent(string placementId, string offerId, string interactionType, Dictionary<string, object> customPayload = null);
+        void LogOfferInteractionEventWithProductId(string productId, string interactionType, Dictionary<string, object> customPayload = null);
+        void LogOfferPurchaseEvent(string placementId, string offerId, string currencyCode, double totalAmount, Dictionary<string, object> customPayload = null);
+        void LogOfferPurchaseEventWithProductId(string productId, string currencyCode, double totalAmount, Dictionary<string, object> customPayload = null);
+        void LogFullStateUserUpdateEvent(Dictionary<string, object> fullUserStateAttributes, Dictionary<string, object> customPayload = null);
+        void LogPartialStateUserUpdateEvent(Dictionary<string, object> partialUserStateAttributes, Dictionary<string, object> customPayload = null);
+    }
 
     public class MeticaSdk : IMeticaSdk, IAsyncDisposable
     {
