@@ -56,7 +56,7 @@ namespace Metica.Experimental.Unity
         {
             Task.Run(async () =>
             {
-                var result = await _sdk.GetConfigsAsync(configKeys = null, userData = null, deviceInfo);
+                var result = await SDK.GetConfigsAsync(configKeys = null, userData = null, deviceInfo);
                 responseCallback?.Invoke(new SdkResultImpl<Dictionary<string, object>>().WithResult(result.Configs));
             });
         }
@@ -71,7 +71,7 @@ namespace Metica.Experimental.Unity
         {
             Task.Run(async () =>
             {
-                var result = await _sdk.GetConfigsAsync(configKeys = null, userProperties = null, deviceInfo);
+                var result = await SDK.GetConfigsAsync(configKeys = null, userProperties = null, deviceInfo);
                 responseCallback?.Invoke(new SdkResultImpl<ConfigResult>().WithResult(result));
             });
         }
@@ -104,10 +104,9 @@ namespace Metica.Experimental.Unity
         /// </remarks>
         public static void GetOffers(String[] placements, MeticaSdkDelegate<Dictionary<string, List<Offer>>> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
-
             Task.Run(async () =>
             {
-                var result = await _sdk.GetOffersAsync(placements, userProperties, deviceInfo);
+                var result = await SDK.GetOffersAsync(placements, userProperties, deviceInfo);
                 responseCallback?.Invoke(new SdkResultImpl<Dictionary<string, List<Offer>>>().WithResult(result.Placements));
             });
         }
@@ -115,7 +114,7 @@ namespace Metica.Experimental.Unity
         {
             Task.Run(async () =>
             {
-                var result = await _sdk.GetOffersAsync(placements, userProperties, deviceInfo);
+                var result = await SDK.GetOffersAsync(placements, userProperties, deviceInfo);
                 responseCallback?.Invoke(new SdkResultImpl<OfferResult>().WithResult(result));
             });
         }
@@ -125,7 +124,7 @@ namespace Metica.Experimental.Unity
         {
             Task.Run(async () =>
             {
-                var result = await _sdk.GetOffersAsync(placements, userProperties, deviceInfo);
+                var result = await SDK.GetOffersAsync(placements, userProperties, deviceInfo);
                 var offersByPlacement = new OffersByPlacement();
                 offersByPlacement.placements = result.Placements;
                 responseCallback?.Invoke(new SdkResultImpl<OffersByPlacement>().WithResult(offersByPlacement));
@@ -134,40 +133,40 @@ namespace Metica.Experimental.Unity
 
 
         public static void LogInstall(Dictionary<string, object> customPayload = null) => 
-            _sdk.LogInstallEvent(customPayload);
+            SDK.LogInstallEvent(customPayload);
 
         public static void LogLogin(string newCurrentUserId = null, Dictionary<string, object> customPayload = null) =>
-            _sdk.LogLoginEvent(customPayload);
+            SDK.LogLoginEvent(customPayload);
 
         public static void LogOfferDisplay(string offerId, string placementId, Dictionary<string, object> customPayload = null) =>
-            _sdk.LogOfferImpressionEvent(placementId, offerId, customPayload);
+            SDK.LogOfferImpressionEvent(placementId, offerId, customPayload);
 
         public static void LogOfferDisplayWithProductId(string productId, Dictionary<string, object> customPayload = null) =>
-            _sdk.LogOfferImpressionEventWithProductId(productId, customPayload);
+            SDK.LogOfferImpressionEventWithProductId(productId, customPayload);
 
         public static void LogOfferPurchase(string offerId, string placementId, double totalAmount, string currencyCode, Dictionary<string, object> customPayload = null) =>
-            _sdk.LogOfferPurchaseEvent(placementId, offerId, currencyCode, totalAmount, customPayload);
+            SDK.LogOfferPurchaseEvent(placementId, offerId, currencyCode, totalAmount, customPayload);
 
         public static void LogOfferPurchaseWithProductId(string productId, double totalAmount, string currencyCode, Dictionary<string, object> customPayload = null) =>
-            _sdk.LogOfferPurchaseEventWithProductId(productId, currencyCode, totalAmount, customPayload);
+            SDK.LogOfferPurchaseEventWithProductId(productId, currencyCode, totalAmount, customPayload);
 
         public static void LogOfferInteraction(string offerId, string placementId, string interactionType, Dictionary<string, object> customPayload = null) =>
-            _sdk.LogOfferInteractionEvent(placementId, offerId, interactionType, customPayload);
+            SDK.LogOfferInteractionEvent(placementId, offerId, interactionType, customPayload);
 
         public static void LogOfferInteractionWithProductId(string productId, string interactionType, Dictionary<string, object> customPayload = null) =>
-            _sdk.LogOfferInteractionEventWithProductId(productId, interactionType, customPayload);
+            SDK.LogOfferInteractionEventWithProductId(productId, interactionType, customPayload);
 
         public static void LogAdRevenue(double totalAmount, string currencyCode, string adPlacement = null, string adPlacementType = null, string adPlacementSource = null, Dictionary<string, object> customPayload = null) =>
-            _sdk.LogAdRevenueEvent(adPlacement, adPlacementType, adPlacementSource, currencyCode, totalAmount, customPayload);
+            SDK.LogAdRevenueEvent(adPlacement, adPlacementType, adPlacementSource, currencyCode, totalAmount, customPayload);
 
         public static void LogFullStateUpdate(Dictionary<string, object> fullUserStateAttributes) =>
-            _sdk.LogFullStateUserUpdateEvent(fullUserStateAttributes, null);
+            SDK.LogFullStateUserUpdateEvent(fullUserStateAttributes, null);
 
         public static void LogPartialStateUpdate(Dictionary<string, object> partialUserAttributes) =>
-            _sdk.LogPartialStateUserUpdateEvent(partialUserAttributes, null);
+            SDK.LogPartialStateUserUpdateEvent(partialUserAttributes, null);
 
         public static void LogCustomEvent(string eventType, Dictionary<string, object> userEvent) =>
-            _sdk.LogCustomEvent(eventType, null);
+            SDK.LogCustomEvent(eventType, null);
 
         [Obsolete("Please use LogCustomEvent")]
         public static void LogUserEvent(string eventType, Dictionary<string, object> userEvent, bool reuseDictionary) =>
