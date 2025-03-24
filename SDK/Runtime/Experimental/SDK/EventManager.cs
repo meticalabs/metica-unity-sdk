@@ -2,6 +2,7 @@ using Metica.Experimental.Core;
 using Metica.Experimental.Network;
 using Metica.Experimental.SDK;
 using Metica.Experimental.SDK.Model;
+using Metica.Experimental.Unity;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -89,7 +90,7 @@ namespace Metica.Experimental
                 { FieldNames.AppId, appId },
                 { FieldNames.UserId, userId },
                 { FieldNames.DeviceInfo, _deviceInfoProvider.GetDeviceInfo() },
-                { FieldNames.MeticaUnitySdk, "NEW_SDK" }, // TODO : set to package version like in old SDK.
+                { FieldNames.MeticaUnitySdk, MeticaSdk.Version },
                 { FieldNames.CustomPayload, customPayload }
             };
 

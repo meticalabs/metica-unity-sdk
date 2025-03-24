@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace Metica.Experimental.Unity
 {
-    // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    // Metica API for retro compatibility with previous SDK.
-    // NOTE that this part will soon be removed or subject to changes.
-    // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+    // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+    // Metica API for retro compatibility with previous SDK. //
+    // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
 
     public static class MeticaAPI
     {
@@ -29,7 +28,6 @@ namespace Metica.Experimental.Unity
         }
 
         // Fields
-        public static string SDKVersion { get; } = "0.0.0";
         public static string UserId { get => MeticaSdk.CurrentUserId; set => MeticaSdk.CurrentUserId = value; }
         public static string AppId { get => MeticaSdk.AppId; }
         public static string ApiKey { get => MeticaSdk.ApiKey; }

@@ -30,6 +30,8 @@ namespace Metica.Experimental
     {
         #region Fields
 
+        public static string Version { get => "1.4.0"; }
+
         public static string CurrentUserId {  get; set; }
         public static string ApiKey { get; private set; }
         public static string AppId { get; private set; }
