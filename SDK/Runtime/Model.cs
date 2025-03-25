@@ -83,6 +83,8 @@ namespace Metica.Unity
     public class OffersByPlacement
     {
         public Dictionary<string, List<Offer>> placements = new Dictionary<string, List<Offer>>();
+        public Dictionary<string, List<Offer>> Placements => placements;
+
         public override string ToString()
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder("OffersByPlacement:");
