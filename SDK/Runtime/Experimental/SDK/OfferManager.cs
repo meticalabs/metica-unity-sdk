@@ -13,7 +13,10 @@ namespace Metica.Experimental
     [System.Serializable]
     public class OfferResult : IMeticaHttpResult
     {
+        [JsonProperty("placements")]
         public Dictionary<string, List<Offer>> Placements { get; set; }
+        [Obsolete("Please use 'Placements'")]
+        public Dictionary<string, List<Offer>> placements { get => Placements; }
 
         [JsonIgnore] public HttpResponse.ResultStatus Status { get; set; }
         [JsonIgnore] public string Error { get; set; }
