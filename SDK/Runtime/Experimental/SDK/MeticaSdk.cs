@@ -11,7 +11,7 @@ namespace Metica.Experimental
 {
     public interface IMeticaSdk
     {
-        Task<ConfigResult> GetConfigsAsync(List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null);
+        Task<ConfigResult> GetConfigsAsync(List<string> configKeys = null, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null);
         Task<OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null);
         void LogAdRevenueEvent(string placement, string type, string source, string currencyCode, double totalAmount, Dictionary<string, object> customPayload = null);
         void LogCustomEvent(string customEventType, Dictionary<string, object> customPayload = null);

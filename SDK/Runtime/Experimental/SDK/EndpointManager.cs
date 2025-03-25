@@ -27,6 +27,12 @@ namespace Metica.Experimental
             }
         }
 
+        /// <summary>
+        /// Converts an <see cref="HttpResponse"/> to another serializable <see cref="IMeticaHttpResult"/> sub-type.
+        /// </summary>
+        /// <typeparam name="TResult">The typoe to convert to.</typeparam>
+        /// <param name="response">An <see cref="HttpResponse"/> object.</param>
+        /// <returns>The object of type specified in <typeparamref name="TResult"/>.</returns>
         protected TResult ResponseToResult<TResult>(HttpResponse response) where TResult : IMeticaHttpResult, new()
         {
             if (response.Status == HttpResponse.ResultStatus.Success)
