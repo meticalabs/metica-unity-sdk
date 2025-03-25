@@ -31,6 +31,8 @@ namespace Metica.Experimental
     {
         #region Fields
 
+        public static IMeticaSdk SDK {  get => Registry.Resolve<IMeticaSdk>(); }
+
         public static string Version { get => "1.4.0"; }
 
         public static string CurrentUserId {  get; set; }
