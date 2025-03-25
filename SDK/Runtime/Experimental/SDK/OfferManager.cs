@@ -7,6 +7,7 @@ using Metica.Experimental.Core;
 using Metica.Experimental.Network;
 using Metica.Experimental.SDK;
 using Metica.Experimental.SDK.Model;
+using System;
 
 namespace Metica.Experimental
 {
@@ -119,11 +120,19 @@ namespace Metica.Experimental
             }
         }
 
+        /// <summary>
+        /// Gets specified placements asynchronously.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="placements"></param>
+        /// <param name="userData"></param>
+        /// <param name="deviceInfo"></param>
+        /// <returns></returns>
         public async Task<OfferResult> GetOffersAsync(string userId, string[] placements, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
         {
             if(placements == null || placements.Length == 0)
             {
-                throw new System.ArgumentException($"{nameof(placements)} cannot be null nor with length = 0");
+                return await GetAllOffersAsync(userId, userData, deviceInfo);
             }
 
             var requestBody = new Dictionary<string, object>
