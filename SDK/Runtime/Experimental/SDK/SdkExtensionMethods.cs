@@ -1,9 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Metica.Experimental.SDK
 {
-    public static class DictionaryExtensionMethods
+    public static class SdkExtensionMethods
     {
         public static void AddDictionary<T, S>(this Dictionary<T,S> dictionary, Dictionary<T,S> additionalDictionary, bool overwriteExistingKeys = false)
         {
@@ -28,6 +30,19 @@ namespace Metica.Experimental.SDK
                 {
                     dictionary.Add(item.Key, item.Value); // lets exceptions bubble up
                 }
+            }
+        }
+
+        /// <summary>
+        /// This can be used to wait for tasks and async methods to complete.
+        /// </summary>
+        /// <param name="task"></param>
+        /// <returns></returns>
+        public static IEnumerator Await(this Task task)
+        {
+            while (task.IsCompleted == false) // (from MS docs): IsCompleted is true if the task has completed (that is, the task is in one of the three final states: RanToCompletion, Faulted, or Canceled); otherwise, false.
+            {
+                yield return null;
             }
         }
     }
