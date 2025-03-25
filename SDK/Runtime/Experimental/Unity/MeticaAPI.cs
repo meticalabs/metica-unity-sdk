@@ -2,11 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using Metica.Experimental.Core;
 using Metica.Experimental.SDK;
 using Metica.Experimental.SDK.Model;
-using static UnityEngine.Random;
-using UnityEngine;
 
 namespace Metica.Experimental.Unity
 {
@@ -14,27 +11,58 @@ namespace Metica.Experimental.Unity
     // Metica API for retro compatibility with previous SDK. //
     // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_- //
 
+    /// <summary>
+    /// # Metica API
+    /// 
+    /// ## How to upgrade to new SDK
+    /// 
+    /// If you're using a version of the SDK that is below 1.3.1 and you want to upgrade to 1.4.0
+    /// you don't need to do much. In fact, this class, <see cref="MeticaAPI"/> should look familiar to you.
+    /// This version of it is made for retro compatibility with the provious releases.
+    /// 
+    /// Where you find errors related to the type `OffersByPlacement`, add the following line at the top of the file:
+    /// <code>
+    /// using OffersByPlacement = Metica.Experimental.OfferResult;
+    /// </code>
+    /// Where you find errors related to the type `Log`, add the following line at the top of the file:
+    /// <code>
+    /// using MeticaLogger = Log;
+    /// </code>
+    /// That should be enough to keep you going with your project. However,
+    /// note that there is a new way to use the SDK and it is recommended that you switch to it.
+    /// 
+    /// ## New way to access SDK methods
+    /// 
+    /// ### Initialization
+    /// 
+    /// Currently the initialization is done in Unity in the `MeticaUnitySdk`, linked to the `MeticaSdk` prefab,
+    /// so make sure you have exactly one `MeticaSdk` prefab in your starting scene. This object will be marked
+    /// as `DontDestroyOnLoad` so it will not be disposed of when a new scene is loaded.
+    /// There is no need to call <see cref="Initialise(string, string, string, SdkConfig, MeticaAPI.MeticaSdkDelegate{bool})"/>
+    /// (or other overload) anymore.
+    /// 
+    /// ### New way to use the SDK
+    /// 
+    /// 1. Get the sdk instance (after Unity's `Awake` phase):
+    /// <code>
+    /// IMeticaSdk _sdk = MeticaSdk.SDK;</IMeticaSdk>
+    /// </code>
+    /// 2. Call asynchronous methods:
+    /// <code>
+    /// var offerResult = await _sdk.GetOffersAsync(null);
+    /// </code>
+    /// </summary>
     public static class MeticaAPI
     {
         // Reference to the SDK
         private static IMeticaSdk _sdk = null;
-        private static IMeticaSdk SDK {
-            get
-            {
-                if (!Initialized)
-                {
-                    _sdk = Registry.Resolve<IMeticaSdk>();
-                    Initialized = true;
-                }
-                return _sdk;
-            }
-        }
+        private static IMeticaSdk SDK { get => MeticaSdk.SDK; }
 
         // Fields
         public static string UserId { get => MeticaSdk.CurrentUserId; set => MeticaSdk.CurrentUserId = value; }
         public static string AppId { get => MeticaSdk.AppId; }
         public static string ApiKey { get => MeticaSdk.ApiKey; }
-        public static bool Initialized { get; private set; }
+        public static bool Initialized { get; private set; } = true;
         public static SdkConfig Config { get; }
 
         //Methods
@@ -64,14 +92,18 @@ namespace Metica.Experimental.Unity
         /// <param name="configKeys">List of keys of required SmartConfigs. Leave to null or empty to get all SmartConfigs.</param>
         /// <param name="userProperties">Real-time user state data to override pre-ingested user state attributes, conforms to userStateAttributes.</param>
         /// <param name="deviceInfo">A <see cref="DeviceInfo"/> object. If null, one will be automatically created to retrieve information about the device.</param>
-        public static void GetConfig(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
+        /// <remarks>
+        /// ## ROADMAP
+        /// - TODO [BREAKING CHANGE] : This will be renamed back to GetConfig and will be the only way to get the result.
+        /// </remarks>
+        public static void GetConfigAsConfigResult(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
-            CoroutineHelper.Instance.RunCoroutine(GetConfigCoroutine(responseCallback, configKeys, userData, deviceInfo));
+            CoroutineHelper.Instance.RunCoroutine(GetConfigCoroutine(responseCallback, configKeys, userProperties, deviceInfo));
         }
 
-        private static IEnumerator GetConfigCoroutine(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
+        private static IEnumerator GetConfigCoroutine(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
-            var task = SDK.GetConfigsAsync(configKeys, userData, deviceInfo);
+            var task = SDK.GetConfigsAsync(configKeys, userProperties, deviceInfo);
             yield return task.Await();
             if (task.IsCompletedSuccessfully == false)
             {
@@ -151,10 +183,11 @@ namespace Metica.Experimental.Unity
         ///     }
         /// }
         /// </code>
+        /// ## ROADMAP
+        /// 
+        /// - TODO : This call will be removed in favour of <see cref="GetOffers(string[], MeticaSdkDelegate{OfferResult}, Dictionary{string, object}, DeviceInfo)"/>.
         /// </remarks>
-        [Obsolete(@"Please use GetOffers(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
-                    or GetOffers(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)")]
-        public static void GetOffers(String[] placements, MeticaSdkDelegate<Dictionary<string, List<Offer>>> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        public static void GetOffersAsDictionary(String[] placements, MeticaSdkDelegate<Dictionary<string, List<Offer>>> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
             CoroutineHelper.Instance.RunCoroutine(GetOffersCoroutine(placements, responseCallback, userProperties, deviceInfo));
         }
@@ -231,7 +264,9 @@ namespace Metica.Experimental.Unity
         public static void LogUserAttributes(Dictionary<string, object> userAttributes) =>
             LogFullStateUpdate(userAttributes);
 
-        // Related types from old SDK
+        // =-=-=-=-=-=-=-=-=-=-=-=-=-= //
+        // Related types from old SDK  //
+        // =-=-=-=-=-=-=-=-=-=-=-=-=-= //
 
         [Obsolete]
         public delegate void MeticaSdkDelegate<T>(ISdkResult<T> result);
