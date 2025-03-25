@@ -81,6 +81,11 @@ namespace Metica.Experimental.Unity
         /// <param name="configKeys">List of keys of required SmartConfigs. Leave to null or empty to get all SmartConfigs.</param>
         /// <param name="userProperties">Real-time user state data to override pre-ingested user state attributes, conforms to userStateAttributes.</param>
         /// <param name="deviceInfo">A <see cref="DeviceInfo"/> object. If null, one will be automatically created to retrieve information about the device.</param>
+        /// <remarks>
+        /// ## ROADMAP
+        /// - TODO : make this obsolete and use a response callback with <see cref="ConfigResult"/> as in
+        /// <see cref="GetConfigAsConfigResult(MeticaSdkDelegate{ConfigResult}, List{string}, Dictionary{string, object}, DeviceInfo)"/>
+        /// </remarks>
         public static void GetConfig(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
             CoroutineHelper.Instance.RunCoroutine(GetConfigCoroutine(responseCallback, configKeys, userProperties, deviceInfo));
@@ -95,6 +100,7 @@ namespace Metica.Experimental.Unity
         /// <remarks>
         /// ## ROADMAP
         /// - TODO [BREAKING CHANGE] : This will be renamed back to GetConfig and will be the only way to get the result.
+        /// - TODO : we'll likely introduce static async versions for some or all of the methods as alternatives to the current static void versions.
         /// </remarks>
         public static void GetConfigAsConfigResult(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
