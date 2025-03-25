@@ -51,11 +51,11 @@ namespace Metica.Experimental.Unity
         /// </summary>
         /// <param name="responseCallback">Callback method to process the result as a dictionary.</param>
         /// <param name="configKeys">List of keys of required SmartConfigs. Leave to null or empty to get all SmartConfigs.</param>
-        /// <param name="userData">Real-time user state data to override pre-ingested user state attributes, conforms to userStateAttributes.</param>
+        /// <param name="userProperties">Real-time user state data to override pre-ingested user state attributes, conforms to userStateAttributes.</param>
         /// <param name="deviceInfo">A <see cref="DeviceInfo"/> object. If null, one will be automatically created to retrieve information about the device.</param>
-        public static void GetConfig(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
+        public static void GetConfig(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
-            CoroutineHelper.Instance.RunCoroutine(GetConfigCoroutine(responseCallback, configKeys, userData, deviceInfo));
+            CoroutineHelper.Instance.RunCoroutine(GetConfigCoroutine(responseCallback, configKeys, userProperties, deviceInfo));
         }
         
         //public static void GetConfig(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
