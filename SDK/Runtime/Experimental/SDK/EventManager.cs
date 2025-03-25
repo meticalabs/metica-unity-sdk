@@ -49,7 +49,6 @@ namespace Metica.Experimental
         public event OnEventsDispatchDelegate OnEventsDispatch;
 
         private readonly IMeticaAttributesProvider _meticaAttributesProvider;
-        private readonly IDeviceInfoProvider _deviceInfoProvider;
         private readonly ITimeSource _timeSource = new SystemDateTimeSource();
         private readonly SdkConfig _sdkConfig;
 
@@ -66,7 +65,6 @@ namespace Metica.Experimental
             ) : base(httpService, endpoint)
         {
             _meticaAttributesProvider = meticaAttributesProvider;
-            _deviceInfoProvider = Registry.Resolve<IDeviceInfoProvider>();
             _events = new List<object>();
             OnEventsDispatch += DispatchHandler;
             _eventQueueCountTrigger = eventQueueCountTrigger;
@@ -89,7 +87,6 @@ namespace Metica.Experimental
                 { FieldNames.EventTime, _timeSource.EpochSeconds() },
                 { FieldNames.AppId, appId },
                 { FieldNames.UserId, userId },
-                { FieldNames.DeviceInfo, _deviceInfoProvider.GetDeviceInfo() },
                 { FieldNames.MeticaUnitySdk, MeticaSdk.Version },
                 { FieldNames.CustomPayload, customPayload }
             };
