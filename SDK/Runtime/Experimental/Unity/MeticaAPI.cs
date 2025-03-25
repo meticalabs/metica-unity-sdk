@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using Metica.Experimental.Core;
 using Metica.Experimental.SDK;
 using Metica.Experimental.SDK.Model;
+using static UnityEngine.Random;
+using UnityEngine;
 
 namespace Metica.Experimental.Unity
 {
@@ -55,44 +57,50 @@ namespace Metica.Experimental.Unity
         {
             CoroutineHelper.Instance.RunCoroutine(GetConfigCoroutine(responseCallback, configKeys, userProperties, deviceInfo));
         }
-        
-        //public static void GetConfig(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
-        //{
-        //    CoroutineHelper.Instance.RunCoroutine(GetConfigCoroutine(responseCallback, configKeys, userData, deviceInfo));
-        //}
-
         /// <summary>
-        /// Method in the form of coroutine to get all SmartConfigs with the given keys.
+        /// Gets all or the StartConfigs with the given keys.
         /// </summary>
-        /// <param name="responseCallback">Callback method to process the result as a dictionary.</param>
+        /// <param name="responseCallback">Callback method to process the result as a <see cref="ConfigResult"/>.</param>
         /// <param name="configKeys">List of keys of required SmartConfigs. Leave to null or empty to get all SmartConfigs.</param>
-        /// <param name="userData">Real-time user state data to override pre-ingested user state attributes, conforms to userStateAttributes.</param>
+        /// <param name="userProperties">Real-time user state data to override pre-ingested user state attributes, conforms to userStateAttributes.</param>
         /// <param name="deviceInfo">A <see cref="DeviceInfo"/> object. If null, one will be automatically created to retrieve information about the device.</param>
-        /// <remarks>
-        /// Note that this method is there only to adapt the new SDK to the former MeticaAPI surface. We wrap asynchronous methods in a coroutine.
-        /// </remarks>
-        public static IEnumerator GetConfigCoroutine(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
+        public static void GetConfig(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
+        {
+            CoroutineHelper.Instance.RunCoroutine(GetConfigCoroutine(responseCallback, configKeys, userData, deviceInfo));
+        }
+
+        private static IEnumerator GetConfigCoroutine(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
         {
             var task = SDK.GetConfigsAsync(configKeys, userData, deviceInfo);
             yield return task.Await();
+            if (task.IsCompletedSuccessfully == false)
+            {
+                Log.Error(() => $"A task didn't complete successfully in {nameof(GetConfigCoroutine)}");
+                yield break;
+            }
             responseCallback?.Invoke(new SdkResultImpl<Dictionary<string, object>>().WithResult(task.Result.Configs));
         }
-        //public static IEnumerator GetConfigCoroutine(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
-        //{
-        //    var task = SDK.GetConfigsAsync(configKeys, userProperties, deviceInfo);
-        //    while (!task.IsCompleted)
-        //        yield return null;
-        //    responseCallback?.Invoke(new SdkResultImpl<ConfigResult>().WithResult(task.Result));
-        //}
+        private static IEnumerator GetConfigCoroutine(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        {
+            var task = SDK.GetConfigsAsync(configKeys, userProperties, deviceInfo);
+            yield return task.Await();
+            if (task.IsCompletedSuccessfully == false)
+            {
+                Log.Error(() => $"A task didn't complete successfully in {nameof(GetOffersCoroutine)}");
+                yield break;
+            }
+            responseCallback?.Invoke(new SdkResultImpl<ConfigResult>().WithResult(task.Result));
+        }
 
 
         /// <summary>
-        /// Gets all or 
+        /// Gets the placements with the given IDs. if placement is null or empty, all placements and offers will be fetched.
         /// </summary>
-        /// <param name="placements"></param>
-        /// <param name="responseCallback"></param>
-        /// <param name="userProperties"></param>
-        /// <param name="deviceInfo"></param>
+        /// <param name="placements">Ad array of placement IDs. If this field is null or empty, all placements and offers will be fetched.</param>
+        /// <param name="responseCallback">A callback method that takes an <see cref="OfferResult"/> to process it when the data is received.</param>
+        /// <param name="userProperties">Real-time user state data to override pre-ingested user state attributes, conforms to its userStateAttributes property.</param>
+        /// <param name="deviceInfo">A <see cref="DeviceInfo"/> object. If null, one will be created automatically.</param>
+        /// <seealso cref="GetOffers(string[], MeticaSdkDelegate{Dictionary{string, List{Offer}}}, Dictionary{string, object}, DeviceInfo)"/>
         /// <remarks>
         /// Example call:
         /// <code>
@@ -112,35 +120,50 @@ namespace Metica.Experimental.Unity
         /// }
         /// </code>
         /// </remarks>
-        //public static void GetOffers(String[] placements, MeticaSdkDelegate<Dictionary<string, List<Offer>>> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
-        //{
-        //        _ = GetOffersAsync(placements, responseCallback, userProperties, deviceInfo);
-        //}
-        //public static void GetOffers(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
-        //{
-        //        _ = GetOffersAsync(placements, responseCallback, userProperties, deviceInfo);
-        //}
-        [Obsolete(@"Please use GetOffers(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
-                    or GetOffers(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)")]
         public static void GetOffers(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
             CoroutineHelper.Instance.RunCoroutine(GetOffersCoroutine(placements, responseCallback, userProperties, deviceInfo));
         }
-        //public static async Task GetOffersAsync(String[] placements, MeticaSdkDelegate<Dictionary<string, List<Offer>>> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
-        //{
-        //    var result = await SDK.GetOffersAsync(placements, userProperties, deviceInfo);
-        //    responseCallback?.Invoke(new SdkResultImpl<Dictionary<string, List<Offer>>>().WithResult(result.Placements));
-        //}
-        //public static async Task GetOffersAsync(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
-        //{
-        //    var result = await SDK.GetOffersAsync(placements, userProperties, deviceInfo);
-        //    responseCallback?.Invoke(new SdkResultImpl<OfferResult>().WithResult(result));
-        //}
-        public static IEnumerator GetOffersCoroutine(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        /// <summary>
+        /// Gets the placements with the given IDs. if placement is null or empty, all placements and offers will be fetched.
+        /// </summary>
+        /// <param name="placements">Ad array of placement IDs. If this field is null or empty, all placements and offers will be fetched.</param>
+        /// <param name="responseCallback">A callback method that takes a <code>Dictionary<string, List<Offer>></code> to process it when the data is received.</param>
+        /// <param name="userProperties">Real-time user state data to override pre-ingested user state attributes, conforms to its userStateAttributes property.</param>
+        /// <param name="deviceInfo">A <see cref="DeviceInfo"/> object. If null, one will be created automatically.</param>
+        /// <seealso cref="GetOffers(string[], MeticaSdkDelegate{OfferResult}, Dictionary{string, object}, DeviceInfo)"/>
+        /// <remarks>
+        /// Example call:
+        /// <code>
+        /// // Get all placements:
+        /// MeticaAPI.GetOffers(null, MyOfferResultHandler, myUserProperties);
+        /// </code>
+        /// A handler example:
+        /// <code>
+        /// void MyOfferResultHandler(OfferResult offerResult)
+        /// {
+        ///     var placements = offerResult.Placements;
+        ///     foreach(var pId in placements.Keys)
+        ///     {
+        ///         List<Offer> offers = placements[pId];
+        ///         foreach(var offer in offers)
+        ///             Log.Info(()=> $"{offer.offerId} :: {offer.currencyId}{offer.price}");
+        ///     }
+        /// }
+        /// </code>
+        /// </remarks>
+        [Obsolete(@"Please use GetOffers(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+                    or GetOffers(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)")]
+        public static void GetOffers(String[] placements, MeticaSdkDelegate<Dictionary<string, List<Offer>>> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        {
+            CoroutineHelper.Instance.RunCoroutine(GetOffersCoroutine(placements, responseCallback, userProperties, deviceInfo));
+        }
+
+        private static IEnumerator GetOffersCoroutine(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
             var task = SDK.GetOffersAsync(placements, userProperties, deviceInfo);
             yield return task.Await();
-            if (!task.IsCompletedSuccessfully)
+            if (task.IsCompletedSuccessfully == false)
             {
                 Log.Error(() => $"A task didn't complete successfully in {nameof(GetOffersCoroutine)}");
                 yield break;
@@ -151,6 +174,19 @@ namespace Metica.Experimental.Unity
             };
             responseCallback?.Invoke(new SdkResultImpl<OfferResult>().WithResult(offerResult));
         }
+        private static IEnumerator GetOffersCoroutine(String[] placements, MeticaSdkDelegate<Dictionary<string,List<Offer>>> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        {
+            var task = SDK.GetOffersAsync(placements, userProperties, deviceInfo);
+            yield return task.Await();
+            if (!task.IsCompletedSuccessfully)
+            {
+                Log.Error(() => $"A task didn't complete successfully in {nameof(GetOffersCoroutine)}");
+                yield break;
+            }
+            var result = task.Result;
+            responseCallback?.Invoke(new SdkResultImpl<Dictionary<string, List<Offer>>>().WithResult(result.Placements));
+        }
+
 
         public static void LogInstall(Dictionary<string, object> customPayload = null) => 
             SDK.LogInstallEvent(customPayload);
