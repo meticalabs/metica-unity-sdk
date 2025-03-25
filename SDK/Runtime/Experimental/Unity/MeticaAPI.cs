@@ -1,12 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 using Metica.Experimental.Core;
 using Metica.Experimental.SDK;
 using Metica.Experimental.SDK.Model;
-using UnityEngine;
 
 namespace Metica.Experimental.Unity
 {
@@ -76,8 +74,7 @@ namespace Metica.Experimental.Unity
         public static IEnumerator GetConfigCoroutine(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
         {
             var task = SDK.GetConfigsAsync(configKeys, userData, deviceInfo);
-            while (task.IsCompleted == false && !task.IsCanceled)
-                yield return null;
+            yield return task.Await();
             responseCallback?.Invoke(new SdkResultImpl<Dictionary<string, object>>().WithResult(task.Result.Configs));
         }
         //public static IEnumerator GetConfigCoroutine(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
@@ -142,8 +139,12 @@ namespace Metica.Experimental.Unity
         public static IEnumerator GetOffersCoroutine(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
             var task = SDK.GetOffersAsync(placements, userProperties, deviceInfo);
-            while (!task.IsCompleted)
-                yield return null;
+            yield return task.Await();
+            if (!task.IsCompletedSuccessfully)
+            {
+                Log.Error(() => $"A task didn't complete successfully in {nameof(GetOffersCoroutine)}");
+                yield break;
+            }
             var result = task.Result;
             var offerResult = new OfferResult {
                 Placements = result.Placements
@@ -196,8 +197,10 @@ namespace Metica.Experimental.Unity
 
         // Related types from old SDK
 
+        [Obsolete]
         public delegate void MeticaSdkDelegate<T>(ISdkResult<T> result);
 
+        [Obsolete]
         /// <summary>
         /// Represents the result of an SDK operation.
         /// </summary>
@@ -215,6 +218,7 @@ namespace Metica.Experimental.Unity
             string Error { get; }
         }
 
+        [Obsolete]
         public class SdkResultImpl<T> : ISdkResult<T>
         {
             public T Result { get; internal set; }
