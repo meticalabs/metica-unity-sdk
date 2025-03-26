@@ -74,7 +74,7 @@ namespace Metica.Experimental
             // Initialize a ConfigManager
             _configManager = new ConfigManager(_http, $"{Config.remoteConfigEndpoint}/config/v1/apps/{Config.appId}");
             // Initialize an EventManager with _offerManager as IMeticaAttributesProvider
-            _eventManager = new EventManager(_http, $"{Config.ingestionEndpoint}/ingest/v1/events", _offerManager, config.maxPendingLoggedEvents);
+            _eventManager = new EventManager(_http, $"{Config.ingestionEndpoint}/ingest/v1/events", _offerManager, config.eventsLogDispatchMaxQueueSize);
             // Set the current (mutable) CurrentUserId with the initial value given in the configuration
             CurrentUserId = Config.initialUserId;
             ApiKey = Config.apiKey;

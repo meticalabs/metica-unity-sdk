@@ -1,5 +1,4 @@
-using System.IO;
-using UnityEngine;
+using static System.Net.WebRequestMethods;
 
 namespace Metica.Experimental.SDK
 {
@@ -9,6 +8,8 @@ namespace Metica.Experimental.SDK
         public string apiKey;
         public string appId;
         public string initialUserId;
+
+        private const string DefaultEndpoint = "https://api-gateway.prod-eu.metica.com";
 
         /// <summary>
         /// The full endpoint to the Metica offers endpoint.
@@ -32,22 +33,22 @@ namespace Metica.Experimental.SDK
         /// This limit is shared by all offers. Once the limit is reached, then the oldest entries
         /// will be removed and replaced by the newly incoming ones.
         /// </remarks>
-        public uint maxDisplayLogEntries;
+        //public uint maxDisplayLogEntries;
 
         /// <summary>
         /// The filesystem path where the display log will be persisted.
         /// </summary>
-        public string displayLogPath;
+        //public string displayLogPath;
 
         /// <summary>
         /// The cadence, in seconds, by which the displays log will be persisted to the filesystem.
         /// </summary>
-        public uint displayLogFlushCadence;
+        //public uint displayLogFlushCadence;
 
         /// <summary>
         /// The cadence, in seconds, by which the logged events will be sent to the ingestion service.
         /// </summary>
-        public uint eventsLogFlushCadence;
+        public uint eventsLogDispatchCadence;
 
         /// <summary>
         /// The maximum number of pending logged events before they are sent to the ingestion service.
@@ -56,27 +57,27 @@ namespace Metica.Experimental.SDK
         /// When the number of pending logged events reaches this maximum value, then the oldest accumulated events
         /// will be dropped to accomodate the most recent ones.
         /// </remarks>
-        public uint maxPendingLoggedEvents;
+        public uint eventsLogDispatchMaxQueueSize;
 
         /// <summary>
         /// The time-to-live, in minutes, for the offers cache.
         /// </summary>
-        public uint offersCacheTtlMinutes;
+        public uint httpCacheTTLSeconds;
 
         /// <summary>
         /// The filesystem path where the offers cache will be stored.
         /// </summary>
-        public string offersCachePath;
+        //public string offersCachePath;
 
         /// <summary>
         /// The filesystem path where the remote config cache will be stored.
         /// </summary>
-        public string remoteConfigCachePath;
+        //public string remoteConfigCachePath;
 
         /// <summary>
         /// The network timeout, in seconds, for the calls to any Metica endpoint.
         /// </summary>
-        public int networkTimeout;
+        public int httpRequestTimeout;
 
         /// <summary>
         /// The log level for the SDK.
@@ -92,18 +93,18 @@ namespace Metica.Experimental.SDK
                 appId = string.Empty,
                 initialUserId = string.Empty,
                 // - - - - - - - - - -
-                ingestionEndpoint = "https://api.prod-eu.metica.com",
-                offersEndpoint = "https://api.prod-eu.metica.com",
-                remoteConfigEndpoint = "https://api.prod-eu.metica.com",
-                maxDisplayLogEntries = 256,
-                displayLogFlushCadence = 60,
-                displayLogPath = Path.Combine(Application.persistentDataPath, "display_log"),
-                maxPendingLoggedEvents = 256,
-                eventsLogFlushCadence = 60,
-                offersCacheTtlMinutes = 120,
-                offersCachePath = Path.Combine(Application.persistentDataPath, "metica-offers.json"),
-                remoteConfigCachePath = Path.Combine(Application.persistentDataPath, "metica-rc.json"),
-                networkTimeout = 2,
+                ingestionEndpoint = DefaultEndpoint,
+                offersEndpoint = DefaultEndpoint,
+                remoteConfigEndpoint = DefaultEndpoint,
+                //maxDisplayLogEntries = 256,
+                //displayLogFlushCadence = 60,
+                //displayLogPath = Path.Combine(Application.persistentDataPath, "display_log"),
+                eventsLogDispatchMaxQueueSize = 32,
+                eventsLogDispatchCadence = 60,
+                httpCacheTTLSeconds = 60,
+                //offersCachePath = Path.Combine(Application.persistentDataPath, "metica-offers.json"),
+                //remoteConfigCachePath = Path.Combine(Application.persistentDataPath, "metica-rc.json"),
+                httpRequestTimeout = 2,
                 logLevel = LogLevel.Error
             };
         }
