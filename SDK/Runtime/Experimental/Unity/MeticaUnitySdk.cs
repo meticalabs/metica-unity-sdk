@@ -11,6 +11,11 @@ namespace Metica.Experimental.Unity
         [SerializeField] private SdkConfigProvider _sdkConfigProvider;
         private MeticaSdk _meticaSdk;
 
+#if UNITY_EDITOR
+        /// <summary>EDITOR ONLY</summary>
+        public SdkConfigProvider SdkConfigProviderEditor { get { return _sdkConfigProvider; } set { _sdkConfigProvider = value; } }
+#endif
+
         private void Awake()
         {
             // Register implementations before anything else. These are Unity implementations.
