@@ -281,73 +281,75 @@ namespace Metica.Experimental.Unity
         public static void LogUserAttributes(Dictionary<string, object> userAttributes) =>
             LogFullStateUpdate(userAttributes);
 
-        // =-=-=-=-=-=-=-=-=-=-=-=-=-= //
-        // Related types from old SDK  //
-        // =-=-=-=-=-=-=-=-=-=-=-=-=-= //
+        
+    }
 
-        [Obsolete]
-        public delegate void MeticaSdkDelegate<T>(ISdkResult<T> result);
+    // =-=-=-=-=-=-=-=-=-=-=-=-=-= //
+    // Related types from old SDK  //
+    // =-=-=-=-=-=-=-=-=-=-=-=-=-= //
 
-        [Obsolete]
+    [Obsolete]
+    public delegate void MeticaSdkDelegate<T>(ISdkResult<T> result);
+
+    [Obsolete]
+    /// <summary>
+    /// Represents the result of an SDK operation.
+    /// </summary>
+    public interface ISdkResult<T>
+    {
         /// <summary>
-        /// Represents the result of an SDK operation.
+        /// The result of the operation, if any.
         /// </summary>
-        public interface ISdkResult<T>
-        {
-            /// <summary>
-            /// The result of the operation, if any.
-            /// </summary>
-            T Result { get; }
+        T Result { get; }
 
-            /// <summary>
-            /// Contains an error code, if the operation failed. Will be null if the operation was successful.
-            /// </summary>
-            /// <value>The error string from the result. If no error occured value is null or empty.</value>
-            string Error { get; }
+        /// <summary>
+        /// Contains an error code, if the operation failed. Will be null if the operation was successful.
+        /// </summary>
+        /// <value>The error string from the result. If no error occured value is null or empty.</value>
+        string Error { get; }
+    }
+
+    [Obsolete]
+    public class SdkResultImpl<T> : ISdkResult<T>
+    {
+        public T Result { get; internal set; }
+
+        public string Error { get; internal set; }
+
+        public ISdkResult<T> WithResult(T result)
+        {
+            return new SdkResultImpl<T>()
+            {
+                Result = result
+            };
         }
 
-        [Obsolete]
-        public class SdkResultImpl<T> : ISdkResult<T>
+        public ISdkResult<T> WithError(string error)
         {
-            public T Result { get; internal set; }
-
-            public string Error { get; internal set; }
-
-            public ISdkResult<T> WithResult(T result)
+            return new SdkResultImpl<T>()
             {
-                return new SdkResultImpl<T>()
-                {
-                    Result = result
-                };
-            }
-
-            public ISdkResult<T> WithError(string error)
-            {
-                return new SdkResultImpl<T>()
-                {
-                    Error = error,
-                };
-            }
+                Error = error,
+            };
         }
+    }
 
-        [Serializable, Obsolete("Please use 'OfferResult'")]
-        public class OffersByPlacement
+    [Serializable, Obsolete("Please use 'OfferResult'")]
+    public class OffersByPlacement
+    {
+        public Dictionary<string, List<Offer>> placements = new Dictionary<string, List<Offer>>();
+        public override string ToString()
         {
-            public Dictionary<string, List<Offer>> placements = new Dictionary<string, List<Offer>>();
-            public override string ToString()
+            System.Text.StringBuilder sb = new System.Text.StringBuilder("OffersByPlacement:");
+            foreach (var placement in placements.Keys)
             {
-                System.Text.StringBuilder sb = new System.Text.StringBuilder("OffersByPlacement:");
-                foreach (var placement in placements.Keys)
+                sb.AppendLine($"Placement: {placement}");
+                foreach (var offer in placements[placement])
                 {
-                    sb.AppendLine($"Placement: {placement}");
-                    foreach (var offer in placements[placement])
-                    {
-                        sb.AppendLine($"\tOffer: {offer.offerId}");
-                        sb.AppendLine($"\t\t{offer.iap}");
-                    }
+                    sb.AppendLine($"\tOffer: {offer.offerId}");
+                    sb.AppendLine($"\t\t{offer.iap}");
                 }
-                return sb.ToString();
             }
+            return sb.ToString();
         }
     }
 }
