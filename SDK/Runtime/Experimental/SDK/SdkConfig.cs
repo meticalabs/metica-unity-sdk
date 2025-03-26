@@ -1,5 +1,3 @@
-using static System.Net.WebRequestMethods;
-
 namespace Metica.Experimental.SDK
 {
     [System.Serializable]
@@ -12,19 +10,9 @@ namespace Metica.Experimental.SDK
         private const string DefaultEndpoint = "https://api-gateway.prod-eu.metica.com";
 
         /// <summary>
-        /// The full endpoint to the Metica offers endpoint.
-        /// </summary>
-        public string offersEndpoint;
-
-        /// <summary>
         /// The full endpoint to the Metica ingestion service.
         /// </summary>
-        public string ingestionEndpoint;
-
-        /// <summary>
-        /// The full endpoint to the Metica remote-config service.
-        /// </summary>
-        public string remoteConfigEndpoint;
+        public string baseEndpoint;
 
         /// <summary>
         /// The maximum number of entries stored in the displays log. 
@@ -93,9 +81,7 @@ namespace Metica.Experimental.SDK
                 appId = string.Empty,
                 initialUserId = string.Empty,
                 // - - - - - - - - - -
-                ingestionEndpoint = DefaultEndpoint,
-                offersEndpoint = DefaultEndpoint,
-                remoteConfigEndpoint = DefaultEndpoint,
+                baseEndpoint = DefaultEndpoint,
                 //maxDisplayLogEntries = 256,
                 //displayLogFlushCadence = 60,
                 //displayLogPath = Path.Combine(Application.persistentDataPath, "display_log"),
