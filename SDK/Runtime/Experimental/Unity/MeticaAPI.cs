@@ -209,7 +209,7 @@ namespace Metica.Experimental.Unity
             }
             var result = task.Result;
             var offerResult = new OfferResult {
-                Placements = result.Placements
+                placements = result.placements
             };
             responseCallback?.Invoke(new SdkResultImpl<OfferResult>().WithResult(offerResult));
         }
@@ -223,7 +223,7 @@ namespace Metica.Experimental.Unity
                 yield break;
             }
             var result = task.Result;
-            responseCallback?.Invoke(new SdkResultImpl<Dictionary<string, List<Offer>>>().WithResult(result.Placements));
+            responseCallback?.Invoke(new SdkResultImpl<Dictionary<string, List<Offer>>>().WithResult(result.placements));
         }
 
 

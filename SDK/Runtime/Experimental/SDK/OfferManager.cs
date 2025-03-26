@@ -7,7 +7,6 @@ using Metica.Experimental.Core;
 using Metica.Experimental.Network;
 using Metica.Experimental.SDK;
 using Metica.Experimental.SDK.Model;
-using System;
 
 namespace Metica.Experimental
 {
@@ -15,9 +14,9 @@ namespace Metica.Experimental
     public class OfferResult : IMeticaHttpResult
     {
         [JsonProperty("placements")]
-        public Dictionary<string, List<Offer>> Placements { get; set; }
-        [Obsolete("Please use 'Placements'")]
-        public Dictionary<string, List<Offer>> placements { get => Placements; }
+        public Dictionary<string, List<Offer>> placements { get; set; }
+        //[Obsolete("Please use 'Placements'")]
+        //public Dictionary<string, List<Offer>> placements { get => Placements; }
 
         [JsonIgnore] public HttpResponse.ResultStatus Status { get; set; }
         [JsonIgnore] public string Error { get; set; }
@@ -26,9 +25,9 @@ namespace Metica.Experimental
         public override string ToString()
         {
             string placementsString = string.Empty;
-            if(Placements != null)
+            if(placements != null)
             {
-                foreach (var p in Placements)
+                foreach (var p in placements)
                 {
                     placementsString = $"{placementsString}{p.Key}\n";
                 }
@@ -73,7 +72,7 @@ namespace Metica.Experimental
             {
                 // Lazy fetching of all placements into storage
                 var result = await GetAllOffersAsync(MeticaSdk.CurrentUserId);
-                _sessionPlacementStorage = result.Placements;
+                _sessionPlacementStorage = result.placements;
             }
             if (_sessionPlacementStorage.ContainsKey(placementId) == false)
             {
@@ -104,7 +103,7 @@ namespace Metica.Experimental
             {
                 // Lazy fetching of all placements into storage
                 var result = await GetAllOffersAsync(MeticaSdk.CurrentUserId);
-                _sessionPlacementStorage = result.Placements;
+                _sessionPlacementStorage = result.placements;
             }
 
             foreach (var k in placements.Keys)
@@ -159,7 +158,7 @@ namespace Metica.Experimental
 
             var httpResponse = await _httpService.PostAsync(url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
             OfferResult offerResult = ResponseToResult<OfferResult>(httpResponse);
-            await AddOrUpdateStorage(offerResult.Placements); // Add or update storage with the new received placements.
+            await AddOrUpdateStorage(offerResult.placements); // Add or update storage with the new received placements.
             return offerResult;
         }
 

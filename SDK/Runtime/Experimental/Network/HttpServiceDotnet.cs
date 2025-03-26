@@ -155,7 +155,12 @@ namespace Metica.Experimental.Network
                 HttpResponse cachedResponse = _cache.Get(cacheKey);
                 if (cachedResponse != null)
                 {
+                    //Log.Debug(() => $"Cache HIT {cacheKey.method} {cacheKey.url} {cacheKey.body}");
                     return cachedResponse;
+                }
+                else
+                {
+                    //Log.Debug(() => $"Cache MISS {cacheKey.method} {cacheKey.url} {cacheKey.body}");
                 }
             }
 

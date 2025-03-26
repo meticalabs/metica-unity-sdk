@@ -98,6 +98,8 @@ namespace Metica.Experimental
 
             _events.Add(requestBody);
 
+            Log.Debug(() => $"Queueing {eventType} event, id={requestBody[FieldNames.EventId]}");
+
             if(_events.Count >= _eventQueueCountTrigger)
             {
                 _ = DispatchEvents();
@@ -192,7 +194,7 @@ namespace Metica.Experimental
 
         private void DispatchHandler(EventDispatchResult result)
         {
-            UnityEngine.Debug.Log($"Events Dispatched.\n{result}");
+            Log.Debug(() => $"Events Dispatched.\n{result}");
         }
 
         public override async ValueTask DisposeAsync()
