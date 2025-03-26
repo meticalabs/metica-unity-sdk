@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using System.IO;
 
 namespace Metica.Experimental.Unity
 {
@@ -8,6 +9,8 @@ namespace Metica.Experimental.Unity
     {
         MeticaUnitySdk m_sdk = null;
         SdkConfigProvider m_configProvider = null;
+
+        private const string MeticaDataFolder = "Assets/Metica/Data";
 
         public override void OnInspectorGUI()
         {
@@ -23,11 +26,14 @@ namespace Metica.Experimental.Unity
             {
                 if (GUILayout.Button("Create Configuration"))
                 {
+                    Directory.CreateDirectory(MeticaDataFolder);
+
                     string assetPath = EditorUtility.SaveFilePanelInProject(
                         "Save Metica SDK Configuration",
                         "MeticaSdkConfiguration",
                         "asset",
-                        "Enter a file name for the new configuration asset."
+                        "Enter a file name for the new configuration asset.",
+                        MeticaDataFolder
                     );
 
                     if (!string.IsNullOrEmpty(assetPath))
