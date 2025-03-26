@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Metica.Experimental.SDK
@@ -38,10 +39,14 @@ namespace Metica.Experimental.SDK
         /// </summary>
         /// <param name="task"></param>
         /// <returns></returns>
-        public static IEnumerator Await(this Task task)
+        public static IEnumerator Await(this Task task, CancellationToken cancellationToken = default)
         {
-            while (task.IsCompleted == false) // (from MS docs): IsCompleted is true if the task has completed (that is, the task is in one of the three final states: RanToCompletion, Faulted, or Canceled); otherwise, false.
+            while (task.IsCompleted == false && !cancellationToken.IsCancellationRequested)
             {
+                //if (cancellationToken.IsCancellationRequested)
+                //{
+                //    throw new OperationCanceledException();
+                //}
                 yield return null;
             }
         }
