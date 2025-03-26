@@ -1,7 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Threading;
+using System.Threading.Tasks;
 using Metica.Experimental.SDK;
 using Metica.Experimental.SDK.Model;
 
@@ -75,6 +76,33 @@ namespace Metica.Experimental.Unity
             => Log.Info(() => "There is no need to manually call 'Initialize'.");
 
         /// <summary>
+        /// Utility method to run task in a coroutine
+        /// </summary>
+        /// <typeparam name="T">Return type of the task that's processed in the callback.</typeparam>
+        /// <param name="asyncTaskFunc">Any <see cref="Func{TResult}"/> with <see cref="Task"/>&lt;<typeparamref name="T"/>&gt; as result.</param>
+        /// <param name="responseCallback">The callback that processes the returned value.</param>
+        /// <param name="cancellationToken">A cancellation token for task cancellation.</param>
+        /// <returns><see cref="IEnumerator"/></returns>
+        private static IEnumerator RunAsyncTaskCoroutine<T>(Func<Task<T>> asyncTaskFunc, MeticaSdkDelegate<T> responseCallback, CancellationToken cancellationToken = default)
+        {
+            var task = asyncTaskFunc();
+            yield return task.Await(cancellationToken);
+            if (task.IsCompletedSuccessfully == false)
+            {
+                if (task.IsCanceled)
+                {
+                    Log.Info(() => "Task was cancelled");
+                }
+                else
+                {
+                    Log.Error(() => $"A task didn't complete successfully in {nameof(RunAsyncTaskCoroutine)}");
+                }
+                yield break;
+            }
+            responseCallback?.Invoke(new SdkResultImpl<T>().WithResult(task.Result));
+        }
+
+        /// <summary>
         /// Gets all or the StartConfigs with the given keys.
         /// </summary>
         /// <param name="responseCallback">Callback method to process the result as a dictionary.</param>
@@ -88,7 +116,7 @@ namespace Metica.Experimental.Unity
         /// </remarks>
         public static void GetConfig(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
-            CoroutineHelper.Instance.RunCoroutine(GetConfigCoroutine(responseCallback, configKeys, userProperties, deviceInfo));
+            CoroutineRunner.Instance.RunCoroutine(GetConfigAsDictionaryCoroutine(responseCallback, configKeys, userProperties, deviceInfo));
         }
         /// <summary>
         /// Gets all or the StartConfigs with the given keys.
@@ -104,32 +132,24 @@ namespace Metica.Experimental.Unity
         /// </remarks>
         public static void GetConfigAsConfigResult(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
-            CoroutineHelper.Instance.RunCoroutine(GetConfigCoroutine(responseCallback, configKeys, userProperties, deviceInfo));
+            CoroutineRunner.Instance.RunCoroutine(GetConfigAsConfigResultCoroutine(responseCallback, configKeys, userProperties, deviceInfo));
         }
 
-        private static IEnumerator GetConfigCoroutine(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        private static IEnumerator GetConfigAsDictionaryCoroutine(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
-            var task = SDK.GetConfigsAsync(configKeys, userProperties, deviceInfo);
-            yield return task.Await();
-            if (task.IsCompletedSuccessfully == false)
+            yield return RunAsyncTaskCoroutine(() => SDK.GetConfigsAsync(configKeys, userProperties, deviceInfo), (result) =>
             {
-                Log.Error(() => $"A task didn't complete successfully in {nameof(GetConfigCoroutine)}");
-                yield break;
-            }
-            responseCallback?.Invoke(new SdkResultImpl<Dictionary<string, object>>().WithResult(task.Result.Configs));
-        }
-        private static IEnumerator GetConfigCoroutine(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
-        {
-            var task = SDK.GetConfigsAsync(configKeys, userProperties, deviceInfo);
-            yield return task.Await();
-            if (task.IsCompletedSuccessfully == false)
-            {
-                Log.Error(() => $"A task didn't complete successfully in {nameof(GetOffersCoroutine)}");
-                yield break;
-            }
-            responseCallback?.Invoke(new SdkResultImpl<ConfigResult>().WithResult(task.Result));
+                responseCallback?.Invoke(new SdkResultImpl<Dictionary<string, object>>().WithResult(result.Result.Configs));
+            });
         }
 
+        private static IEnumerator GetConfigAsConfigResultCoroutine(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        {
+            yield return RunAsyncTaskCoroutine(() => SDK.GetConfigsAsync(configKeys, userProperties, deviceInfo), (result) =>
+            {
+                responseCallback?.Invoke(new SdkResultImpl<ConfigResult>().WithResult(result.Result));
+            });
+        }
 
         /// <summary>
         /// Gets the placements with the given IDs. if placement is null or empty, all placements and offers will be fetched.
@@ -160,7 +180,7 @@ namespace Metica.Experimental.Unity
         /// </remarks>
         public static void GetOffers(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
-            CoroutineHelper.Instance.RunCoroutine(GetOffersCoroutine(placements, responseCallback, userProperties, deviceInfo));
+            CoroutineRunner.Instance.RunCoroutine(GetOffersAsOfferResultCoroutine(placements, responseCallback, userProperties, deviceInfo));
         }
         /// <summary>
         /// Gets the placements with the given IDs. if placement is null or empty, all placements and offers will be fetched.
@@ -195,37 +215,28 @@ namespace Metica.Experimental.Unity
         /// </remarks>
         public static void GetOffersAsDictionary(String[] placements, MeticaSdkDelegate<Dictionary<string, List<Offer>>> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
-            CoroutineHelper.Instance.RunCoroutine(GetOffersCoroutine(placements, responseCallback, userProperties, deviceInfo));
+            CoroutineRunner.Instance.RunCoroutine(GetOffersAsDictionaryCoroutine(placements, responseCallback, userProperties, deviceInfo));
         }
 
-        private static IEnumerator GetOffersCoroutine(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        private static IEnumerator GetOffersAsOfferResultCoroutine(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
         {
-            var task = SDK.GetOffersAsync(placements, userProperties, deviceInfo);
-            yield return task.Await();
-            if (task.IsCompletedSuccessfully == false)
+            yield return RunAsyncTaskCoroutine(() => SDK.GetOffersAsync(placements, userProperties, deviceInfo), (result) =>
             {
-                Log.Error(() => $"A task didn't complete successfully in {nameof(GetOffersCoroutine)}");
-                yield break;
-            }
-            var result = task.Result;
-            var offerResult = new OfferResult {
-                placements = result.placements
-            };
-            responseCallback?.Invoke(new SdkResultImpl<OfferResult>().WithResult(offerResult));
-        }
-        private static IEnumerator GetOffersCoroutine(String[] placements, MeticaSdkDelegate<Dictionary<string,List<Offer>>> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
-        {
-            var task = SDK.GetOffersAsync(placements, userProperties, deviceInfo);
-            yield return task.Await();
-            if (!task.IsCompletedSuccessfully)
-            {
-                Log.Error(() => $"A task didn't complete successfully in {nameof(GetOffersCoroutine)}");
-                yield break;
-            }
-            var result = task.Result;
-            responseCallback?.Invoke(new SdkResultImpl<Dictionary<string, List<Offer>>>().WithResult(result.placements));
+                var offerResult = new OfferResult
+                {
+                    placements = result.Result.placements
+                };
+                responseCallback?.Invoke(new SdkResultImpl<OfferResult>().WithResult(offerResult));
+            });
         }
 
+        private static IEnumerator GetOffersAsDictionaryCoroutine(String[] placements, MeticaSdkDelegate<Dictionary<string, List<Offer>>> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        {
+            yield return RunAsyncTaskCoroutine(() => SDK.GetOffersAsync(placements, userProperties, deviceInfo), (result) =>
+            {
+                responseCallback?.Invoke(new SdkResultImpl<Dictionary<string, List<Offer>>>().WithResult(result.Result.placements));
+            });
+        }
 
         public static void LogInstall(Dictionary<string, object> customPayload = null) => 
             SDK.LogInstallEvent(customPayload);
