@@ -46,7 +46,7 @@ namespace Metica.Experimental.Caching
 
         protected const long DefaultTTLSeconds = 60;
 
-        protected readonly long _garbageCollectionIntervalSeconds; // TODO : make this settable
+        protected readonly long _garbageCollectionIntervalSeconds;
         protected long _nextGarbageCollection = 0;
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Metica.Experimental.Caching
         /// <param name="timeSource">An implementation of <see cref="ITimeSource"/></param>
         /// <param name="gcTimeoutSeconds">Minimum time interval between garbage collection.
         /// Note that in this case garbage collection means clearing the cache from expired/invalid cache entries.</param>
-        public Cache(ITimeSource timeSource, long gcTimeoutSeconds = 10)
+        public Cache(ITimeSource timeSource, long gcTimeoutSeconds)
         {
             _timeSource = timeSource;
             _garbageCollectionIntervalSeconds = gcTimeoutSeconds;

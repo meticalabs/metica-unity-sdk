@@ -48,13 +48,15 @@ namespace Metica.Experimental.Network
         private readonly HttpClient _http;
         private readonly CancellationTokenSource cts = new();
         private ICache<CacheKey, HttpResponse> _cache { get; set; } = null;
+        private readonly long _cacheTTLSeconds;
 
-        public HttpServiceDotnet(double timeoutSeconds = 10)
+        public HttpServiceDotnet(double requestTimeoutSeconds, long cacheGCTimeoutSeconds, long cacheTTLSeconds)
         {
             _http = new() {
-                Timeout = TimeSpan.FromSeconds(timeoutSeconds)
+                Timeout = TimeSpan.FromSeconds(requestTimeoutSeconds)
             };
-            _cache = new Cache<CacheKey, HttpResponse>(new SystemDateTimeSource());
+            _cache = new Cache<CacheKey, HttpResponse>(new SystemDateTimeSource(), cacheGCTimeoutSeconds);
+            _cacheTTLSeconds = cacheTTLSeconds;
         }
 
         /// <summary>
@@ -130,7 +132,7 @@ namespace Metica.Experimental.Network
                 var httpResponse = new HttpResponse(HttpResponse.ResultStatus.Success, content);
                 if (useHttpCache)
                 {
-                    _cache?.AddOrUpdate(cacheKey, httpResponse, 10);
+                    _cache?.AddOrUpdate(cacheKey, httpResponse, _cacheTTLSeconds);
                 }
                 return httpResponse;
             }
@@ -202,7 +204,7 @@ namespace Metica.Experimental.Network
                 var httpResponse = new HttpResponse(HttpResponse.ResultStatus.Success, responseContent);
                 if (useHttpCache)
                 {
-                    _cache?.AddOrUpdate(cacheKey, httpResponse, 10);
+                    _cache?.AddOrUpdate(cacheKey, httpResponse, _cacheTTLSeconds);
                 }
                 return httpResponse;
             }

@@ -64,13 +64,17 @@ namespace Metica.Experimental
 
             // In the following code we compose our SDK
 
-            _http = new HttpServiceDotnet().WithPersistentHeaders(new Dictionary<string, string> { { "X-API-Key", Config.apiKey } });
+            _http = new HttpServiceDotnet(
+                requestTimeoutSeconds: config.httpRequestTimeout,
+                cacheGCTimeoutSeconds: 10,
+                cacheTTLSeconds: 60
+                ).WithPersistentHeaders(new Dictionary<string, string> { { "X-API-Key", Config.apiKey } });
             // Initialize an OfferManager
             _offerManager = new OfferManager(_http, $"{Config.offersEndpoint}/offers/v1/apps/{Config.appId}");
             // Initialize a ConfigManager
             _configManager = new ConfigManager(_http, $"{Config.remoteConfigEndpoint}/config/v1/apps/{Config.appId}");
             // Initialize an EventManager with _offerManager as IMeticaAttributesProvider
-            _eventManager = new EventManager(_http, $"{Config.ingestionEndpoint}/ingest/v1/events", _offerManager);
+            _eventManager = new EventManager(_http, $"{Config.ingestionEndpoint}/ingest/v1/events", _offerManager, config.maxPendingLoggedEvents);
             // Set the current (mutable) CurrentUserId with the initial value given in the configuration
             CurrentUserId = Config.initialUserId;
             ApiKey = Config.apiKey;

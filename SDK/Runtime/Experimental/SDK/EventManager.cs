@@ -52,8 +52,8 @@ namespace Metica.Experimental
         private readonly ITimeSource _timeSource = new SystemDateTimeSource();
         private readonly SdkConfig _sdkConfig;
 
-        public const int DefaultEventQueueCountTrigger = 8;
-        private readonly int _eventQueueCountTrigger;
+        public const uint DefaultEventQueueCountTrigger = 64;
+        private readonly uint _eventQueueCountTrigger;
 
         private List<object> _events;
 
@@ -61,7 +61,7 @@ namespace Metica.Experimental
             IHttpService httpService,
             string endpoint,
             IMeticaAttributesProvider meticaAttributesProvider,
-            int eventQueueCountTrigger = DefaultEventQueueCountTrigger
+            uint eventQueueCountTrigger = DefaultEventQueueCountTrigger
             ) : base(httpService, endpoint)
         {
             _meticaAttributesProvider = meticaAttributesProvider;
