@@ -178,6 +178,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MeticaSdk
       objectReference: {fileID: 0}
+    - target: {fileID: 5377088341090210397, guid: ec4d6084c9c050341809368efe60916f, type: 3}
+      propertyPath: _sdkConfigProvider
+      value: 
+      objectReference: {fileID: 11400000, guid: b7dc2839fbbb6d644bba5c1e65dfa295, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ec4d6084c9c050341809368efe60916f, type: 3}
 --- !u!1 &1310770909
