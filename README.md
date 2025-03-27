@@ -19,11 +19,11 @@ graph LR
     App -- Submits Events --> SDK[Metica SDK] -- Events --> Ingestion
     App -- Requests Offers --> SDK
     SDK <-- Offers --> ODS
-    SDK <-- Personalised Configuration --> SmartConfig
+    SDK <-- Personalised Configuration --> RemoteConfig
     subgraph Metica Backend
         Ingestion[Ingestion Service]
         ODS[Offers Decision Service]
-        SmartConfig[Smart Config Service]
+        RemoteConfig[Remote Config Service]
     end
 ```
 
@@ -83,15 +83,15 @@ The SdkConfig provides the following configuration parameters
 | `initialUserId`			 | A string that identifies a user. This can change during the lifetime of your app/game so, for example and depending on your needs, this could be a temporary id like "guest" that later becomes a specific userId, or it can be the current user's id if it's already identified.
 | `offersEndpoint`           | The full endpoint to the Metica offers endpoint.                                                                                                                                                  |
 | `ingestionEndpoint`        | The full endpoint to the Metica ingestion service.                                                                                                                                                |
-| `remoteConfigEndpoint`     | The full endpoint to the Metica smart config service (known as "remote config too").                                                                                                                                            |
+| `remoteConfigEndpoint`     | The full endpoint to the Metica remote config service.                                                                                                                                            |
 | `maxDisplayLogEntries`     | [Obsolete] The maximum number of entries stored in the displays log. This limit is shared by all offers and once reached, oldest entries will be removed and replaced by newly incoming ones.                |
 | `displayLogFlushCadence`   | [Obsolete] The cadence, in seconds, by which the displays log will be persisted to the filesystem.                                                                                                           |
 | `displayLogPath`           | [Obsolete] The filesystem path where the display log will be persisted.                                                                                                                                      |
 | `eventsLogFlushCadence`    | The cadence, in seconds, by which the logged events will be sent to the ingestion service.                                                                                                        |
 | `maxPendingLoggedEvents`   | The maximum number of pending logged events before they are sent to the ingestion service. When this value is reached, oldest accumulated events will be dropped to accommodate most recent ones. |
 | `offersCacheTtlMinutes`    | The time-to-live, in minutes, for the offers cache.                                                                                                                                               |
-| `offersCachePath`          | The filesystem path where the offers cache will be stored.                                                                                                                                        |
-| `remoteConfigCachePath`    | The filesystem path where the smart config cache will be stored.                                                                                                                                 |
+| `offersCachePath`          | [Removed] The filesystem path where the offers cache will be stored.                                                                                                                                        |
+| `remoteConfigCachePath`    | [Removed] The filesystem path where the remote config cache will be stored.                                                                                                                                 |
 | `networkTimeout`           | The network timeout, in seconds, for the calls to any Metica endpoint.                                                                                                                            |
 | `logLevel`                 | The level of the SDK's logs. The valid values are provided by the enumeration `Metica.Unity.LogLevel`                                                                                             |
 | `eventsSubmissionDelegate` | A delegate that is invoked whenever the asynchronous events submission process is completed.                                                                                                      |
@@ -154,7 +154,7 @@ An overview of the role of each DeviceInfo property:
 | appVersion | The game/app version, in [SemVer](https://semver.org/) format                                                                                                                                   | 1.2.3           | 
 | locale     | Locale expressed as a combination of language (ISO 639) and country (ISO 3166), // [JDK 8 standard reference](https://www.oracle.com/java/technologies/javase/jdk8-jre8-suported-locales.html). | en-US           |
 
-### Smart Configuration
+### Remote Configuration
 
 The `GetConfig` method can be used to obtain the smart config.
 
