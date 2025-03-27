@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 
-using Metica.Core;
-
-namespace Metica.Caching
+namespace Metica.Core.Caching
 {
     public interface ICache<TKey, TValue>
     {

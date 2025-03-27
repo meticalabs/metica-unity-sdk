@@ -4,8 +4,8 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Metica.Caching;
 using Metica.Core;
+using Metica.Core.Caching;
 
 namespace Metica.Network
 {

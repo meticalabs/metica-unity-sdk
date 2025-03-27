@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 
-using Metica.Core;
-
-namespace Metica.Caching
+namespace Metica.Core.Caching
 {
     /// <summary>
     /// Basic caching system with a set of methods to add and retrieve data. It also handles time-to-live and hit-counts.
