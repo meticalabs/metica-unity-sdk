@@ -25,6 +25,11 @@
       "displayName": "MeticaExample01",
       "description": "Contains a minimal scene and script that roughly simulate a game/app session. This example uses the familiar approach used in Metica Unity SDK prior to release 1.3.1.",
       "path": "Samples~/Metica/Example01"
+    },
+    {
+      "displayName": "MeticaExample02",
+      "description": "Contains a minimal scene that shows how to use the new SDK call style based on async/await. This approach exists for versions above 1.3.1.",
+      "path": "Samples~/Metica/Example02"
     }
   ]
 }

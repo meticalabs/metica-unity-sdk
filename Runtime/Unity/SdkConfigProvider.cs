@@ -21,6 +21,14 @@ namespace Metica.Unity
                 _defaultInitialized = true;
             }
         }
+
+        private void OnValidate()
+        {
+            if (_sdkConfig.baseEndpoint.EndsWith('/'))
+            {
+                _sdkConfig.baseEndpoint = _sdkConfig.baseEndpoint.TrimEnd('/');
+            }
+        }
 #endif
 
     }
