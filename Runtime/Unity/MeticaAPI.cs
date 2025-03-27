@@ -281,6 +281,10 @@ namespace Metica.Unity
         public static void LogUserAttributes(Dictionary<string, object> userAttributes) =>
             LogFullStateUpdate(userAttributes);
 
+        /// <summary>
+        /// Requests an immediate dispatch of any queued events.
+        /// </summary>
+        public static void RequestDispatchEvents() => SDK.RequestDispatchEvents();
         
     }
 

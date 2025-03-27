@@ -24,6 +24,7 @@ namespace Metica.SDK
         void LogOfferPurchaseEventWithProductId(string productId, string currencyCode, double totalAmount, Dictionary<string, object> customPayload = null);
         void LogFullStateUserUpdateEvent(Dictionary<string, object> fullUserStateAttributes, Dictionary<string, object> customPayload = null);
         void LogPartialStateUserUpdateEvent(Dictionary<string, object> partialUserStateAttributes, Dictionary<string, object> customPayload = null);
+        void RequestDispatchEvents();
     }
 
     public class MeticaSdk : IMeticaSdk, IAsyncDisposable
@@ -233,6 +234,11 @@ namespace Metica.SDK
             customEventType,
             null,
             customPayload);
+        }
+
+        public void RequestDispatchEvents()
+        {
+            _ = _eventManager.RequestDispatchEvents();
         }
 
         public async ValueTask DisposeAsync()

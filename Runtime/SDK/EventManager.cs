@@ -170,6 +170,11 @@ namespace Metica.SDK
                 );
         }
 
+        public async Task RequestDispatchEvents()
+        {
+            await DispatchEvents();
+        }
+
         /// <summary>
         /// Dispatches events in bulk and clears the list/queue.
         /// </summary>
