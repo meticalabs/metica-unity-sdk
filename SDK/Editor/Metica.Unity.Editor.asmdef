@@ -1,9 +1,7 @@
 {
     "name": "Metica.Unity.Editor",
     "rootNamespace": "",
-    "references": [
-        "GUID:c70d7e8293e2f454694263ce5328694c"
-    ],
+    "references": [],
     "includePlatforms": [
         "Editor"
     ],

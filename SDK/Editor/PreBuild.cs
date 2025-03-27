@@ -1,13 +1,14 @@
-using UnityEditor.Build;
-using UnityEditor.Build.Reporting;
-using Metica.Unity;
+//using UnityEditor.Build;
+//using UnityEditor.Build.Reporting;
 
-class PrebuildProcessor : IPreprocessBuildWithReport
-{
-    public int callbackOrder { get { return 0; } }
-    public void OnPreprocessBuild(BuildReport report)
-    {
-        UnityEngine.Debug.Log("BUILDING");
-        MeticaAPI.WriteJsonSdkInfo();
-    }
-}
+//using Metica.Unity;
+
+//class PrebuildProcessor : IPreprocessBuildWithReport
+//{
+//    public int callbackOrder { get { return 0; } }
+//    public void OnPreprocessBuild(BuildReport report)
+//    {
+//        UnityEngine.Debug.Log("BUILDING");
+//        MeticaAPI.WriteJsonSdkInfo();
+//    }
+//}
