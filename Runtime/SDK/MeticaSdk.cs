@@ -61,6 +61,16 @@ namespace Metica.SDK
         {
             _sdkConfig = config;
 
+            if(string.IsNullOrEmpty(_sdkConfig.apiKey) || string.IsNullOrEmpty(_sdkConfig.initialUserId) || string.IsNullOrEmpty(_sdkConfig.appId) || string.IsNullOrEmpty(config.baseEndpoint))
+            {
+                Log.Error(() => "The given SDK configuration is not valid. Please make sure all fields are filled.");
+                return;
+            }
+            if (_sdkConfig.baseEndpoint.EndsWith('/'))
+            {
+                Log.Error(() => "Please remove the '/' character at the end of the endpoint URL");
+            }
+
             // In the following code we compose our SDK
 
             _http = new HttpServiceDotnet(

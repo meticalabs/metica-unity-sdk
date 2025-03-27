@@ -98,6 +98,11 @@ namespace Metica.SDK
         /// It is and should remain private as the management of this auxiliary storage should be hidden to client-code.</remarks>
         private async Task AddOrUpdateStorage(Dictionary<string, List<Offer>> placements)
         {
+            if (placements == null)
+            {
+                Log.Error(() => "Null placements were passed. This could be due to an inconsistent initialization of the SDK.");
+                return;
+            }
             if(_sessionPlacementStorage == null)
             {
                 // Lazy fetching of all placements into storage
