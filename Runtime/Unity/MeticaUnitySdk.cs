@@ -27,6 +27,16 @@ namespace Metica.Unity
             DontDestroyOnLoad(this);
         }
 
+        private async void OnApplicationFocus(bool focus)
+        {
+            await _meticaSdk.DisposeAsync();
+        }
+
+        private async void OnApplicationPause(bool pause)
+        {
+            await _meticaSdk.DisposeAsync();
+        }
+
         private async void OnDestroy()
         {
             await _meticaSdk.DisposeAsync();
