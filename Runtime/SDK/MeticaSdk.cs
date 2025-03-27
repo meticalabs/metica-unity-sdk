@@ -81,7 +81,7 @@ namespace Metica.SDK
             // Initialize an OfferManager
             _offerManager = new OfferManager(_http, $"{Config.baseEndpoint}/offers/v1/apps/{Config.appId}");
             // Initialize a ConfigManager
-            _configManager = new ConfigManager(_http, $"{Config.baseEndpoint}/config/v1/apps/{Config.appId}");
+            _configManager = new ConfigManager(_http, $"{Config.baseEndpoint}/configs/v1/apps/{Config.appId}");
             // Initialize an EventManager with _offerManager as IMeticaAttributesProvider
             _eventManager = new EventManager(_http, $"{Config.baseEndpoint}/ingest/v1/events", _offerManager, config.eventsLogDispatchMaxQueueSize);
             // Set the current (mutable) CurrentUserId with the initial value given in the configuration
