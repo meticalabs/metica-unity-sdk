@@ -1,5 +1,5 @@
 {
-    "name": "Metica.Unity.Editor",
+    "name": "Metica.UnityEd",
     "rootNamespace": "",
     "references": [
         "GUID:c2fa3a29e8c2d344eb32bb07693f48f2"

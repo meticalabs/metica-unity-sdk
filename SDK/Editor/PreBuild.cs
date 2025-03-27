@@ -1,9 +1,7 @@
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
-using Metica.Unity;
-
-namespace Metica.UnityEditor
+namespace Metica.UnityEd
 {
     class PrebuildProcessor : IPreprocessBuildWithReport
     {
@@ -11,7 +9,7 @@ namespace Metica.UnityEditor
         public void OnPreprocessBuild(BuildReport report)
         {
             UnityEngine.Debug.Log("BUILDING");
-            MeticaAPI.WriteJsonSdkInfo();
+            MeticaEditorUtilities.WriteJsonSdkInfo();
         }
     }
 }

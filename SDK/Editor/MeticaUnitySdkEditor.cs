@@ -1,9 +1,10 @@
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+
 using Metica.Unity;
 
-namespace Metica.UnityEditor
+namespace Metica.UnityEd
 {
     [CustomEditor(typeof(MeticaUnitySdk))]
     public class MeticaUnitySdkEditor : Editor
