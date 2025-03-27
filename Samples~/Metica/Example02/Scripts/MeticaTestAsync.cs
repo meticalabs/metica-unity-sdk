@@ -5,10 +5,18 @@ using UnityEngine;
 
 public class MeticaTestAsync : MonoBehaviour
 {
-    private async void Start()
+    private void Start()
     {
-        await (Example(MeticaSdk.SDK));
+        // Use a fire and forget to run any async methods...
+        _ = (Example(MeticaSdk.SDK));
     }
+
+    // ...alternatively you can keep the asynchronousness in the Start
+    //private void async Start()
+    //{
+    //  await (Example(MeticaSDK.SDK));
+    //}
+
 
     private static async Task Example(IMeticaSdk meticaSdk)
     {

@@ -33,7 +33,7 @@ namespace Metica.UnityEd
         }
 
         /// <summary>
-        /// Just to force Unity to check the info file.
+        /// Just to force Unity to write the info file.
         /// </summary>
         [InitializeOnLoadMethod]
         private static void TouchSdkInfo()
