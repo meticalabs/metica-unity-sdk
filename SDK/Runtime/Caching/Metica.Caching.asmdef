@@ -1,0 +1,16 @@
+{
+    "name": "Metica.Caching",
+    "rootNamespace": "",
+    "references": [
+        "GUID:338a946abe1644d408adf5afa3f9bf49"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -7,7 +7,7 @@ using Metica.Core;
 using Metica.Network;
 using Metica.SDK.Model;
 
-namespace Metica.Experimental.SDK
+namespace Metica.SDK
 {
     [System.Serializable]
     public class OfferResult : IMeticaHttpResult

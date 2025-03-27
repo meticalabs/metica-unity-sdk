@@ -1,10 +1,8 @@
 using System;
 
-using Metica.Core;
-
-namespace Metica.SDK
+namespace Metica.Core
 {
-    internal class SystemDateTimeSource : ITimeSource
+    public class SystemDateTimeSource : ITimeSource
     {
         public long EpochSeconds()
         {
