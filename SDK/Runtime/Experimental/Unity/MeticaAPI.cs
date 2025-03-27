@@ -56,7 +56,6 @@ namespace Metica.Experimental.Unity
     public static class MeticaAPI
     {
         // Reference to the SDK
-        private static IMeticaSdk _sdk = null;
         private static IMeticaSdk SDK { get => MeticaSdk.SDK; }
 
         // Fields
