@@ -63,15 +63,45 @@ the '+' button in the top left corner. Select "Add package from git URL..." and 
 
 ```https://github.com/meticalabs/metica-unity-sdk.git?path=SDK```
 
+## Upgrading from 1.3.1 to 1.5.0
+
+The MeticaAPI class was the main *surface* to use the SDK. We preserved it but since we renamed some types, you may need to add, at the start of the file, one or both of the following lines where `OffersByPlacement` and/or `MeticaLogger` are not found.
+
+```
+using MeticaLogger = Log;
+using OffersByPlacement = Metica.SDK.OfferResult;
+```
+
+## New way to use the SDK (async/await)
+
+**Additionally** to the previous static call style via `MeticaAPI`, you can retrieve an instance of `IMeticaSdk` with
+
+```
+private IMeticaSdk _sdk = MeticaSdk.SDK;
+```
+
+If you do so, you can now take advantage of the asynchronous calls. Example:
+
+```
+configResult = await _sdk.GetConfigsAsync(new List<string> { "dynamic_difficulty" });
+```
+
+One of the main advantages is that you now have a return type rather than having to pass a callback method.
+
+### Event Dispatch (Flush)
+
+When you log an event (both with static calling or using async), it isn't guaranteed to be sent immediately as events are sent in bulks.
+
+If you need to make sure events are immediately sent to the ingestion endpoint, you can use the `MeticaAPI.RequestDispatchEvents` call but don't overuse it as the default behaviour helps aggregating events for lower network load.
+
 ## Setup
 
-No code is needed to initialize the Metica Unity SDK as, with recent changes, the process has been reduced to
-the following steps in Unity.
+No code is needed to initialize the Metica Unity SDK as, with recent changes, the process has been reduced to the following steps in Unity.
 
 1. In the Hierarchy view, right click (on an empty area) and select `Metica > Add SDK`. This will add a prefab
 with the MeticaUnitySdk component attached. Alternatively you can manually drag and drop the prefab from `Packages/Metica Unity Sdk/Runtime/Unity/Prefabs/`.
 2. Select the prefab and click the `Create Configuration` button to create and save it in the folder you select.\*
-3. Select the configuration file and fill the fields.
+3. Select the configuration file and fill the fields (see [SDK Configuration](#sdk-configuration))
 4. If needed, add the file to the MeticaSdk prefab. When you use the *Create Configuration* button the configuration should be automatically linked.
 
 \*: Alternatively, create a configuration asset by right clicking a folder in the Project View and selecting `Create > Metica > SDK > New SDK Configuration`. This can also be found in the main menu under `Assets > Create` but it will create the asset in the Assets' root.
@@ -102,7 +132,9 @@ MeticaAPI.Initialise("userId", "appId", "apiKey", config, result => {
 });
 ```
 
-The SdkConfig provides the following configuration parameters
+## SDK Configuration
+
+The SdkConfig provides the following configuration parameters:
 
 | Property                   | Description
 |----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -120,9 +152,7 @@ The SdkConfig provides the following configuration parameters
 
 ### Get Offers
 
-After initialization, use the `GetOffers` method to obtain offers available for particular placements.
-
-Asynchronously fetches offers for specified placements from the Metica API.
+Asynchronously fetches offers for specified (or all) placements from the Metica API.
 The result is delivered through a callback and is a dictionary of placements and their respective offers.
 
 A dictionary of user attributes can be passed to the method to personalize the offers. If not, then the last known user
