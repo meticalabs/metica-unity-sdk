@@ -7,12 +7,13 @@
 This document provides a quick summary on how to use the MeticaAPI Unity SDK.
 
 Further information about the Metica backend API can be found at
-the [documentation](https://docs.metica.com/api-metica-integration#api-request-1) page.
+the [documentation](https://docs.metica.com/integration) page.
 
 ## Overview
 
-The MeticaAPI Unity SDK provides a simple interface to interact with the backend Metica API. The SDK provides methods to
-fetch offers, and log user interactions with the system as events.
+The Metica Unity SDK provides a simple interface to interact with the backend Metica API. The SDK provides simplified methods to
+fetch offers and configs (abbraviation for SmartConfigs) and to log user actions with your app/game as events. The Metica Unity SDK
+takes care of networking nuance, caching and much more so you don't have to.
 
 ```mermaid
 graph LR
@@ -23,39 +24,66 @@ graph LR
     subgraph Metica Backend
         Ingestion[Ingestion Service]
         ODS[Offers Decision Service]
-        SmartConfig[Smart Config Service]
+        RemoteConfig[Remote Config Service]
     end
 ```
 
 ### Terminology
 
+_Application_
+
+Your application or game that uses the Metica services.
+
+_User_
+
+A user or player of the application. Player and user are used interchangeably.
+
 _Event_
 
-An 'event' refers to a user's action or interaction with the system. For example, clicking a button, entering text, etc.
-The properties or attributes associated with these events could be numerous e.g., `event.totalAmount` could represent
-the total amount spent by a user purchasing an in-app offer.
-This is more dynamic information about the user, and is used to derive information amount the user and predict their
-future actions.
+An 'event' refers to a user's action within the context of the application. For example, clicking a button, logging in, clicking an ad, etc.
+The properties (or attributes) associated with these events vary based on the type of the event;
+e.g., the property `totalAmount` must be set when logging an in-app offer `purchase` event. 
 
-_User Attributes_
+_User Properties_
 
-The attributes that describe a user of the app. These could be game progression, demographic information, user
-preferences, etc.
-This is more static information about the user, and is used to personalize the offers and make them more relevant to the
-user.
+Sometimes (and formerly) called _User Attributes_, user properties consist of general information about the user that
+best characterises them in your application. For example you could define your user properties to include game progression,
+demographics, user preferences, player's level, etc.
+
+## What you need
+
+To use the Metica Unity SDK you need:
+- An API key, obtainable in the Metica platform (www.metica.com)
+- An appId, configurable in the Metica platform.
 
 ## Installation
 
-The installation can be done simply through the Package Manager in Unity. Select Window > Package Manager and click on
-the '+' button in the top left corner. Select "Add package from git URL" and enter the following URL:
+In Unity, open the Package Manager (Window > Package Manager) and click on
+the '+' button in the top left corner. Select "Add package from git URL..." and enter the following:
 
 ```https://github.com/meticalabs/metica-unity-sdk.git?path=SDK```
+
+## Setup
+
+No code is needed to initialize the Metica Unity SDK as, with recent changes, the process has been reduced to
+the following steps in Unity.
+
+1. In the Hierarchy view, right click (on an empty area) and select `Metica > Add SDK`. This will add a prefab
+with the MeticaUnitySdk component attached. Alternatively you can manually drag and drop the prefab from `Packages/Metica Unity Sdk/Runtime/Unity/Prefabs/`.
+2. Select the prefab and click the `Create Configuration` button to create and save it in the folder you select.\*
+3. Select the configuration file and fill the fields.
+4. If needed, add the file to the MeticaSdk prefab. When you use the *Create Configuration* button the configuration should be automatically linked.
+
+\*: Alternatively, create a configuration asset by right clicking a folder in the Project View and selecting `Create > Metica > SDK > New SDK Configuration`. This can also be found in the main menu under `Assets > Create` but it will create the asset in the Assets' root.
 
 ## Available SDK Operations
 
 ### Initialize the API
 
-Use the `Initialise` method to prepare the MeticaAPI for use. To obtain your API key please contact Metica.  
+If you upgraded to the new SDK and your code is still calling the `Initialise` method to prepare the MeticaAPI, it's not a problem but you can remove it. If you leave it, a harmless warning will appear.
+
+With versions of the SDK <= 1.3.1 the initialization is done as follows:
+
 ⚠️: This method is obsolete. Please prefer the next call using `SdkConfig`.
 ```csharp
 MeticaAPI.Initialise("userId", "appId", "apiKey", result => { 
@@ -76,33 +104,19 @@ MeticaAPI.Initialise("userId", "appId", "apiKey", config, result => {
 
 The SdkConfig provides the following configuration parameters
 
-| Property                   | Description                                                                                                                                                                                       |
-|----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Property                   | Description
+|----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | `apiKey`					 | Your API key
 | `appId`					 | The application identifier accessible from Metica's dashboard.
 | `initialUserId`			 | A string that identifies a user. This can change during the lifetime of your app/game so, for example and depending on your needs, this could be a temporary id like "guest" that later becomes a specific userId, or it can be the current user's id if it's already identified.
-| `offersEndpoint`           | The full endpoint to the Metica offers endpoint.                                                                                                                                                  |
-| `ingestionEndpoint`        | The full endpoint to the Metica ingestion service.                                                                                                                                                |
-| `remoteConfigEndpoint`     | The full endpoint to the Metica smart config service (known as "remote config too").                                                                                                                                            |
-| `maxDisplayLogEntries`     | [Obsolete] The maximum number of entries stored in the displays log. This limit is shared by all offers and once reached, oldest entries will be removed and replaced by newly incoming ones.                |
-| `displayLogFlushCadence`   | [Obsolete] The cadence, in seconds, by which the displays log will be persisted to the filesystem.                                                                                                           |
-| `displayLogPath`           | [Obsolete] The filesystem path where the display log will be persisted.                                                                                                                                      |
-| `eventsLogFlushCadence`    | The cadence, in seconds, by which the logged events will be sent to the ingestion service.                                                                                                        |
-| `maxPendingLoggedEvents`   | The maximum number of pending logged events before they are sent to the ingestion service. When this value is reached, oldest accumulated events will be dropped to accommodate most recent ones. |
-| `offersCacheTtlMinutes`    | The time-to-live, in minutes, for the offers cache.                                                                                                                                               |
-| `offersCachePath`          | The filesystem path where the offers cache will be stored.                                                                                                                                        |
-| `remoteConfigCachePath`    | The filesystem path where the smart config cache will be stored.                                                                                                                                 |
-| `networkTimeout`           | The network timeout, in seconds, for the calls to any Metica endpoint.                                                                                                                            |
-| `logLevel`                 | The level of the SDK's logs. The valid values are provided by the enumeration `Metica.Unity.LogLevel`                                                                                             |
-| `eventsSubmissionDelegate` | A delegate that is invoked whenever the asynchronous events submission process is completed.                                                                                                      |
-
-The `eventsSubmissionDelegate` delegate's type is 
-```c#
-delegate void EventsSubmissionResultDelegate(ISdkResult<Int32> result);
-```
-
-If the events' submission was successful, then the reported `Int32` result is the number of events submitted.
-Otherwise, in case of error, the field `result.Error` will be non-empty and provide some description of the error.
+| `Base Endpoint`           | Base metica endpoint : https://api-gateway.prod-eu.metica.com
+| `Events Log Dispatch Cadence`     | The cadence, in seconds, that triggers an events dispatch.
+| `displayLogFlushCadence`   | The number of stored events above which they are dispecthed (actually sent to Metica). Events in fact don't get always sent immediately, they accumulate and get sent in bulks.
+| `Events Log Dispatch Cadence`    | The cadence, in seconds, by which the logged events will be sent to the ingestion service.
+| `Events Log Dispatch Max Queue Size`   | The maximum number of pending logged events before they are sent to the ingestion service. When this value is reached, oldest accumulated events will be dropped to accommodate most recent ones.
+| `Http Cache TTL Seconds`    | The time-to-live, in seconds, for the http-level cache.
+| `Http Request Timeout`           | The network timeout, in seconds, for the calls to any Metica endpoint.
+| `Log Level`                 | The level of the SDK's logs. The valid values are provided by the enumeration `Metica.Unity.LogLevel`                                                                                             
 
 ### Get Offers
 
@@ -154,9 +168,9 @@ An overview of the role of each DeviceInfo property:
 | appVersion | The game/app version, in [SemVer](https://semver.org/) format                                                                                                                                   | 1.2.3           | 
 | locale     | Locale expressed as a combination of language (ISO 639) and country (ISO 3166), // [JDK 8 standard reference](https://www.oracle.com/java/technologies/javase/jdk8-jre8-suported-locales.html). | en-US           |
 
-### Smart Configuration
+### Remote Configuration
 
-The `GetConfig` method can be used to obtain the smart config.
+The `GetConfig` method can be used to retrieve the Smart Configs.
 
 Similar to the `GetOffers` method, the operation is performed asynchronously and the result is delivered through a callback.
 Because the result is specific to each application, the SDK represents it in a generic manner, through a `Dictionary<string, object>` instance.
