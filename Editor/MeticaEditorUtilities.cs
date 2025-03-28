@@ -3,12 +3,13 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 using Metica.Unity;
-//using UnityEditor.PackageManager;
 
 namespace Metica.UnityEd
 {
     public static class MeticaEditorUtilities
     {
+
+        private static string MeticaSdkPrefabName = "MeticaSdk";
 
         internal class SdkInfo
         {
@@ -26,7 +27,7 @@ namespace Metica.UnityEd
 
             if (!File.Exists(filePath))
             {
-                        return new SdkInfo { Version = "unknown" };
+                return new SdkInfo { Version = "unknown" };
             }
 
             string json = File.ReadAllText(filePath);
@@ -68,7 +69,8 @@ namespace Metica.UnityEd
 
         /// <summary>
         /// Editor utility to write an SdkInfo json file in Unity's StreamingAssets folder.
-        /// If StreamingAssets doesn't exist, it will be created.
+        /// If StreamingAssets doesn't exist, it will be created
+        /// TODO : Use GetPackageInfoByName in here rahter than GetPackageVersion
         /// </summary>
         internal static void WriteJsonSdkInfo()
         {
@@ -110,7 +112,7 @@ namespace Metica.UnityEd
         }
 
         // TODO : undo support
-        [MenuItem("GameObject/Metica/Add SDK to current scene")]
+        [MenuItem("GameObject/Metica/Add SDK Prefab")]
         private static void AddMeticaSdkPrefab()
         {
             if (GameObject.FindObjectOfType<MeticaUnitySdk>() != null)
@@ -121,12 +123,12 @@ namespace Metica.UnityEd
             UnityEditor.PackageManager.PackageInfo meticaPackageInfo;
             if (GetPackageInfoByName("com.metica.unity", out meticaPackageInfo) == true)
             {
-                var ids = AssetDatabase.FindAssets("MeticaSdk t:GameObject a:packages", new string[] { meticaPackageInfo.assetPath } );
+                var ids = AssetDatabase.FindAssets($"{MeticaSdkPrefabName} t:GameObject", new string[] { meticaPackageInfo.assetPath } );
                 if (ids.Length > 0)
                 {
                     if (ids.Length > 1)
                     {
-                        Debug.LogWarning("Multiple instances of 'MeticaSdk' prefab. First found used.");
+                        Debug.LogWarning($"Multiple instances of '{MeticaSdkPrefabName}' prefab. First found used.");
                     }
                     var prefabPath = AssetDatabase.GUIDToAssetPath(ids[0]);
                     var asset = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject));
@@ -134,7 +136,7 @@ namespace Metica.UnityEd
                 }
                 else
                 {
-                    Debug.LogError("MeticaSdk prefab wasn't found.");
+                    Debug.LogError($"{MeticaSdkPrefabName} prefab wasn't found.");
                 }
             }
         }
