@@ -29,12 +29,18 @@ namespace Metica.Unity
 
         private async void OnApplicationFocus(bool focus)
         {
-            await _meticaSdk.DisposeAsync();
+            if(focus == false) // focus lost
+            {
+                _meticaSdk.RequestDispatchEvents();
+            }
         }
 
-        private async void OnApplicationPause(bool pause)
+        private void OnApplicationPause(bool pause)
         {
-            await _meticaSdk.DisposeAsync();
+            if (pause == true) // paused
+            {
+                _meticaSdk.RequestDispatchEvents();
+            }
         }
 
         private async void OnDestroy()
