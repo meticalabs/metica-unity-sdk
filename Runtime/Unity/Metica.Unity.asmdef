@@ -1,0 +1,17 @@
+{
+    "name": "Metica.Unity",
+    "rootNamespace": "",
+    "references": [
+        "GUID:201bb3ee2b9a58648b8158bc0b3694a5",
+        "GUID:338a946abe1644d408adf5afa3f9bf49"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
