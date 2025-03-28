@@ -1,4 +1,10 @@
-# [1.2.3]([1.2.1](https://github.com/meticalabs/metica-unity-sdk/compare/v1.2.2...v1.2.3)
+# 1.5.0
+# [1.5.0](https://github.com/meticalabs/metica-unity-sdk/compare/v1.3.1...v1.5.0)
+
+This was a complete SDK overhaul.  
+We redesigned it, modularized it, made it more efficient and more future proof.
+
+# [1.2.3]((https://github.com/meticalabs/metica-unity-sdk/compare/v1.2.2...v1.2.3)
 ### Fixes
 - Minor improvements to SampleScript (including setting userId upon test call).
 - Make `UserId` not internal
