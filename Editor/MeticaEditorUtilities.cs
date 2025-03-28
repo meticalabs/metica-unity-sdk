@@ -2,6 +2,8 @@ using Newtonsoft.Json;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+using Metica.Unity;
+//using UnityEditor.PackageManager;
 
 namespace Metica.UnityEd
 {
@@ -92,6 +94,49 @@ namespace Metica.UnityEd
                 Debug.LogError("Package version not found.");
             }
         }
+        private static bool GetPackageInfoByName(string packageName, out UnityEditor.PackageManager.PackageInfo packageInfo)
+        {
+            var packageInfos = UnityEditor.PackageManager.PackageInfo.GetAllRegisteredPackages();
+            foreach (var pi in packageInfos)
+            {
+                if (pi.name == packageName)
+                {
+                    packageInfo = pi;
+                    return true;
+                }
+            }
+            packageInfo = null;
+            return false;
+        }
 
+        // TODO : undo support
+        [MenuItem("GameObject/Metica/Add SDK to current scene")]
+        private static void AddMeticaSdkPrefab()
+        {
+            if (GameObject.FindObjectOfType<MeticaUnitySdk>() != null)
+            {
+                Debug.LogError("Metica Sdk is already present in loaded scene(s).");
+                return;
+            }
+            UnityEditor.PackageManager.PackageInfo meticaPackageInfo;
+            if (GetPackageInfoByName("com.metica.unity", out meticaPackageInfo) == true)
+            {
+                var ids = AssetDatabase.FindAssets("MeticaSdk t:GameObject a:packages", new string[] { meticaPackageInfo.assetPath } );
+                if (ids.Length > 0)
+                {
+                    if (ids.Length > 1)
+                    {
+                        Debug.LogWarning("Multiple instances of 'MeticaSdk' prefab. First found used.");
+                    }
+                    var prefabPath = AssetDatabase.GUIDToAssetPath(ids[0]);
+                    var asset = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject));
+                    PrefabUtility.InstantiatePrefab(asset);
+                }
+                else
+                {
+                    Debug.LogError("MeticaSdk prefab wasn't found.");
+                }
+            }
+        }
     }
 }
