@@ -1,4 +1,4 @@
-# MeticaAPI Unity SDK Guide
+# MeticaAPI Unity SDK Guide 
 
 **Disclaimer: please note that the SDK is undergoing some quick changes so, for the time being, this information might contain inaccuracies.**
 
@@ -17,15 +17,18 @@ takes care of networking nuance, caching and much more so you don't have to.
 
 ```mermaid
 graph LR
-    App -- Submits Events --> SDK[Metica SDK] -- Events --> Ingestion
-    App -- Requests Offers --> SDK
+    App -- Submits Events --> API[Metica API]
+    SDK -- Events --> Ingestion
+    App -- Requests Offers --> API
+    App -- Requests Configs --> API
     SDK <-- Offers --> ODS
     SDK <-- Personalised Configuration --> SmartConfig
+    API --> SDK
     subgraph Metica Backend
         Ingestion[Ingestion Service]
         ODS[Offers Decision Service]
-        RemoteConfig[Remote Config Service]
-    end
+        SmartConfig[Smart Config Service]
+end
 ```
 
 ### Terminology
@@ -65,7 +68,7 @@ the '+' button in the top left corner. Select "Add package from git URL..." and 
 
 ## Upgrading from 1.3.1 to 1.5.0
 
-The MeticaAPI class was the main *surface* to use the SDK. We preserved it but since we renamed some types, you may need to add, at the start of the file, one or both of the following lines where `OffersByPlacement` and/or `MeticaLogger` are not found.
+The `MeticaAPI` class was the main *surface* to use the SDK. We preserved it but since we renamed some types, you may need to add, at the start of the file, one or both of the following lines where `OffersByPlacement` and/or `MeticaLogger` are not found.
 
 ```
 using MeticaLogger = Log;
@@ -88,23 +91,23 @@ configResult = await _sdk.GetConfigsAsync(new List<string> { "dynamic_difficulty
 
 One of the main advantages is that you now have a return type rather than having to pass a callback method.
 
-### Event Dispatch (Flush)
+### Event Dispatch (Flushing)
 
 When you log an event (both with static calling or using async), it isn't guaranteed to be sent immediately as events are sent in bulks.
 
-If you need to make sure events are immediately sent to the ingestion endpoint, you can use the `MeticaAPI.RequestDispatchEvents` call but don't overuse it as the default behaviour helps aggregating events for lower network load.
+If you need to make sure events are immediately sent to the ingestion endpoint, you can use the `MeticaAPI.RequestDispatchEvents` call but **don't overuse it as the default behaviour helps aggregating events for lower network load**.
 
 ## Setup
 
 No code is needed to initialize the Metica Unity SDK as, with recent changes, the process has been reduced to the following steps in Unity.
 
-1. In the Hierarchy view, right click (on an empty area) and select `Metica > Add SDK`. This will add a prefab
-with the MeticaUnitySdk component attached. Alternatively you can manually drag and drop the prefab from `Packages/Metica Unity Sdk/Runtime/Unity/Prefabs/`.
+1. In Unity's Hierarchy View, right click (on an empty area) and select `Metica > Add SDK`. This will add a prefab
+with the MeticaUnitySdk component attached (if not already in scene). Alternatively you can manually drag and drop the prefab from `Packages/Metica Unity Sdk/Runtime/Unity/Prefabs/`.
 2. Select the prefab and click the `Create Configuration` button to create and save it in the folder you select.\*
 3. Select the configuration file and fill the fields (see [SDK Configuration](#sdk-configuration))
 4. If needed, add the file to the MeticaSdk prefab. When you use the *Create Configuration* button the configuration should be automatically linked.
 
-\*: Alternatively, create a configuration asset by right clicking a folder in the Project View and selecting `Create > Metica > SDK > New SDK Configuration`. This can also be found in the main menu under `Assets > Create` but it will create the asset in the Assets' root.
+\*: Alternatively, create a configuration asset by right clicking a folder in the Project View and selecting `Create > Metica > SDK > New SDK Configuration`. This can also be found in the main menu under `Assets > Create > Metica` but it will create the asset in the Assets' root.
 
 ## Available SDK Operations
 
@@ -122,7 +125,7 @@ MeticaAPI.Initialise("userId", "appId", "apiKey", result => {
 });
 ```
 
-You can also pass an instance of `SdkConfig`, if you want to have greater control over the SDK's operations.
+You can pass an instance of `SdkConfig`, if you want to have greater control over the SDK's operations.
 ```csharp
 var config = SdkConfig.Default();
 config.logLevel = LogLevel.Off;
@@ -134,7 +137,7 @@ MeticaAPI.Initialise("userId", "appId", "apiKey", config, result => {
 
 ## SDK Configuration
 
-The SdkConfig provides the following configuration parameters:
+The SDK configuration exposes the following parameters:
 
 | Property                   | Description
 |----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -148,18 +151,26 @@ The SdkConfig provides the following configuration parameters:
 | `Events Log Dispatch Max Queue Size`   | The maximum number of pending logged events before they are sent to the ingestion service. When this value is reached, oldest accumulated events will be dropped to accommodate most recent ones.
 | `Http Cache TTL Seconds`    | The time-to-live, in seconds, for the http-level cache.
 | `Http Request Timeout`           | The network timeout, in seconds, for the calls to any Metica endpoint.
-| `Log Level`                 | The level of the SDK's logs. The valid values are provided by the enumeration `Metica.Unity.LogLevel`                                                                                             
+| `Log Level`                 | The level of the SDK's logs. Do not confuse this with the meaning *Log* in the context of event logging. The valid values are provided by the enumeration `Metica.SDK.LogLevel` and determine the verbosity of the logs with `Info` being the most verbose and `Debug` being the least verbose. `Off`suppresses all logging.                                                                                    
 
 ### Get Offers
 
 Asynchronously fetches offers for specified (or all) placements from the Metica API.
-The result is delivered through a callback and is a dictionary of placements and their respective offers.
+The result is delivered through a callback and consists of a dictionary of **placements** with their respective offers.
 
 A dictionary of user attributes can be passed to the method to personalize the offers. If not, then the last known user
 attributes are used.
 
-Also, a `DeviceInfo` object can be passed to the method to provide device information. If not, then the device
+Also, a `DeviceInfo` (see [Device Info](#device-info)) object can be passed to the method to provide device information. If not, then the device
 information is automatically collected.
+
+**Signature**
+
+```csharp
+public static void GetOffers(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+```
+
+**Example**
 
 ```csharp
 MeticaAPI.GetOffers(new string[] { "placementId1", "placementId2" }, result => { 
@@ -186,21 +197,24 @@ MeticaAPI.GetOffers(new string[] { "placementId1", "placementId2" }, result => {
         });
 ```
 
-The `DeviceInfo` stores information regarding the client context, and it can differ across different devices of the same
-user.
+## Device Info
 
-An overview of the role of each DeviceInfo property:
+The `DeviceInfo` stores information regarding the host device, and it can differ across different devices of the same user.
 
-| Property   | Description                                                                                                                                                                                     | Example         |
+**Note that leaving this variable to `null` is perfectly fine as it will trigger a device detector that is internal to the SDK**
+
+An overview of the role of each `DeviceInfo` property:
+
+| Property   | Type | Description                                                                                                                                                                                     | Example         |
 |------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|
-| store      | Identifies the app store related to the in-game offers. Possible values: <br/>- `GooglePlayStore`, the Google store <br/> - `AppStore`, the Apple store                                         | GooglePlayStore |
-| timezone   | Device timezone expressed with [IANA tz identifier format](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)                                                                        | +01:00          | 
-| appVersion | The game/app version, in [SemVer](https://semver.org/) format                                                                                                                                   | 1.2.3           | 
-| locale     | Locale expressed as a combination of language (ISO 639) and country (ISO 3166), // [JDK 8 standard reference](https://www.oracle.com/java/technologies/javase/jdk8-jre8-suported-locales.html). | en-US           |
+| store      |  string | Identifies the app store related to the in-game offers. Possible values: <br/>- `GooglePlayStore`, the Google store <br/> - `AppStore`, the Apple store                                         | GooglePlayStore |
+| timezone   | string | Device timezone expressed with [IANA tz identifier format](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)                                                                        | +01:00          | 
+| appVersion |  string | The game/app version, in [SemVer](https://semver.org/) format                                                                                                                                   | 0.1.5           | 
+| locale     |  string |Locale expressed as a combination of language (ISO 639) and country (ISO 3166), // [JDK 8 standard reference](https://www.oracle.com/java/technologies/javase/jdk8-jre8-suported-locales.html). | en-US           |
 
-### Remote Configuration
+### Remote Configuration (Smart Configs)
 
-The `GetConfig` method can be used to retrieve the Smart Configs.
+The `GetConfig` method can be used to retrieve the *Smart Configs*.
 
 Similar to the `GetOffers` method, the operation is performed asynchronously and the result is delivered through a callback.
 Because the result is specific to each application, the SDK represents it in a generic manner, through a `Dictionary<string, object>` instance.
@@ -208,7 +222,16 @@ Each entry in the dictionary represents a configuration key and its value. The l
 
 Also, again similar to the `GetOffers` method, the operation can be passed a dictionary of user properties and the device details, as a `DeviceInfo` instance, in order to personalise the returned configuration. The personalisation happens on the server side, based on the configured variations and experimentation setup.
 
-Example usage:
+**Signature**
+
+```csharp
+public static void GetConfigAsConfigResult(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+```
+
+Note that the name includes `AsConfigResult`. For retro-compatibility we had to append this to the method name but in the future this signature, using `ConfigResult` as return type, will be the standard. The `GetConfig` method, using `Dictionary<string, object>` as return type, will be marked obsolete in the next versions.
+
+**Example**
+
 
 ```csharp
 MeticaAPI.GetConfig(
@@ -216,7 +239,7 @@ MeticaAPI.GetConfig(
     responseCallback: result => { 
         if (result.Error == null) 
         {             
-            Debug.Log(result.Result["key1"]);             
+            Debug.Log(result.Result.Configs["key1"]);             
         } else 
         { 
             Debug.Log("Failed to get offers: " + result.Error); 
@@ -257,11 +280,11 @@ MeticaAPI.LogOfferInteractionWithProductId("<productId>", "click");
 
 ### Full State Update
 
-Formerly known as `LogUserAttributes`.
+Formerly known as `LogUserAttributes`, logs updates to user attributes and custom user events.
 
-`LogFullStateUpdate` sends a complete snapshot of the user's state to the server, replacing any previously stored data. 
-This method fully resets the user's state on the server and expects all relevant state information to be included in the request.
-Any user attributes that are currently stored in the server with the given userId but are not sent with this update, will be erased.Logs updates to user attributes and custom user events.
+`LogFullStateUpdate` sends a **complete snapshot** of the user's state to the server, replacing any previously stored data.  
+Please note that **this method fully resets the user's state on the server and expects all relevant state information to be included** in the request.  
+Any user attributes that are currently stored in the server with the given `userId` but are not sent with this update, will be erased. 
 
 ```csharp
 Dictionary<string, object> userAttributes = new Dictionary<string, object> { { "level", 25 }, { "favoriteItem", "shield" } };
@@ -270,7 +293,7 @@ MeticaAPI.LogFullStateUpdate(userAttributes);
 
 ### Partial State Update
 
-`LogPartialStateUpdate` sends a partial update of the user's state to the server
+`LogPartialStateUpdate` sends a **partial update** of the user's state to the server,
 modifying or adding only the provided fields while preserving those that are currently stored on the server.
 This method cannot erase existing fields (like `LogFullStateUpdate` does); it can only overwrite values or introduce new ones.
 
@@ -294,27 +317,29 @@ LogOfferPurchase(someOfferId, somePlacementId, 2.49, "GBP", customPayload: myCus
 
 Formerly known as `LogUserEvent`.
 
-`LogCustomEvent` logs custom application events. The only required field in the Dictionary is `eventType` which is used by Metica to
-distinguish the different types of events.
+`LogCustomEvent` logs custom application events. The only required field in this dictionary is `eventType` which is used by Metica to
+classify the different types of events your application is sending.
 
 ```csharp
 Dictionary<string, object> customUserEvent = new Dictionary<string, object> { { "eventType", "completed_level" }, { "eventDetails", "level 5" } };
 MeticaAPI.LogCustomEvent(userEvent);
 ```
 
-**Note:** The final event that is submitted to the Metica backend is enriched with additional information, so an
-additional Dictionary instance is allocated internally and the application event attributes are copied into that.
-It's possible to avoid the extra allocation by passing `true` to the `reuseDictionary` argument.
+**Note:** The final event that is submitted to the Metica backend is enriched with additional information that's gathered by the SDK. See [Base Fields](https://docs.metica.com/integration#base-fields) for further information. In a scenario where you weren't using Metica SDK you'd have to code your game/app so these fields are always included.
 
 ```csharp
 // this will avoid the extra allocation but will mutate the passed userEvent
 MeticaAPI.LogUserEvent(userEvent, true);
 ```
 
-### Code Sample
+## Code Samples
 
-An example usage of the above operations can be found in a small code sample can be found
-at `TestProject/Assets/SampleScript.cs`.
+The Metica Unity SDK package includes examples that can be easily imported into your Assets by selecting the package in the Package Manager and clicking the *Import* button next to one of the examples.
+
+Currently available examples:
+
+- **MeticaExample01** shows how to use the SDK via `MeticaAPI`. This uses the static calls code style.
+- **MeticaExample02** shows how to use the SDK by retrieving the instance and using asynchronous code style.
 
 ## Privacy Manifest
 
@@ -322,3 +347,4 @@ For iOS, iPadOS, tvOS and watchOS apps, we provide
 a [privacy manifest](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files)
 at [Assets/Plugins/PrivacyInfo.xcprivacy](Assets/Plugins/PrivacyInfo.xcprivacy)
 that describes the data collected by the Metica SDK. 
+
