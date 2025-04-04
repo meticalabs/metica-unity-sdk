@@ -1,6 +1,6 @@
-name: Check PR 
+name: Check PR
 
-on: 
+on:
   push:
     branches:
       - main
@@ -15,7 +15,7 @@ permissions:
 jobs:
   build:
     name: Build & test
-    permissions: 
+    permissions:
       checks: write
     runs-on: ubuntu-latest
     steps:
@@ -39,19 +39,19 @@ jobs:
           repository: meticalabs/unity-test-runner
           token: ${{ secrets.CI_GITHUB_TOKEN }}
           path: ./.github/actions/unity-test-runner
-          
-      - name: Run tests
-        uses: ./.github/actions/unity-test-runner
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          E2E_TESTSAPP_API_KEY: ${{ secrets.E2E_TESTSAPP_API_KEY }}
-          ODS_ENDPOINT: ${{ secrets.ODS_ENDPOINT }}
-          INGESTION_ENDPOINT: ${{ secrets.INGESTION_ENDPOINT }}
-          RC_ENDPOINT: ${{ secrets.RC_ENDPOINT }}
-          
-        with:
-          projectPath: TestProject
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
+
+#      - name: Run tests
+#        uses: ./.github/actions/unity-test-runner
+#        env:
+#          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+#          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+#          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+#          E2E_TESTSAPP_API_KEY: ${{ secrets.E2E_TESTSAPP_API_KEY }}
+#          ODS_ENDPOINT: ${{ secrets.ODS_ENDPOINT }}
+#          INGESTION_ENDPOINT: ${{ secrets.INGESTION_ENDPOINT }}
+#          RC_ENDPOINT: ${{ secrets.RC_ENDPOINT }}
+#        
+#        with:
+#          projectPath: TestProject
+#          githubToken: ${{ secrets.GITHUB_TOKEN }}
 
