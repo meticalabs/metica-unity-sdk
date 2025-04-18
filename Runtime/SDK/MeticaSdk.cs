@@ -38,6 +38,7 @@ namespace Metica.SDK
         public static string CurrentUserId {  get; set; }
         public static string ApiKey { get; private set; }
         public static string AppId { get; private set; }
+        public static string BaseEndpoint { get; private set; }
 
         private readonly SdkConfig _sdkConfig;
         private readonly IHttpService _http;
@@ -70,6 +71,7 @@ namespace Metica.SDK
             if (_sdkConfig.baseEndpoint.EndsWith('/'))
             {
                 Log.Error(() => "Please remove the '/' character at the end of the endpoint URL");
+                return;
             }
 
             // In the following code we compose our SDK
@@ -89,7 +91,8 @@ namespace Metica.SDK
             CurrentUserId = Config.initialUserId;
             ApiKey = Config.apiKey;
             AppId = Config.appId;
-
+            BaseEndpoint = Config.baseEndpoint;
+                
             // Register this class as IMeticaSdk service in Registry
             Registry.Register<IMeticaSdk>(this);
         }
