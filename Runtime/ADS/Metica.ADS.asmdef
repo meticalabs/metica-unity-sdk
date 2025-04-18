@@ -1,3 +1,6 @@
 {
-  "name": "Metica.ADS"
+  "name": "Metica.ADS",
+  "references": [
+    "Metica.SDK"
+  ]
 }

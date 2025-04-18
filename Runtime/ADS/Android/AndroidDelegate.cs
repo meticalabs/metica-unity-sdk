@@ -28,8 +28,12 @@ internal class AndroidDelegate : PlatformDelegate
         // TODO
     }
 
+    public void Initialize(string apiKey, string appId, string baseEndpoint)
+    {
+        MeticaUnityPluginClass.CallStatic("initialize", apiKey, appId, baseEndpoint);
+    }
 
-    public Task<bool> LoadInterstitialAsync()
+    public Task<bool> LoadInterstitialAsync(string userId)
     {
         Debug.Log($"{TAG} LoadInterstitialAsync called");
 
@@ -41,7 +45,7 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdLoadFailed += InterstitialAdLoadFailed;
 
         Debug.Log($"{TAG} About to call Android loadInterstitial method");
-        MeticaUnityPluginClass.CallStatic("loadInterstitial", callback);
+        MeticaUnityPluginClass.CallStatic("loadInterstitial", userId, callback);
         Debug.Log($"{TAG} Android loadInterstitial method called");
 
         return tcs.Task;
