@@ -3,6 +3,7 @@
 using UnityEngine;
 using System;
 using System.Threading.Tasks;
+using Metica.SDK;
 
 namespace Metica.ADS 
 {
@@ -29,14 +30,18 @@ namespace Metica.ADS
             platformDelegate.InterstitialAdClicked += MeticaAdsCallbacks.Interstitial.OnAdClickedInternal;
         }
 
+        public static void Initialize()
+        {
+            platformDelegate.Initialize(MeticaSdk.ApiKey, MeticaSdk.AppId, MeticaSdk.BaseEndpoint);
+        }
         public static void SetLogEnabled(bool logEnabled) 
         {
             platformDelegate.SetLogEnabled(logEnabled);
         }
         
-        public static async Task<bool> LoadInterstitialAsync()
+        public static async Task<bool> LoadInterstitialAsync(string userId)
         {
-            return await platformDelegate.LoadInterstitialAsync();
+            return await platformDelegate.LoadInterstitialAsync(userId);
         }
         public static async Task<bool> ShowInterstitialAsync()
         {
@@ -52,9 +57,10 @@ namespace Metica.ADS
         public event Action<string, string> InterstitialAdShowFailed;
         public event Action<string> InterstitialAdHidden;
         public event Action<string> InterstitialAdClicked;
-        
+
+        public void Initialize(string apiKey, string appId, string baseEndpoint);
         void SetLogEnabled(bool logEnabled);
-        Task<bool> LoadInterstitialAsync();
+        Task<bool> LoadInterstitialAsync(string userId);
         Task<bool> ShowInterstitialAsync();
     }
 }
