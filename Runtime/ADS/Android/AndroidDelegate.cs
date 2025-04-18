@@ -70,5 +70,10 @@ internal class AndroidDelegate : PlatformDelegate
 
         return tcs.Task;
     }
+
+    public bool IsInterstitialReady()
+    {
+        return MeticaUnityPluginClass.CallStatic<bool>("isInterstitialReady");
+    }
 }
 }

@@ -47,6 +47,11 @@ namespace Metica.ADS
         {
             return await platformDelegate.ShowInterstitialAsync();
         }
+
+        public static bool IsInterstitialReady()
+        {
+            return platformDelegate.IsInterstitialReady();
+        }
     }
 
     internal interface PlatformDelegate {
@@ -62,5 +67,6 @@ namespace Metica.ADS
         void SetLogEnabled(bool logEnabled);
         Task<bool> LoadInterstitialAsync(string userId);
         Task<bool> ShowInterstitialAsync();
+        bool IsInterstitialReady();
     }
 }
