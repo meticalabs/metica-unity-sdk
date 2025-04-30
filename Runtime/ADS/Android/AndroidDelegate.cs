@@ -65,7 +65,7 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdClicked += (adUnitId) => InterstitialAdClicked?.Invoke(adUnitId);
 
         Debug.Log($"{TAG} About to call Android showInterstitial method");
-        MeticaUnityPluginClass.CallStatic("showInterstitial", callback);
+        MeticaUnityPluginClass.CallStatic("showInterstitial", "TODO", callback); // TODO passing userId
         Debug.Log($"{TAG} Android showInterstitial method called");
 
         return tcs.Task;
