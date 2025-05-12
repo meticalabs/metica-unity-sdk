@@ -32,7 +32,7 @@ namespace Metica.ADS
 
         public static void Initialize()
         {
-            platformDelegate.Initialize(MeticaSdk.ApiKey, MeticaSdk.AppId, MeticaSdk.BaseEndpoint);
+            platformDelegate.Initialize(MeticaSdk.ApiKey, MeticaSdk.AppId, MeticaSdk.CurrentUserId, MeticaSdk.BaseEndpoint);
         }
         public static void SetLogEnabled(bool logEnabled) 
         {
@@ -63,7 +63,7 @@ namespace Metica.ADS
         public event Action<string> InterstitialAdHidden;
         public event Action<string> InterstitialAdClicked;
 
-        public void Initialize(string apiKey, string appId, string baseEndpoint);
+        public void Initialize(string apiKey, string appId, string userId, string baseEndpoint);
         void SetLogEnabled(bool logEnabled);
         Task<bool> LoadInterstitialAsync(string userId);
         Task<bool> ShowInterstitialAsync();
