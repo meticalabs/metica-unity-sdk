@@ -34,7 +34,7 @@ internal class AndroidDelegate : PlatformDelegate
         MeticaUnityPluginClass.CallStatic("initialize", apiKey, appId, userId, baseEndpoint, callback);
     }
 
-    public Task<bool> LoadInterstitialAsync(string userId)
+    public Task<bool> LoadInterstitialAsync()
     {
         Debug.Log($"{TAG} LoadInterstitialAsync called");
 
