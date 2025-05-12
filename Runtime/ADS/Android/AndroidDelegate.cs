@@ -52,12 +52,11 @@ internal class AndroidDelegate : PlatformDelegate
         return tcs.Task;
     }
 
-    public Task<bool> ShowInterstitialAsync()
+    public void ShowInterstitial()
     {
-        Debug.Log($"{TAG} ShowInterstitialAsync called");
+        Debug.Log($"{TAG} ShowInterstitial called");
 
-        var tcs = new TaskCompletionSource<bool>();
-        var callback = new ShowCallbackProxy(tcs);
+        var callback = new ShowCallbackProxy();
 
         // Wire up all events
         callback.AdShowSuccess += (adUnitId) => InterstitialAdShowSuccess?.Invoke(adUnitId);
@@ -68,8 +67,6 @@ internal class AndroidDelegate : PlatformDelegate
         Debug.Log($"{TAG} About to call Android showInterstitial method");
         MeticaUnityPluginClass.CallStatic("showInterstitial", callback);
         Debug.Log($"{TAG} Android showInterstitial method called");
-
-        return tcs.Task;
     }
 
     public bool IsInterstitialReady()

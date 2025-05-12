@@ -7,7 +7,6 @@ namespace Metica.ADS
 {
 public class ShowCallbackProxy : AndroidJavaProxy
 {    private const string TAG = MeticaAds.TAG;
-    private readonly TaskCompletionSource<bool> _tcs;
     
     // Events for all callbacks
     public event Action<string> AdShowSuccess;
@@ -16,10 +15,9 @@ public class ShowCallbackProxy : AndroidJavaProxy
     public event Action<string> AdClicked;
     public event Action<string> AdRewarded;
     
-    public ShowCallbackProxy(TaskCompletionSource<bool> tcs) 
+    public ShowCallbackProxy() 
         : base("com.metica.ads.MeticaShowAdCallback")
     {
-        _tcs = tcs;
         Debug.Log($"{TAG} ShowCallbackProxy created");
     }
     
@@ -28,7 +26,6 @@ public class ShowCallbackProxy : AndroidJavaProxy
     {
         Debug.Log($"{TAG} onAdShowSuccess callback received for adUnitId={adUnitId}");
         AdShowSuccess?.Invoke(adUnitId);
-        _tcs.SetResult(true);
     }
     
     // Called when ad fails to show
@@ -36,7 +33,6 @@ public class ShowCallbackProxy : AndroidJavaProxy
     {
         Debug.Log($"{TAG} onAdShowFailed callback received for adUnitId={adUnitId}, error={error}");
         AdShowFailed?.Invoke(adUnitId, error);
-        _tcs.SetResult(false);
     }
     
     // Called when ad is hidden (closed)
