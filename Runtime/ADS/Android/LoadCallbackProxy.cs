@@ -9,14 +9,12 @@ namespace Metica.ADS
 public class LoadCallbackProxy : AndroidJavaProxy
 {
     private const string TAG = MeticaAds.TAG;
-    private readonly TaskCompletionSource<bool> _tcs;
     public event Action<string> AdLoadSuccess;
     public event Action<string, string> AdLoadFailed;
 
-    public LoadCallbackProxy(TaskCompletionSource<bool> tcs)
+    public LoadCallbackProxy()
         : base("com.metica.ads.MeticaLoadAdCallback")
     {
-        _tcs = tcs;
         Debug.Log($"{TAG} LoadCallbackProxy created");
     }
 
@@ -25,7 +23,6 @@ public class LoadCallbackProxy : AndroidJavaProxy
     {
         Debug.Log($"{TAG} onAdLoadSuccess callback received for adUnitId={adUnitId}");
         AdLoadSuccess?.Invoke(adUnitId);
-        _tcs.SetResult(true);
     }
 
     // Called from Android when ad load fails
@@ -33,7 +30,6 @@ public class LoadCallbackProxy : AndroidJavaProxy
     {
         Debug.Log($"{TAG} onAdLoadFailed callback received for adUnitId={adUnitId}, error={error}");
         AdLoadFailed?.Invoke(adUnitId, error);
-        _tcs.SetResult(false);
     }
 }
 }

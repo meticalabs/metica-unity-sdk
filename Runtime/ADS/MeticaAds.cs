@@ -39,9 +39,9 @@ namespace Metica.ADS
             platformDelegate.SetLogEnabled(logEnabled);
         }
         
-        public static async Task<bool> LoadInterstitialAsync()
+        public static void LoadInterstitial()
         {
-            return await platformDelegate.LoadInterstitialAsync();
+            platformDelegate.LoadInterstitial();
         }
         public static void ShowInterstitial()
         {
@@ -65,7 +65,7 @@ namespace Metica.ADS
 
         public void Initialize(string apiKey, string appId, string userId, string baseEndpoint);
         void SetLogEnabled(bool logEnabled);
-        Task<bool> LoadInterstitialAsync();
+        void LoadInterstitial();
         void ShowInterstitial();
         bool IsInterstitialReady();
     }
