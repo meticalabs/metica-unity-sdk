@@ -28,10 +28,13 @@ internal class AndroidDelegate : PlatformDelegate
         // TODO tomi
     }
 
-    public void Initialize(string apiKey, string appId, string userId, string baseEndpoint)
+    public Task<bool> Initialize(string apiKey, string appId, string userId, string baseEndpoint)
     {
-        var callback = new InitializeCallbackProxy();
+        var tcs = new TaskCompletionSource<bool>();
+
+        var callback = new InitializeCallbackProxy(tcs);
         MeticaUnityPluginClass.CallStatic("initialize", apiKey, appId, userId, baseEndpoint, callback);
+        return tcs.Task;
     }
 
     public void LoadInterstitial()
