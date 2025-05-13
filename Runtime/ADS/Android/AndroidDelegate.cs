@@ -25,38 +25,38 @@ internal class AndroidDelegate : PlatformDelegate
 
     public void SetLogEnabled(bool logEnabled)
     {
-        // TODO
+        // TODO tomi
     }
 
-    public void Initialize(string apiKey, string appId, string baseEndpoint)
+    public Task<bool> Initialize(string apiKey, string appId, string userId, string baseEndpoint)
     {
-        MeticaUnityPluginClass.CallStatic("initialize", apiKey, appId, baseEndpoint);
-    }
-
-    public Task<bool> LoadInterstitialAsync(string userId)
-    {
-        Debug.Log($"{TAG} LoadInterstitialAsync called");
-
         var tcs = new TaskCompletionSource<bool>();
-        var callback = new LoadCallbackProxy(tcs);
+
+        var callback = new InitializeCallbackProxy(tcs);
+        MeticaUnityPluginClass.CallStatic("initialize", apiKey, appId, userId, baseEndpoint, callback);
+        return tcs.Task;
+    }
+
+    public void LoadInterstitial()
+    {
+        Debug.Log($"{TAG} LoadInterstitial called");
+
+        var callback = new LoadCallbackProxy();
         
         // Wire up all events
         callback.AdLoadSuccess += InterstitialAdLoadSuccess;
         callback.AdLoadFailed += InterstitialAdLoadFailed;
 
         Debug.Log($"{TAG} About to call Android loadInterstitial method");
-        MeticaUnityPluginClass.CallStatic("loadInterstitial", userId, callback);
+        MeticaUnityPluginClass.CallStatic("loadInterstitial", callback);
         Debug.Log($"{TAG} Android loadInterstitial method called");
-
-        return tcs.Task;
     }
 
-    public Task<bool> ShowInterstitialAsync()
+    public void ShowInterstitial()
     {
-        Debug.Log($"{TAG} ShowInterstitialAsync called");
+        Debug.Log($"{TAG} ShowInterstitial called");
 
-        var tcs = new TaskCompletionSource<bool>();
-        var callback = new ShowCallbackProxy(tcs);
+        var callback = new ShowCallbackProxy();
 
         // Wire up all events
         callback.AdShowSuccess += (adUnitId) => InterstitialAdShowSuccess?.Invoke(adUnitId);
@@ -65,10 +65,8 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdClicked += (adUnitId) => InterstitialAdClicked?.Invoke(adUnitId);
 
         Debug.Log($"{TAG} About to call Android showInterstitial method");
-        MeticaUnityPluginClass.CallStatic("showInterstitial", "TODO", callback); // TODO passing userId
+        MeticaUnityPluginClass.CallStatic("showInterstitial", callback);
         Debug.Log($"{TAG} Android showInterstitial method called");
-
-        return tcs.Task;
     }
 
     public bool IsInterstitialReady()
