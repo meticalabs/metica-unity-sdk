@@ -30,22 +30,22 @@ namespace Metica.ADS
             platformDelegate.InterstitialAdClicked += MeticaAdsCallbacks.Interstitial.OnAdClickedInternal;
         }
 
-        public static void Initialize()
+        public static async Task<bool> Initialize()
         {
-            platformDelegate.Initialize(MeticaSdk.ApiKey, MeticaSdk.AppId, MeticaSdk.BaseEndpoint);
+            return await platformDelegate.Initialize(MeticaSdk.ApiKey, MeticaSdk.AppId, MeticaSdk.CurrentUserId, MeticaSdk.BaseEndpoint);
         }
         public static void SetLogEnabled(bool logEnabled) 
         {
             platformDelegate.SetLogEnabled(logEnabled);
         }
         
-        public static async Task<bool> LoadInterstitialAsync(string userId)
+        public static void LoadInterstitial()
         {
-            return await platformDelegate.LoadInterstitialAsync(userId);
+            platformDelegate.LoadInterstitial();
         }
-        public static async Task<bool> ShowInterstitialAsync()
+        public static void ShowInterstitial()
         {
-            return await platformDelegate.ShowInterstitialAsync();
+            platformDelegate.ShowInterstitial();
         }
 
         public static bool IsInterstitialReady()
@@ -63,10 +63,10 @@ namespace Metica.ADS
         public event Action<string> InterstitialAdHidden;
         public event Action<string> InterstitialAdClicked;
 
-        public void Initialize(string apiKey, string appId, string baseEndpoint);
+        Task<bool> Initialize(string apiKey, string appId, string userId, string baseEndpoint);
         void SetLogEnabled(bool logEnabled);
-        Task<bool> LoadInterstitialAsync(string userId);
-        Task<bool> ShowInterstitialAsync();
+        void LoadInterstitial();
+        void ShowInterstitial();
         bool IsInterstitialReady();
     }
 }
