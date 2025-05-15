@@ -22,6 +22,15 @@ internal class AndroidDelegate : PlatformDelegate
     public event Action<string, string> InterstitialAdShowFailed;
     public event Action<string> InterstitialAdHidden;
     public event Action<string> InterstitialAdClicked;
+    
+    // Events for rewarded ad lifecycle callbacks
+    public event Action<string> RewardedAdLoadSuccess;
+    public event Action<string, string> RewardedAdLoadFailed;
+    public event Action<string> RewardedAdShowSuccess;
+    public event Action<string, string> RewardedAdShowFailed;
+    public event Action<string> RewardedAdHidden;
+    public event Action<string> RewardedAdClicked;
+    public event Action<string> RewardedAdRewarded;
 
     public void SetLogEnabled(bool logEnabled)
     {
@@ -37,6 +46,7 @@ internal class AndroidDelegate : PlatformDelegate
         return tcs.Task;
     }
 
+    // Interstitial methods
     public void LoadInterstitial()
     {
         Debug.Log($"{TAG} LoadInterstitial called");
@@ -72,6 +82,45 @@ internal class AndroidDelegate : PlatformDelegate
     public bool IsInterstitialReady()
     {
         return MeticaUnityPluginClass.CallStatic<bool>("isInterstitialReady");
+    }
+    
+    // Rewarded methods
+    public void LoadRewarded()
+    {
+        Debug.Log($"{TAG} LoadRewarded called");
+
+        var callback = new LoadCallbackProxy();
+        
+        // Wire up all events
+        callback.AdLoadSuccess += RewardedAdLoadSuccess;
+        callback.AdLoadFailed += RewardedAdLoadFailed;
+
+        Debug.Log($"{TAG} About to call Android loadRewarded method");
+        MeticaUnityPluginClass.CallStatic("loadRewarded", callback);
+        Debug.Log($"{TAG} Android loadRewarded method called");
+    }
+
+    public void ShowRewarded()
+    {
+        Debug.Log($"{TAG} ShowRewarded called");
+
+        var callback = new ShowCallbackProxy();
+
+        // Wire up all events
+        callback.AdShowSuccess += (adUnitId) => RewardedAdShowSuccess?.Invoke(adUnitId);
+        callback.AdShowFailed += (adUnitId, error) => RewardedAdShowFailed?.Invoke(adUnitId, error);
+        callback.AdHidden += (adUnitId) => RewardedAdHidden?.Invoke(adUnitId);
+        callback.AdClicked += (adUnitId) => RewardedAdClicked?.Invoke(adUnitId);
+        callback.AdRewarded += (adUnitId) => RewardedAdRewarded?.Invoke(adUnitId);
+
+        Debug.Log($"{TAG} About to call Android showRewarded method");
+        MeticaUnityPluginClass.CallStatic("showRewarded", callback);
+        Debug.Log($"{TAG} Android showRewarded method called");
+    }
+
+    public bool IsRewardedReady()
+    {
+        return MeticaUnityPluginClass.CallStatic<bool>("isRewardedReady");
     }
 }
 }
