@@ -28,7 +28,7 @@ internal class AndroidDelegate : PlatformDelegate
         // TODO tomi
     }
 
-    public Task<bool> Initialize(string apiKey, string appId, string userId, string version, string baseEndpoint)
+    public Task<bool> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint)
     {
         var tcs = new TaskCompletionSource<bool>();
 
