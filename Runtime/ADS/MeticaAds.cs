@@ -30,9 +30,9 @@ namespace Metica.ADS
             platformDelegate.InterstitialAdClicked += MeticaAdsCallbacks.Interstitial.OnAdClickedInternal;
         }
 
-        public static async Task<bool> Initialize()
+        public static async Task<bool> InitializeAsync()
         {
-            return await platformDelegate.Initialize(MeticaSdk.ApiKey, MeticaSdk.AppId, MeticaSdk.CurrentUserId, MeticaSdk.Version, MeticaSdk.BaseEndpoint);
+            return await platformDelegate.InitializeAsync(MeticaSdk.ApiKey, MeticaSdk.AppId, MeticaSdk.CurrentUserId, MeticaSdk.Version, MeticaSdk.BaseEndpoint);
         }
         public static void SetLogEnabled(bool logEnabled) 
         {
@@ -63,7 +63,7 @@ namespace Metica.ADS
         public event Action<string> InterstitialAdHidden;
         public event Action<string> InterstitialAdClicked;
 
-        Task<bool> Initialize(string apiKey, string appId, string userId, string version, string baseEndpoint);
+        Task<bool> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint);
         void SetLogEnabled(bool logEnabled);
         void LoadInterstitial();
         void ShowInterstitial();
