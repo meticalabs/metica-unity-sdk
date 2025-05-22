@@ -53,9 +53,9 @@ internal class AndroidDelegate : PlatformDelegate
 
         var callback = new LoadCallbackProxy();
         
-        // Wire up all events
-        callback.AdLoadSuccess += InterstitialAdLoadSuccess;
-        callback.AdLoadFailed += InterstitialAdLoadFailed;
+        // Wire up all events with signature conversion
+        callback.AdLoadSuccess += (meticaAd) => InterstitialAdLoadSuccess?.Invoke(meticaAd.adUnitId);
+        callback.AdLoadFailed += (error) => InterstitialAdLoadFailed?.Invoke("", error);
 
         Debug.Log($"{TAG} About to call Android loadInterstitial method");
         MeticaUnityPluginClass.CallStatic("loadInterstitial", callback);
@@ -91,9 +91,9 @@ internal class AndroidDelegate : PlatformDelegate
 
         var callback = new LoadCallbackProxy();
         
-        // Wire up all events
-        callback.AdLoadSuccess += RewardedAdLoadSuccess;
-        callback.AdLoadFailed += RewardedAdLoadFailed;
+        // Wire up all events with signature conversion
+        callback.AdLoadSuccess += (meticaAd) => RewardedAdLoadSuccess?.Invoke(meticaAd.adUnitId);
+        callback.AdLoadFailed += (error) => RewardedAdLoadFailed?.Invoke("", error);
 
         Debug.Log($"{TAG} About to call Android loadRewarded method");
         MeticaUnityPluginClass.CallStatic("loadRewarded", callback);
