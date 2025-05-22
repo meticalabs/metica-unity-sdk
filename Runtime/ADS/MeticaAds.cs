@@ -80,16 +80,16 @@ namespace Metica.ADS
 
     internal interface PlatformDelegate {
         // Events for interstitial ad lifecycle callbacks
-        public event Action<string> InterstitialAdLoadSuccess;
-        public event Action<string, string> InterstitialAdLoadFailed;
+        public event Action<MeticaAd> InterstitialAdLoadSuccess;
+        public event Action<string> InterstitialAdLoadFailed;
         public event Action<string> InterstitialAdShowSuccess;
         public event Action<string, string> InterstitialAdShowFailed;
         public event Action<string> InterstitialAdHidden;
         public event Action<string> InterstitialAdClicked;
         
         // Events for rewarded ad lifecycle callbacks
-        public event Action<string> RewardedAdLoadSuccess;
-        public event Action<string, string> RewardedAdLoadFailed;
+        public event Action<MeticaAd> RewardedAdLoadSuccess;
+        public event Action<string> RewardedAdLoadFailed;
         public event Action<string> RewardedAdShowSuccess;
         public event Action<string, string> RewardedAdShowFailed;
         public event Action<string> RewardedAdHidden;
