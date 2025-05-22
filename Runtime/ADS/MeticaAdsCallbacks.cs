@@ -9,10 +9,10 @@ public static class MeticaAdsCallbacks
         // Public events for consumers to subscribe to
         public static event Action<MeticaAd> OnAdLoadSuccess;
         public static event Action<string> OnAdLoadFailed;
-        public static event Action<string> OnAdShowSuccess;
-        public static event Action<string, string> OnAdShowFailed;
-        public static event Action<string> OnAdHidden;
-        public static event Action<string> OnAdClicked;
+        public static event Action<MeticaAd> OnAdShowSuccess;
+        public static event Action<MeticaAd, string> OnAdShowFailed;
+        public static event Action<MeticaAd> OnAdHidden;
+        public static event Action<MeticaAd> OnAdClicked;
 
         // Internal methods to trigger the events
         internal static void OnAdLoadSuccessInternal(MeticaAd meticaAd)
@@ -24,24 +24,24 @@ public static class MeticaAdsCallbacks
         {
             OnAdLoadFailed?.Invoke(error);
         }      
-        internal static void OnAdShowSuccessInternal(string adUnitId)
+        internal static void OnAdShowSuccessInternal(MeticaAd meticaAd)
         {
-            OnAdShowSuccess?.Invoke(adUnitId);
+            OnAdShowSuccess?.Invoke(meticaAd);
         }
 
-        internal static void OnAdShowFailedInternal(string adUnitId, string error)
+        internal static void OnAdShowFailedInternal(MeticaAd meticaAd, string error)
         {
-            OnAdShowFailed?.Invoke(adUnitId, error);
+            OnAdShowFailed?.Invoke(meticaAd, error);
         }
 
-        internal static void OnAdHiddenInternal(string adUnitId)
+        internal static void OnAdHiddenInternal(MeticaAd meticaAd)
         {
-            OnAdHidden?.Invoke(adUnitId);
+            OnAdHidden?.Invoke(meticaAd);
         }
 
-        internal static void OnAdClickedInternal(string adUnitId)
+        internal static void OnAdClickedInternal(MeticaAd meticaAd)
         {
-            OnAdClicked?.Invoke(adUnitId);
+            OnAdClicked?.Invoke(meticaAd);
         }
     }
 
@@ -50,11 +50,11 @@ public static class MeticaAdsCallbacks
         // Public events for consumers to subscribe to
         public static event Action<MeticaAd> OnAdLoadSuccess;
         public static event Action<string> OnAdLoadFailed;
-        public static event Action<string> OnAdShowSuccess;
-        public static event Action<string, string> OnAdShowFailed;
-        public static event Action<string> OnAdHidden;
-        public static event Action<string> OnAdClicked;
-        public static event Action<string> OnAdRewarded;
+        public static event Action<MeticaAd> OnAdShowSuccess;
+        public static event Action<MeticaAd, string> OnAdShowFailed;
+        public static event Action<MeticaAd> OnAdHidden;
+        public static event Action<MeticaAd> OnAdClicked;
+        public static event Action<MeticaAd> OnAdRewarded;
 
         // Internal methods to trigger the events
         internal static void OnAdLoadSuccessInternal(MeticaAd meticaAd)
@@ -67,29 +67,29 @@ public static class MeticaAdsCallbacks
             OnAdLoadFailed?.Invoke(error);
         }      
         
-        internal static void OnAdShowSuccessInternal(string adUnitId)
+        internal static void OnAdShowSuccessInternal(MeticaAd meticaAd)
         {
-            OnAdShowSuccess?.Invoke(adUnitId);
+            OnAdShowSuccess?.Invoke(meticaAd);
         }
 
-        internal static void OnAdShowFailedInternal(string adUnitId, string error)
+        internal static void OnAdShowFailedInternal(MeticaAd meticaAd, string error)
         {
-            OnAdShowFailed?.Invoke(adUnitId, error);
+            OnAdShowFailed?.Invoke(meticaAd, error);
         }
 
-        internal static void OnAdHiddenInternal(string adUnitId)
+        internal static void OnAdHiddenInternal(MeticaAd meticaAd)
         {
-            OnAdHidden?.Invoke(adUnitId);
+            OnAdHidden?.Invoke(meticaAd);
         }
 
-        internal static void OnAdClickedInternal(string adUnitId)
+        internal static void OnAdClickedInternal(MeticaAd meticaAd)
         {
-            OnAdClicked?.Invoke(adUnitId);
+            OnAdClicked?.Invoke(meticaAd);
         }
         
-        internal static void OnAdRewardedInternal(string adUnitId)
+        internal static void OnAdRewardedInternal(MeticaAd meticaAd)
         {
-            OnAdRewarded?.Invoke(adUnitId);
+            OnAdRewarded?.Invoke(meticaAd);
         }
     }
 

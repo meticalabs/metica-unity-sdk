@@ -22,7 +22,7 @@ public class LoadCallbackProxy : AndroidJavaProxy
     public void onAdLoadSuccess(AndroidJavaObject meticaAdObject)
     {
         // Convert AndroidJavaObject to C# MeticaAd object
-        var meticaAd = ConvertToMeticaAd(meticaAdObject);
+        var meticaAd = meticaAdObject.ToMeticaAd();
         Debug.Log($"{TAG} onAdLoadSuccess callback received for adUnitId={meticaAd.adUnitId}");
         AdLoadSuccess?.Invoke(meticaAd);
     }
@@ -34,18 +34,5 @@ public class LoadCallbackProxy : AndroidJavaProxy
         AdLoadFailed?.Invoke(error);
     }
 
-    private MeticaAd ConvertToMeticaAd(AndroidJavaObject javaObject)
-    {
-        string adUnitId = javaObject.Get<string>("adUnitId");
-
-        // Revenue is no longer nullable, can get directly
-        double revenue = javaObject.Get<double>("revenue");
-
-        string networkName = javaObject.Get<string>("networkName");
-        string placementTag = javaObject.Get<string>("placementTag");
-        string adFormat = javaObject.Get<string>("adFormat");
-
-        return new MeticaAd(adUnitId, revenue, networkName, placementTag, adFormat);
-    }
 }
 }

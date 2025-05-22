@@ -18,19 +18,19 @@ internal class AndroidDelegate : PlatformDelegate
     // Events for interstitial ad lifecycle callbacks - updated signatures
     public event Action<MeticaAd> InterstitialAdLoadSuccess;
     public event Action<string> InterstitialAdLoadFailed;
-    public event Action<string> InterstitialAdShowSuccess;
-    public event Action<string, string> InterstitialAdShowFailed;
-    public event Action<string> InterstitialAdHidden;
-    public event Action<string> InterstitialAdClicked;
+    public event Action<MeticaAd> InterstitialAdShowSuccess;
+    public event Action<MeticaAd, string> InterstitialAdShowFailed;
+    public event Action<MeticaAd> InterstitialAdHidden;
+    public event Action<MeticaAd> InterstitialAdClicked;
     
     // Events for rewarded ad lifecycle callbacks - updated signatures
     public event Action<MeticaAd> RewardedAdLoadSuccess;
     public event Action<string> RewardedAdLoadFailed;
-    public event Action<string> RewardedAdShowSuccess;
-    public event Action<string, string> RewardedAdShowFailed;
-    public event Action<string> RewardedAdHidden;
-    public event Action<string> RewardedAdClicked;
-    public event Action<string> RewardedAdRewarded;
+    public event Action<MeticaAd> RewardedAdShowSuccess;
+    public event Action<MeticaAd, string> RewardedAdShowFailed;
+    public event Action<MeticaAd> RewardedAdHidden;
+    public event Action<MeticaAd> RewardedAdClicked;
+    public event Action<MeticaAd> RewardedAdRewarded;
 
     public void SetLogEnabled(bool logEnabled)
     {
@@ -68,11 +68,11 @@ internal class AndroidDelegate : PlatformDelegate
 
         var callback = new ShowCallbackProxy();
 
-        // Wire up all events
-        callback.AdShowSuccess += (adUnitId) => InterstitialAdShowSuccess?.Invoke(adUnitId);
-        callback.AdShowFailed += (adUnitId, error) => InterstitialAdShowFailed?.Invoke(adUnitId, error);
-        callback.AdHidden += (adUnitId) => InterstitialAdHidden?.Invoke(adUnitId);
-        callback.AdClicked += (adUnitId) => InterstitialAdClicked?.Invoke(adUnitId);
+        // Wire up all events - now using MeticaAd objects directly
+        callback.AdShowSuccess += (meticaAd) => InterstitialAdShowSuccess?.Invoke(meticaAd);
+        callback.AdShowFailed += (meticaAd, error) => InterstitialAdShowFailed?.Invoke(meticaAd, error);
+        callback.AdHidden += (meticaAd) => InterstitialAdHidden?.Invoke(meticaAd);
+        callback.AdClicked += (meticaAd) => InterstitialAdClicked?.Invoke(meticaAd);
 
         Debug.Log($"{TAG} About to call Android showInterstitial method");
         MeticaUnityPluginClass.CallStatic("showInterstitial", callback);
@@ -106,12 +106,12 @@ internal class AndroidDelegate : PlatformDelegate
 
         var callback = new ShowCallbackProxy();
 
-        // Wire up all events
-        callback.AdShowSuccess += (adUnitId) => RewardedAdShowSuccess?.Invoke(adUnitId);
-        callback.AdShowFailed += (adUnitId, error) => RewardedAdShowFailed?.Invoke(adUnitId, error);
-        callback.AdHidden += (adUnitId) => RewardedAdHidden?.Invoke(adUnitId);
-        callback.AdClicked += (adUnitId) => RewardedAdClicked?.Invoke(adUnitId);
-        callback.AdRewarded += (adUnitId) => RewardedAdRewarded?.Invoke(adUnitId);
+        // Wire up all events - now using MeticaAd objects directly
+        callback.AdShowSuccess += (meticaAd) => RewardedAdShowSuccess?.Invoke(meticaAd);
+        callback.AdShowFailed += (meticaAd, error) => RewardedAdShowFailed?.Invoke(meticaAd, error);
+        callback.AdHidden += (meticaAd) => RewardedAdHidden?.Invoke(meticaAd);
+        callback.AdClicked += (meticaAd) => RewardedAdClicked?.Invoke(meticaAd);
+        callback.AdRewarded += (meticaAd) => RewardedAdRewarded?.Invoke(meticaAd);
 
         Debug.Log($"{TAG} About to call Android showRewarded method");
         MeticaUnityPluginClass.CallStatic("showRewarded", callback);
