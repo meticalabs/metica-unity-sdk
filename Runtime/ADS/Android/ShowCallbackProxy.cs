@@ -6,14 +6,15 @@ using UnityEngine;
 namespace Metica.ADS
 {
 public class ShowCallbackProxy : AndroidJavaProxy
-{    private const string TAG = MeticaAds.TAG;
+{
+    private const string TAG = MeticaAds.TAG;
     
-    // Events for all callbacks
-    public event Action<string> AdShowSuccess;
-    public event Action<string, string> AdShowFailed;
-    public event Action<string> AdHidden;
-    public event Action<string> AdClicked;
-    public event Action<string> AdRewarded;
+    // Events for all callbacks - now using MeticaAd instead of string adUnitId
+    public event Action<MeticaAd> AdShowSuccess;
+    public event Action<MeticaAd, string> AdShowFailed;
+    public event Action<MeticaAd> AdHidden;
+    public event Action<MeticaAd> AdClicked;
+    public event Action<MeticaAd> AdRewarded;
     
     public ShowCallbackProxy() 
         : base("com.metica.ads.MeticaShowAdCallback")
@@ -21,39 +22,45 @@ public class ShowCallbackProxy : AndroidJavaProxy
         Debug.Log($"{TAG} ShowCallbackProxy created");
     }
     
-    // Called when ad shows successfully
-    public void onAdShowSuccess(string adUnitId)
+    // Called when ad shows successfully - now receives MeticaAd object
+    public void onAdShowSuccess(AndroidJavaObject meticaAdObject)
     {
-        Debug.Log($"{TAG} onAdShowSuccess callback received for adUnitId={adUnitId}");
-        AdShowSuccess?.Invoke(adUnitId);
+        var meticaAd = meticaAdObject.ToMeticaAd();
+        Debug.Log($"{TAG} onAdShowSuccess callback received for adUnitId={meticaAd.adUnitId}");
+        AdShowSuccess?.Invoke(meticaAd);
     }
     
-    // Called when ad fails to show
-    public void onAdShowFailed(string adUnitId, string error)
+    // Called when ad fails to show - now receives MeticaAd object
+    public void onAdShowFailed(AndroidJavaObject meticaAdObject, string error)
     {
-        Debug.Log($"{TAG} onAdShowFailed callback received for adUnitId={adUnitId}, error={error}");
-        AdShowFailed?.Invoke(adUnitId, error);
+        var meticaAd = meticaAdObject.ToMeticaAd();
+        Debug.Log($"{TAG} onAdShowFailed callback received for adUnitId={meticaAd.adUnitId}, error={error}");
+        AdShowFailed?.Invoke(meticaAd, error);
     }
     
-    // Called when ad is hidden (closed)
-    public void onAdHidden(string adUnitId)
+    // Called when ad is hidden (closed) - now receives MeticaAd object
+    public void onAdHidden(AndroidJavaObject meticaAdObject)
     {
-        Debug.Log($"{TAG} onAdHidden callback received for adUnitId={adUnitId}");
-        AdHidden?.Invoke(adUnitId);
+        var meticaAd = meticaAdObject.ToMeticaAd();
+        Debug.Log($"{TAG} onAdHidden callback received for adUnitId={meticaAd.adUnitId}");
+        AdHidden?.Invoke(meticaAd);
     }
     
-    // Called when ad is clicked
-    public void onAdClicked(string adUnitId)
+    // Called when ad is clicked - now receives MeticaAd object
+    public void onAdClicked(AndroidJavaObject meticaAdObject)
     {
-        Debug.Log($"{TAG} onAdClicked callback received for adUnitId={adUnitId}");
-        AdClicked?.Invoke(adUnitId);
+        var meticaAd = meticaAdObject.ToMeticaAd();
+        Debug.Log($"{TAG} onAdClicked callback received for adUnitId={meticaAd.adUnitId}");
+        AdClicked?.Invoke(meticaAd);
     }
     
-    // Called when ad provides a reward
-    public void onAdRewarded(string adUnitId)
+    // Called when ad provides a reward - this method might not be in the Kotlin interface
+    // but keeping it for rewarded ads compatibility
+    public void onAdRewarded(AndroidJavaObject meticaAdObject)
     {
-        Debug.Log($"{TAG} onAdRewarded callback received for adUnitId={adUnitId}");
-        AdRewarded?.Invoke(adUnitId);
+        var meticaAd = meticaAdObject.ToMeticaAd();
+        Debug.Log($"{TAG} onAdRewarded callback received for adUnitId={meticaAd.adUnitId}");
+        AdRewarded?.Invoke(meticaAd);
     }
 }
 }
