@@ -13,6 +13,7 @@ public static class MeticaAdsCallbacks
         public static event Action<MeticaAd, string> OnAdShowFailed;
         public static event Action<MeticaAd> OnAdHidden;
         public static event Action<MeticaAd> OnAdClicked;
+        public static event Action<MeticaAd> OnAdRevenuePaid;
 
         // Internal methods to trigger the events
         internal static void OnAdLoadSuccessInternal(MeticaAd meticaAd)
@@ -43,6 +44,11 @@ public static class MeticaAdsCallbacks
         {
             OnAdClicked?.Invoke(meticaAd);
         }
+
+        internal static void OnAdRevenuePaidInternal(MeticaAd meticaAd)
+        {
+            OnAdRevenuePaid?.Invoke(meticaAd);
+        }
     }
 
     public static class Rewarded
@@ -55,6 +61,7 @@ public static class MeticaAdsCallbacks
         public static event Action<MeticaAd> OnAdHidden;
         public static event Action<MeticaAd> OnAdClicked;
         public static event Action<MeticaAd> OnAdRewarded;
+        public static event Action<MeticaAd> OnAdRevenuePaid;
 
         // Internal methods to trigger the events
         internal static void OnAdLoadSuccessInternal(MeticaAd meticaAd)
@@ -90,6 +97,11 @@ public static class MeticaAdsCallbacks
         internal static void OnAdRewardedInternal(MeticaAd meticaAd)
         {
             OnAdRewarded?.Invoke(meticaAd);
+        }
+
+        internal static void OnAdRevenuePaidInternal(MeticaAd meticaAd)
+        {
+            OnAdRevenuePaid?.Invoke(meticaAd);
         }
     }
 
