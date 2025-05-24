@@ -2,7 +2,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Metica.ADS.Android;
 using Metica.SDK;
 
 namespace Metica.ADS 
@@ -15,12 +14,11 @@ namespace Metica.ADS
         static MeticaAds()
         {
 #if UNITY_ANDROID
-            platformDelegate = new AndroidDelegate();
+            platformDelegate = new Android.AndroidDelegate();
 #endif
 
 #if UNITY_IOS
-            // TODO
-            platformDelegate = new IOSDelegate();
+            platformDelegate = new IOS.IOSDelegate();
 #endif
             // Interstitial ad callbacks
             platformDelegate.InterstitialAdLoadSuccess += MeticaAdsCallbacks.Interstitial.OnAdLoadSuccessInternal;
