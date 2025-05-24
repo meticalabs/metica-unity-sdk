@@ -1,8 +1,8 @@
 #nullable enable
 
-using UnityEngine;
 using System;
 using System.Threading.Tasks;
+using Metica.ADS.Android;
 using Metica.SDK;
 
 namespace Metica.ADS 
