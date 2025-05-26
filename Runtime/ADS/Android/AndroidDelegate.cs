@@ -2,9 +2,9 @@
 
 #nullable enable
 
-using UnityEngine;
 using System;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Metica.ADS.Android
 {
@@ -114,6 +114,7 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdShowFailed += (meticaAd, error) => RewardedAdShowFailed?.Invoke(meticaAd, error);
         callback.AdHidden += (meticaAd) => RewardedAdHidden?.Invoke(meticaAd);
         callback.AdClicked += (meticaAd) => RewardedAdClicked?.Invoke(meticaAd);
+        callback.AdRewarded += (meticaAd) => RewardedAdRewarded?.Invoke(meticaAd);
         callback.AdRevenuePaid += (meticaAd) => RewardedAdRevenuePaid?.Invoke(meticaAd);
 
         Debug.Log($"{TAG} About to call Android showRewarded method");

@@ -1,7 +1,6 @@
 using System;
 
 using Metica.Core;
-using Metica.SDK;
 
 /// <summary>
 /// Facade class for logging.
@@ -12,6 +11,8 @@ using Metica.SDK;
 /// using MeticaLogger = Log;
 /// </code>
 /// </summary>
+namespace Metica.SDK
+{
 public static class Log
 {
     private static readonly Lazy<ILog> _logger = new Lazy<ILog>(() => Registry.Resolve<ILog>());
@@ -24,7 +25,10 @@ public static class Log
     }
 
     public static void Info(Func<string> messageSupplier) => Logger.LogInfo(messageSupplier);
-    public static void Error(Func<string> messageSupplier, Exception error = null) => Logger.LogError(messageSupplier, error);
+
+    public static void Error(Func<string> messageSupplier, Exception error = null) =>
+        Logger.LogError(messageSupplier, error);
+
     public static void Warning(Func<string> messageSupplier) => Logger.LogWarning(messageSupplier);
     public static void Debug(Func<string> messageSupplier) => Logger.LogDebug(messageSupplier);
 
@@ -32,10 +36,15 @@ public static class Log
 
     [Obsolete("PLease use 'Log.Info'")]
     public static void LogInfo(Func<string> messageSupplier) => Logger.LogInfo(messageSupplier);
+
     [Obsolete("PLease use 'Log.Error'")]
-    public static void LogError(Func<string> messageSupplier, Exception error = null) => Logger.LogError(messageSupplier, error);
+    public static void LogError(Func<string> messageSupplier, Exception error = null) =>
+        Logger.LogError(messageSupplier, error);
+
     [Obsolete("PLease use 'Log.Warning'")]
     public static void LogWarn(Func<string> messageSupplier) => Logger.LogWarning(messageSupplier);
+
     [Obsolete("PLease use 'Log.Debug'")]
     public static void LogDebug(Func<string> messageSupplier) => Logger.LogDebug(messageSupplier);
+}
 }
