@@ -272,7 +272,7 @@ namespace Metica.Unity
             SDK.LogPartialStateUserUpdateEvent(partialUserAttributes, null);
 
         public static void LogCustomEvent(string eventType, Dictionary<string, object> userEvent) =>
-            SDK.LogCustomEvent(eventType, null);
+            SDK.LogCustomEvent(eventType, userEvent);
 
         [Obsolete("Please use LogCustomEvent")]
         public static void LogUserEvent(string eventType, Dictionary<string, object> userEvent, bool reuseDictionary) =>
