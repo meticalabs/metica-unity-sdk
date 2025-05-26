@@ -29,6 +29,7 @@ namespace Metica.ADS
             platformDelegate.InterstitialAdShowFailed += MeticaAdsCallbacks.Interstitial.OnAdShowFailedInternal;
             platformDelegate.InterstitialAdHidden += MeticaAdsCallbacks.Interstitial.OnAdHiddenInternal;
             platformDelegate.InterstitialAdClicked += MeticaAdsCallbacks.Interstitial.OnAdClickedInternal;
+            platformDelegate.InterstitialAdRevenuePaid += MeticaAdsCallbacks.Interstitial.OnAdRevenuePaidInternal;
             
             // Rewarded ad callbacks
             platformDelegate.RewardedAdLoadSuccess += MeticaAdsCallbacks.Rewarded.OnAdLoadSuccessInternal;
@@ -38,6 +39,7 @@ namespace Metica.ADS
             platformDelegate.RewardedAdHidden += MeticaAdsCallbacks.Rewarded.OnAdHiddenInternal;
             platformDelegate.RewardedAdClicked += MeticaAdsCallbacks.Rewarded.OnAdClickedInternal;
             platformDelegate.RewardedAdRewarded += MeticaAdsCallbacks.Rewarded.OnAdRewardedInternal;
+            platformDelegate.RewardedAdRevenuePaid += MeticaAdsCallbacks.Rewarded.OnAdRevenuePaidInternal;
         }
 
         public static async Task<bool> InitializeAsync()
@@ -86,6 +88,7 @@ internal interface PlatformDelegate {
     public event Action<MeticaAd, string> InterstitialAdShowFailed;
     public event Action<MeticaAd> InterstitialAdHidden;
     public event Action<MeticaAd> InterstitialAdClicked;
+    public event Action<MeticaAd> InterstitialAdRevenuePaid;
         
     // Events for rewarded ad lifecycle callbacks
     public event Action<MeticaAd> RewardedAdLoadSuccess;
@@ -95,6 +98,7 @@ internal interface PlatformDelegate {
     public event Action<MeticaAd> RewardedAdHidden;
     public event Action<MeticaAd> RewardedAdClicked;
     public event Action<MeticaAd> RewardedAdRewarded;
+    public event Action<MeticaAd> RewardedAdRevenuePaid;
 
     Task<bool> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint);
     void SetLogEnabled(bool logEnabled);

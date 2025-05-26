@@ -9,12 +9,12 @@ public class ShowCallbackProxy : AndroidJavaProxy
 {
     private const string TAG = MeticaAds.TAG;
     
-    // Events for all callbacks - now using MeticaAd instead of string adUnitId
     public event Action<MeticaAd> AdShowSuccess;
     public event Action<MeticaAd, string> AdShowFailed;
     public event Action<MeticaAd> AdHidden;
     public event Action<MeticaAd> AdClicked;
     public event Action<MeticaAd> AdRewarded;
+    public event Action<MeticaAd> AdRevenuePaid;
     
     public ShowCallbackProxy() 
         : base("com.metica.ads.MeticaShowAdCallback")
@@ -54,13 +54,20 @@ public class ShowCallbackProxy : AndroidJavaProxy
         AdClicked?.Invoke(meticaAd);
     }
     
-    // Called when ad provides a reward - this method might not be in the Kotlin interface
-    // but keeping it for rewarded ads compatibility
+    // Called when ad provides a reward 
     public void onAdRewarded(AndroidJavaObject meticaAdObject)
     {
         var meticaAd = meticaAdObject.ToMeticaAd();
         Debug.Log($"{TAG} onAdRewarded callback received for adUnitId={meticaAd.adUnitId}");
         AdRewarded?.Invoke(meticaAd);
+    }
+    
+    // Called when revenue is paid for the ad 
+    public void onAdRevenuePaid(AndroidJavaObject meticaAdObject)
+    {
+        var meticaAd = meticaAdObject.ToMeticaAd();
+        Debug.Log($"{TAG} onAdRevenuePaid callback received for adUnitId={meticaAd.adUnitId}");
+        AdRevenuePaid?.Invoke(meticaAd);
     }
 }
 }
