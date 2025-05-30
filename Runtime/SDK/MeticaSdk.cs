@@ -1,10 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System;
-
-using Metica.SDK.Model;
-using Metica.Network;
 using Metica.Core;
+using Metica.Network;
+using Metica.SDK.Model;
 
 namespace Metica.SDK
 {
@@ -33,7 +32,7 @@ namespace Metica.SDK
 
         public static IMeticaSdk SDK {  get => Registry.Resolve<IMeticaSdk>(); }
 
-        public static string Version { get => "1.6.1"; }
+        public static string Version { get => "1.6.2"; }
 
         public static string CurrentUserId {  get; set; }
         public static string ApiKey { get; private set; }
