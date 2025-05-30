@@ -149,7 +149,7 @@ namespace Metica.SDK
 
             // We only retrieve via http the pending placements
             var url = _url;
-            if(placements != null && placements.Length > 0)
+            if(placements.Length > 0)
             {
                 url = $"{url}?placements=";
                 for (int i = 0; i < placements.Length; i++)
