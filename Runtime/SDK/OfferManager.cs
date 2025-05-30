@@ -1,17 +1,19 @@
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Metica.Core;
 using Metica.Network;
 using Metica.SDK.Model;
+using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Metica.SDK
 {
+    [Preserve]
     [System.Serializable]
     public class OfferResult : IMeticaHttpResult
     {
+        [Preserve]
         [JsonProperty("placements")]
         public Dictionary<string, List<Offer>> placements { get; set; }
         //[Obsolete("Please use 'Placements'")]
