@@ -1,10 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System;
-
-using Metica.SDK.Model;
-using Metica.Network;
 using Metica.Core;
+using Metica.Network;
+using Metica.SDK.Model;
 
 namespace Metica.SDK
 {
