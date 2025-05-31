@@ -13,12 +13,14 @@ namespace Metica.ADS
 
         static MeticaAds()
         {
-#if UNITY_ANDROID
+#if UNITY_EDITOR
+            platformDelegate = new UnityPlayer.UnityPlayerDelegate();
+#elif UNITY_ANDROID
             platformDelegate = new Android.AndroidDelegate();
-#endif
-
-#if UNITY_IOS
+#elif UNITY_IOS
             platformDelegate = new IOS.IOSDelegate();
+#else
+            throw new PlatformNotSupportedException("MeticaAds is only supported on Android, iOS, and Unity Editor platforms.");
 #endif
             // Interstitial ad callbacks
             platformDelegate.InterstitialAdLoadSuccess += MeticaAdsCallbacks.Interstitial.OnAdLoadSuccessInternal;
