@@ -1,6 +1,6 @@
 // ShowCallbackProxy.cs
+
 using System;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Metica.ADS
