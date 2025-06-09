@@ -5,6 +5,7 @@ using Metica.Network;
 using Metica.SDK.Model;
 using Newtonsoft.Json;
 using UnityEngine.Scripting;
+using SystemInfo = UnityEngine.Device.SystemInfo;
 
 namespace Metica.SDK
 {
