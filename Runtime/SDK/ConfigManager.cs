@@ -5,6 +5,7 @@ using Metica.Network;
 using Metica.SDK.Model;
 using Newtonsoft.Json;
 using UnityEngine.Scripting;
+using SystemInfo = UnityEngine.Device.SystemInfo;
 
 namespace Metica.SDK
 {
@@ -45,16 +46,29 @@ namespace Metica.SDK
             _deviceInfoProvider = Registry.Resolve<IDeviceInfoProvider>();
         }
 
+        /// <summary>
+        /// Asynchronously retrieves configurations, automatically injecting device-specific information.
+        /// </summary>
         public async Task<ConfigResult> GetConfigsAsync(string userId, List<string> configKeys = null, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
         {
+            // If the incoming userData is null, create a new dictionary. Otherwise, use the existing one.
+            var finalUserData = userData ?? new Dictionary<string, object>();
+        
+            // Inject the additional device information using the SystemInfo class
+            // This will add the keys or update them if they already exist.
+            finalUserData["deviceType"] = SystemInfo.deviceType.ToString();
+            finalUserData["osVersion"] = SystemInfo.operatingSystem;
+            finalUserData["deviceModel"] = SystemInfo.deviceModel;
+                    
             var requestBody = new Dictionary<string, object>
             {
                 { FieldNames.UserId, userId },
                 { FieldNames.ConfigKeys, configKeys },
-                { FieldNames.UserData, userData },
+                // Use the augmented dictionary here
+                { FieldNames.UserData, finalUserData }, 
                 { FieldNames.DeviceInfo, deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
             };
-
+        
             var url = _url;
             if(configKeys != null && configKeys.Count > 0)
             {
@@ -65,10 +79,10 @@ namespace Metica.SDK
                     url = $"{url}{ck}{((i<configKeys.Count-1)?",":"")}";
                 }
             }
-
+        
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.NullValueHandling = NullValueHandling.Ignore;
-
+        
             var httpResponse = await _httpService.PostAsync(url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
             return ResponseToResult<ConfigResult>(httpResponse);
         }
