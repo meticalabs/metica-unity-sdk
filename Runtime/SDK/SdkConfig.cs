@@ -90,7 +90,7 @@ namespace Metica.SDK
                 httpCacheTTLSeconds = 60,
                 //offersCachePath = Path.Combine(Application.persistentDataPath, "metica-offers.json"),
                 //remoteConfigCachePath = Path.Combine(Application.persistentDataPath, "metica-rc.json"),
-                httpRequestTimeout = 2,
+                httpRequestTimeout = 10,
                 logLevel = LogLevel.Error
             };
         }

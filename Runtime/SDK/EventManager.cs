@@ -189,11 +189,37 @@ namespace Metica.SDK
             settings.NullValueHandling = NullValueHandling.Ignore;
 
             var body = JsonConvert.SerializeObject(new Dictionary<string, object> { { "events", _events } }, settings);
-            var httpResponse = await _httpService.PostAsync(_url, body, "application/json", useCache: false);
-            _events.Clear();
-            EventDispatchResult result = ResponseToResult<EventDispatchResult>(httpResponse);
-            result.OriginalRequestBody = body;
-            OnEventsDispatch?.Invoke(result);
+            try
+            {
+                var httpResponse = await _httpService.PostAsync(_url, body, "application/json", useCache: false);
+                _events.Clear();
+                EventDispatchResult result = ResponseToResult<EventDispatchResult>(httpResponse);
+                result.OriginalRequestBody = body;
+                OnEventsDispatch?.Invoke(result);
+            }
+            catch (System.Net.Http.HttpRequestException exception) 
+                when (exception.InnerException is TimeoutException || exception.Message.Contains("timed out"))
+            {
+                Log.Error(() => $"EventManager.DispatchEvents: Request timed out: {exception.Message}");
+                EventDispatchResult result = new EventDispatchResult {
+                    Status = HttpResponse.ResultStatus.Failure,
+                    Error = $"Timeout: {exception.Message}",
+                    RawContent = null,
+                    OriginalRequestBody = body
+                };
+                OnEventsDispatch?.Invoke(result);
+            }
+            catch (Exception exception)
+            {
+                Log.Error(() => $"EventManager.DispatchEvents: Exception: {exception.Message}");
+                EventDispatchResult result = new EventDispatchResult {
+                    Status = HttpResponse.ResultStatus.Failure,
+                    Error = exception.Message,
+                    RawContent = null,
+                    OriginalRequestBody = body
+                };
+                OnEventsDispatch?.Invoke(result);
+            }
         }
 
         private void DispatchHandler(EventDispatchResult result)
