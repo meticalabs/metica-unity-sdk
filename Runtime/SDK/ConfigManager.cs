@@ -4,6 +4,7 @@ using Metica.Core;
 using Metica.Network;
 using Metica.SDK.Model;
 using Newtonsoft.Json;
+using UnityEngine;
 using UnityEngine.Scripting;
 using SystemInfo = UnityEngine.Device.SystemInfo;
 
@@ -51,40 +52,65 @@ namespace Metica.SDK
         /// </summary>
         public async Task<ConfigResult> GetConfigsAsync(string userId, List<string> configKeys = null, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
         {
-            // If the incoming userData is null, create a new dictionary. Otherwise, use the existing one.
-            var finalUserData = userData ?? new Dictionary<string, object>();
-        
-            // Inject the additional device information using the SystemInfo class
-            // This will add the keys or update them if they already exist.
-            finalUserData["deviceType"] = SystemInfo.deviceType.ToString();
-            finalUserData["osVersion"] = SystemInfo.operatingSystem;
-            finalUserData["deviceModel"] = SystemInfo.deviceModel;
-                    
-            var requestBody = new Dictionary<string, object>
+            try
             {
-                { FieldNames.UserId, userId },
-                { FieldNames.ConfigKeys, configKeys },
-                // Use the augmented dictionary here
-                { FieldNames.UserData, finalUserData }, 
-                { FieldNames.DeviceInfo, deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
-            };
-        
-            var url = _url;
-            if(configKeys != null && configKeys.Count > 0)
-            {
-                url = $"{url}?keys=";
-                for (int i = 0; i < configKeys.Count; i++)
+                // If the incoming userData is null, create a new dictionary. Otherwise, use the existing one.
+                var finalUserData = userData ?? new Dictionary<string, object>();
+            
+                // Inject the additional device information using the SystemInfo class
+                // This will add the keys or update them if they already exist.
+                finalUserData["deviceType"] = SystemInfo.deviceType.ToString();
+                finalUserData["osVersion"] = SystemInfo.operatingSystem;
+                finalUserData["deviceModel"] = SystemInfo.deviceModel;
+                        
+                var requestBody = new Dictionary<string, object>
                 {
-                    var ck = configKeys[i];
-                    url = $"{url}{ck}{((i<configKeys.Count-1)?",":"")}";
+                    { FieldNames.UserId, userId },
+                    { FieldNames.ConfigKeys, configKeys },
+                    // Use the augmented dictionary here
+                    { FieldNames.UserData, finalUserData }, 
+                    { FieldNames.DeviceInfo, deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
+                };
+            
+                var url = _url;
+                if(configKeys != null && configKeys.Count > 0)
+                {
+                    url = $"{url}?keys=";
+                    for (int i = 0; i < configKeys.Count; i++)
+                    {
+                        var ck = configKeys[i];
+                        url = $"{url}{ck}{((i<configKeys.Count-1)?",":"")}";
+                    }
                 }
+            
+                JsonSerializerSettings settings = new JsonSerializerSettings();
+                settings.NullValueHandling = NullValueHandling.Ignore;
+            
+                var httpResponse = await _httpService.PostAsync(url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
+                Debug.Log("MeticaSdk ConfigManager.GetConfigsAsync: Success: {httpResponse.ResponseContent}");
+                return ResponseToResult<ConfigResult>(httpResponse);
             }
-        
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.NullValueHandling = NullValueHandling.Ignore;
-        
-            var httpResponse = await _httpService.PostAsync(url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
-            return ResponseToResult<ConfigResult>(httpResponse);
+            catch (System.Net.Http.HttpRequestException exception) 
+                when (exception.InnerException is System.TimeoutException || exception.Message.Contains("timed out"))
+            {
+                Log.Error(() => $"ConfigManager.GetConfigsAsync: Request timed out: {exception.Message}");
+                return new ConfigResult {
+                    Status = HttpResponse.ResultStatus.Failure,
+                    Error = $"Timeout: {exception.Message}",
+                    RawContent = null,
+                    Configs = null
+                };
+            }
+            catch (System.Exception exception)
+            {
+                Log.Error(() => $"ConfigManager.GetConfigsAsync: Exception: {exception.Message}");
+                return new ConfigResult {
+                    Status = HttpResponse.ResultStatus.Failure,
+                    Error = exception.Message,
+                    RawContent = null,
+                    Configs = null
+                };
+            }
         }
 
         public override ValueTask DisposeAsync()

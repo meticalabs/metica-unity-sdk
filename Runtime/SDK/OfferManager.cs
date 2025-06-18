@@ -21,19 +21,21 @@ namespace Metica.SDK
 
         [JsonIgnore] public HttpResponse.ResultStatus Status { get; set; }
         [JsonIgnore] public string Error { get; set; }
-        [JsonIgnore] public string RawContent {  get; set; }
+        [JsonIgnore] public string RawContent { get; set; }
 
         public override string ToString()
         {
             string placementsString = string.Empty;
-            if(placements != null)
+            if (placements != null)
             {
                 foreach (var p in placements)
                 {
                     placementsString = $"{placementsString}{p.Key}\n";
                 }
             }
-            return $"{nameof(OfferResult)}:\n{placementsString}\n Status: {Status}\n RawContent: {RawContent}\n Error: {Error}";
+
+            return
+                $"{nameof(OfferResult)}:\n{placementsString}\n Status: {Status}\n RawContent: {RawContent}\n Error: {Error}";
         }
     }
 
@@ -69,23 +71,27 @@ namespace Metica.SDK
 
         public async Task<object> GetMeticaAttributes(string placementId, string offerId)
         {
-            if(_sessionPlacementStorage == null)
+            if (_sessionPlacementStorage == null)
             {
                 // Lazy fetching of all placements into storage
                 var result = await GetAllOffersAsync(MeticaSdk.CurrentUserId);
                 _sessionPlacementStorage = result.placements;
             }
+
             if (_sessionPlacementStorage.ContainsKey(placementId) == false)
             {
                 return null;
             }
+
             var offers = _sessionPlacementStorage[placementId].Where(o => o.offerId == offerId);
-            if(offers == null || offers.Count() == 0)
+            if (offers == null || offers.Count() == 0)
             {
                 return null;
             }
+
             var meticaAttributesObject = offers.First().GetMeticaAttributesObject(); // at this point we always have 1+
-            return new {
+            return new
+            {
                 placementId,
                 offer = meticaAttributesObject,
             };
@@ -102,10 +108,12 @@ namespace Metica.SDK
         {
             if (placements == null)
             {
-                Log.Error(() => "Null placements were passed. This could be due to an inconsistent initialization of the SDK.");
+                Log.Error(() =>
+                    "Null placements were passed. This could be due to an inconsistent initialization of the SDK.");
                 return;
             }
-            if(_sessionPlacementStorage == null)
+
+            if (_sessionPlacementStorage == null)
             {
                 // Lazy fetching of all placements into storage
                 var result = await GetAllOffersAsync(MeticaSdk.CurrentUserId);
@@ -114,7 +122,7 @@ namespace Metica.SDK
 
             foreach (var k in placements.Keys)
             {
-                if(_sessionPlacementStorage.ContainsKey(k))
+                if (_sessionPlacementStorage.ContainsKey(k))
                 {
                     _sessionPlacementStorage[k] = placements[k];
                 }
@@ -133,42 +141,72 @@ namespace Metica.SDK
         /// <param name="userData"></param>
         /// <param name="deviceInfo"></param>
         /// <returns></returns>
-        public async Task<OfferResult> GetOffersAsync(string userId, string[] placements, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
+        public async Task<OfferResult> GetOffersAsync(string userId, string[] placements,
+            Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
         {
-            if(placements == null || placements.Length == 0)
+            try
             {
-                return await GetAllOffersAsync(userId, userData, deviceInfo);
-            }
-
-            var requestBody = new Dictionary<string, object>
-            {
-                { FieldNames.UserId, userId },
-                { FieldNames.DeviceInfo, deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
-                { FieldNames.UserData, userData }
-            };
-
-            // We only retrieve via http the pending placements
-            var url = _url;
-            if(placements.Length > 0)
-            {
-                url = $"{url}?placements=";
-                for (int i = 0; i < placements.Length; i++)
+                if (placements == null || placements.Length == 0)
                 {
-                    var pl = placements[i];
-                    url = $"{url}{pl}{((i<placements.Length-1)?",":"")}";
+                    return await GetAllOffersAsync(userId, userData, deviceInfo);
                 }
+
+                var requestBody = new Dictionary<string, object>
+                {
+                    { FieldNames.UserId, userId },
+                    { FieldNames.DeviceInfo, deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
+                    { FieldNames.UserData, userData }
+                };
+
+                // We only retrieve via http the pending placements
+                var url = _url;
+                if (placements.Length > 0)
+                {
+                    url = $"{url}?placements=";
+                    for (int i = 0; i < placements.Length; i++)
+                    {
+                        var pl = placements[i];
+                        url = $"{url}{pl}{((i < placements.Length - 1) ? "," : "")}";
+                    }
+                }
+
+                JsonSerializerSettings settings = new JsonSerializerSettings();
+                settings.NullValueHandling = NullValueHandling.Ignore;
+
+                var httpResponse = await _httpService.PostAsync(url, JsonConvert.SerializeObject(requestBody, settings),
+                    "application/json");
+                OfferResult offerResult = ResponseToResult<OfferResult>(httpResponse);
+                await AddOrUpdateStorage(offerResult
+                    .placements); // Add or update storage with the new received placements.
+                return offerResult;
             }
-
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.NullValueHandling = NullValueHandling.Ignore;
-
-            var httpResponse = await _httpService.PostAsync(url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
-            OfferResult offerResult = ResponseToResult<OfferResult>(httpResponse);
-            await AddOrUpdateStorage(offerResult.placements); // Add or update storage with the new received placements.
-            return offerResult;
+            catch (System.Net.Http.HttpRequestException exception)
+                when (exception.InnerException is System.TimeoutException || exception.Message.Contains("timed out"))
+            {
+                Log.Error(() => $"OfferManager.GetOffersAsync: Request timed out: {exception.Message}");
+                return new OfferResult
+                {
+                    Status = HttpResponse.ResultStatus.Failure,
+                    Error = $"Timeout: {exception.Message}",
+                    RawContent = null,
+                    placements = null
+                };
+            }
+            catch (System.Exception exception)
+            {
+                Log.Error(() => $"OfferManager.GetOffersAsync: Exception: {exception.Message}");
+                return new OfferResult
+                {
+                    Status = HttpResponse.ResultStatus.Failure,
+                    Error = exception.Message,
+                    RawContent = null,
+                    placements = null
+                };
+            }
         }
 
-        private async Task<OfferResult> GetAllOffersAsync(string userId, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
+        private async Task<OfferResult> GetAllOffersAsync(string userId, Dictionary<string, object> userData = null,
+            DeviceInfo deviceInfo = null)
         {
             var requestBody = new Dictionary<string, object>
             {
@@ -180,7 +218,8 @@ namespace Metica.SDK
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.NullValueHandling = NullValueHandling.Ignore;
 
-            var httpResponse = await _httpService.PostAsync(_url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
+            var httpResponse = await _httpService.PostAsync(_url, JsonConvert.SerializeObject(requestBody, settings),
+                "application/json");
             OfferResult offerResult = ResponseToResult<OfferResult>(httpResponse);
 
             return offerResult;
