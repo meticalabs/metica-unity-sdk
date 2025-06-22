@@ -107,7 +107,7 @@ public static class MeticaAdsCallbacks
 
     public static class Banner
     {
-        // TODO
+        // NOOP
     }
 }
 }
