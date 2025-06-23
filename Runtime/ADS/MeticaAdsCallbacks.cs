@@ -107,7 +107,7 @@ public static class MeticaAdsCallbacks
 
     public static class Banner
     {
-        // TODO
+        // NOOP
     }
 
     // Reset all static events to null at the start of each Play Mode session
