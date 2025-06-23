@@ -68,5 +68,12 @@ namespace Metica.Core
                 throw new InvalidOperationException($"Service of type {serviceType} is not registered.");
             }
         }
+
+        // Ensures Registry is cleared when entering Play Mode without Domain Reload
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetRegistry()
+        {
+            instance = null;
+        }
     }
 }

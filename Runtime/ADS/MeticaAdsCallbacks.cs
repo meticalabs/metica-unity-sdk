@@ -109,5 +109,27 @@ public static class MeticaAdsCallbacks
     {
         // TODO
     }
+
+    // Reset all static events to null at the start of each Play Mode session
+    [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetEvents()
+    {
+        Interstitial.OnAdLoadSuccess = null;
+        Interstitial.OnAdLoadFailed = null;
+        Interstitial.OnAdShowSuccess = null;
+        Interstitial.OnAdShowFailed = null;
+        Interstitial.OnAdHidden = null;
+        Interstitial.OnAdClicked = null;
+        Interstitial.OnAdRevenuePaid = null;
+
+        Rewarded.OnAdLoadSuccess = null;
+        Rewarded.OnAdLoadFailed = null;
+        Rewarded.OnAdShowSuccess = null;
+        Rewarded.OnAdShowFailed = null;
+        Rewarded.OnAdHidden = null;
+        Rewarded.OnAdClicked = null;
+        Rewarded.OnAdRewarded = null;
+        Rewarded.OnAdRevenuePaid = null;
+    }
 }
 }
