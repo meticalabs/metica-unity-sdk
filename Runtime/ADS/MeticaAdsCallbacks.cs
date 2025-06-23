@@ -49,6 +49,18 @@ public static class MeticaAdsCallbacks
         {
             OnAdRevenuePaid?.Invoke(meticaAd);
         }
+
+        // Add a method to clear all events
+        internal static void ResetEvents()
+        {
+            OnAdLoadSuccess = null;
+            OnAdLoadFailed = null;
+            OnAdShowSuccess = null;
+            OnAdShowFailed = null;
+            OnAdHidden = null;
+            OnAdClicked = null;
+            OnAdRevenuePaid = null;
+        }
     }
 
     public static class Rewarded
@@ -103,6 +115,19 @@ public static class MeticaAdsCallbacks
         {
             OnAdRevenuePaid?.Invoke(meticaAd);
         }
+
+        // Add a method to clear all events
+        internal static void ResetEvents()
+        {
+            OnAdLoadSuccess = null;
+            OnAdLoadFailed = null;
+            OnAdShowSuccess = null;
+            OnAdShowFailed = null;
+            OnAdHidden = null;
+            OnAdClicked = null;
+            OnAdRewarded = null;
+            OnAdRevenuePaid = null;
+        }
     }
 
     public static class Banner
@@ -114,22 +139,8 @@ public static class MeticaAdsCallbacks
     [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetEvents()
     {
-        Interstitial.OnAdLoadSuccess = null;
-        Interstitial.OnAdLoadFailed = null;
-        Interstitial.OnAdShowSuccess = null;
-        Interstitial.OnAdShowFailed = null;
-        Interstitial.OnAdHidden = null;
-        Interstitial.OnAdClicked = null;
-        Interstitial.OnAdRevenuePaid = null;
-
-        Rewarded.OnAdLoadSuccess = null;
-        Rewarded.OnAdLoadFailed = null;
-        Rewarded.OnAdShowSuccess = null;
-        Rewarded.OnAdShowFailed = null;
-        Rewarded.OnAdHidden = null;
-        Rewarded.OnAdClicked = null;
-        Rewarded.OnAdRewarded = null;
-        Rewarded.OnAdRevenuePaid = null;
+        Interstitial.ResetEvents();
+        Rewarded.ResetEvents();
     }
 }
 }
