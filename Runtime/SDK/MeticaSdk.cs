@@ -50,6 +50,16 @@ namespace Metica.SDK
 
         #endregion Fields
 
+        // Ensures static fields are reset when entering Play Mode without Domain Reload
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStaticFields()
+        {
+            CurrentUserId = null;
+            ApiKey = null;
+            AppId = null;
+            BaseEndpoint = null;
+        }
+
         /// <summary>
         /// Metica SDK, engine and platform independent, control room.
         /// </summary>

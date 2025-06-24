@@ -24,5 +24,12 @@ namespace Metica.Unity
         {
             StartCoroutine(coroutine);
         }
+
+        // Reset static instance at the start of each Play Mode session
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetInstance()
+        {
+            _instance = null;
+        }
     }
 }

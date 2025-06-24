@@ -49,6 +49,18 @@ public static class MeticaAdsCallbacks
         {
             OnAdRevenuePaid?.Invoke(meticaAd);
         }
+
+        // Add a method to clear all events
+        internal static void ResetEvents()
+        {
+            OnAdLoadSuccess = null;
+            OnAdLoadFailed = null;
+            OnAdShowSuccess = null;
+            OnAdShowFailed = null;
+            OnAdHidden = null;
+            OnAdClicked = null;
+            OnAdRevenuePaid = null;
+        }
     }
 
     public static class Rewarded
@@ -103,11 +115,32 @@ public static class MeticaAdsCallbacks
         {
             OnAdRevenuePaid?.Invoke(meticaAd);
         }
+
+        // Add a method to clear all events
+        internal static void ResetEvents()
+        {
+            OnAdLoadSuccess = null;
+            OnAdLoadFailed = null;
+            OnAdShowSuccess = null;
+            OnAdShowFailed = null;
+            OnAdHidden = null;
+            OnAdClicked = null;
+            OnAdRewarded = null;
+            OnAdRevenuePaid = null;
+        }
     }
 
     public static class Banner
     {
         // NOOP
+    }
+
+    // Reset all static events to null at the start of each Play Mode session
+    [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetEvents()
+    {
+        Interstitial.ResetEvents();
+        Rewarded.ResetEvents();
     }
 }
 }
