@@ -43,7 +43,7 @@ namespace Metica.ADS
 
         public static async Task<bool> InitializeAsync(MeticaInitParameters parameters)
         {
-            return await platformDelegate.InitializeAsync(MeticaSdk.ApiKey, MeticaSdk.AppId, MeticaSdk.CurrentUserId, MeticaSdk.Version, MeticaSdk.BaseEndpoint);
+            return await platformDelegate.InitializeAsync(MeticaSdk.ApiKey, MeticaSdk.AppId, MeticaSdk.CurrentUserId, MeticaSdk.Version, MeticaSdk.BaseEndpoint, parameters);
         }
         public static void SetLogEnabled(bool logEnabled) 
         {
