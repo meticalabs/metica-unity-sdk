@@ -25,7 +25,7 @@ internal class UnityPlayerDelegate : PlatformDelegate
     public event Action<MeticaAd> RewardedAdRevenuePaid;
 
     public Task<bool> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
-        MeticaInitParameters meticaInitParameters)
+        MeticaConfiguration meticaConfiguration)
     {
         Debug.Log("[MeticaAds Unity] Mock initialization - always returns false");
         return Task.FromResult(false);

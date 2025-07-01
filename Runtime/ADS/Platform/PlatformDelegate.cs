@@ -27,7 +27,7 @@ internal interface PlatformDelegate
     public event Action<MeticaAd> RewardedAdRevenuePaid;
 
     Task<bool> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
-        MeticaInitParameters initParameters);
+        MeticaConfiguration configuration);
     void SetLogEnabled(bool logEnabled);
             
     // Interstitial methods

@@ -36,7 +36,7 @@ internal class IOSDelegate : PlatformDelegate
     }
 
     public Task<bool> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
-        MeticaInitParameters initParameters)
+        MeticaConfiguration configuration)
     {
         var tcs = new TaskCompletionSource<bool>();
         tcs.SetResult(false);
