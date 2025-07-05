@@ -77,5 +77,25 @@ namespace Metica.ADS
         {
             return platformDelegate.IsRewardedReady();
         }
+
+        public static void NotifyAdLoadAttempt(string interstitialAdUnitId)
+        {
+            platformDelegate.NotifyAdLoadAttempt(interstitialAdUnitId);
+        }
+
+        public static void NotifyAdLoadSuccess(MeticaAd meticaAd)
+        {
+            platformDelegate.NotifyAdLoadSuccess(meticaAd);
+        }
+
+        public static void NotifyAdLoadFailed(string adUnitId, string error)
+        {
+            platformDelegate.NotifyAdLoadFailed(adUnitId, error);
+        }
+
+        public static void NotifyAdShowSuccess(MeticaAd meticaAd)
+        {
+            platformDelegate.NotifyAdShowSuccess(meticaAd);
+        }
     }
 }

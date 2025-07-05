@@ -127,5 +127,30 @@ internal class AndroidDelegate : PlatformDelegate
     {
         return MeticaUnityPluginClass.CallStatic<bool>("isRewardedReady");
     }
+    
+    // Notification methods
+    public void NotifyAdLoadAttempt(string adUnitId)
+    {
+        Debug.Log($"{TAG} NotifyAdLoadAttempt called for adUnitId: {adUnitId}");
+        MeticaUnityPluginClass.CallStatic("notifyAdLoadAttempt", adUnitId);
+    }
+
+    public void NotifyAdLoadSuccess(MeticaAd meticaAd)
+    {
+        Debug.Log($"{TAG} NotifyAdLoadSuccess called for adUnitId: {meticaAd.adUnitId}");
+        MeticaUnityPluginClass.CallStatic("notifyAdLoadSuccess", meticaAd.adUnitId, meticaAd.revenue, meticaAd.networkName, meticaAd.placementTag, meticaAd.adFormat, meticaAd.creativeId);
+    }
+
+    public void NotifyAdLoadFailed(string adUnitId, string error)
+    {
+        Debug.Log($"{TAG} NotifyAdLoadFailed called for adUnitId: {adUnitId}, error: {error}");
+        MeticaUnityPluginClass.CallStatic("notifyAdLoadFailed", adUnitId, error);
+    }
+
+    public void NotifyAdShowSuccess(MeticaAd meticaAd)
+    {
+        Debug.Log($"{TAG} NotifyAdShowSuccess called for adUnitId: {meticaAd.adUnitId}");
+        MeticaUnityPluginClass.CallStatic("notifyAdShowSuccess", meticaAd.adUnitId, meticaAd.revenue, meticaAd.networkName, meticaAd.placementTag, meticaAd.adFormat, meticaAd.creativeId);
+    }
 }
 }
