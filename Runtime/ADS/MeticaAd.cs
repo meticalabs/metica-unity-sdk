@@ -14,8 +14,8 @@ public class MeticaAd
     public string adFormat;
     public string creativeId;
 
-    public MeticaAd(string adUnitId, double revenue = -1, string networkName = null, 
-        string placementTag = null, string adFormat = null, string creativeId = null)
+    public MeticaAd(string adUnitId, double revenue, string networkName, 
+        string placementTag, string adFormat, string creativeId)
     {
         this.adUnitId = adUnitId;
         this.revenue = revenue;
