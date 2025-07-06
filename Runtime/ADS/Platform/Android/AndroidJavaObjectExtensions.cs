@@ -45,7 +45,6 @@ public static class AndroidJavaObjectExtensions
     /// <returns>AndroidJavaObject representing the MeticaAd on the Android side</returns>
     public static AndroidJavaObject ToAndroidJavaObject(this MeticaAd meticaAd)
     {
-        // Much cleaner - directly reference the MeticaAd class
         using var meticaAdClass = new AndroidJavaClass("com.metica.ads.MeticaAdKt");
         return meticaAdClass.CallStatic<AndroidJavaObject>("createMeticaAd", 
             meticaAd.adUnitId, 
