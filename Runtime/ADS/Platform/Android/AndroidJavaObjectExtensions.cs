@@ -37,5 +37,21 @@ public static class AndroidJavaObjectExtensions
 
         return new MeticaAd(adUnitId, revenue, networkName, placementTag, adFormat, creativeId);
     }
+    
+    /// <summary>
+    /// Converts a MeticaAd object to an AndroidJavaObject for Unity-Android interop.
+    /// </summary>
+    /// <param name="meticaAd">The MeticaAd object to convert</param>
+    /// <returns>AndroidJavaObject representing the MeticaAd on the Android side</returns>
+    public static AndroidJavaObject ToAndroidJavaObject(this MeticaAd meticaAd)
+    {
+        return new AndroidJavaObject("com.metica.ads.MeticaAd", 
+            meticaAd.adUnitId, 
+            meticaAd.revenue, 
+            meticaAd.networkName, 
+            meticaAd.placementTag, 
+            meticaAd.adFormat, 
+            meticaAd.creativeId);
+    }
 }
 }
