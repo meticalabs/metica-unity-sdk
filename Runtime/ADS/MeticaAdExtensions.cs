@@ -40,7 +40,7 @@ public static class MeticaAdExtensions
             adUnitId: adInfo.AdUnitIdentifier,
             revenue: adInfo.Revenue,
             networkName: adInfo.NetworkName,
-            placementTag: adInfo.Placement,
+            placementTag: string.IsNullOrWhiteSpace(adInfo.Placement) ? null : adInfo.Placement,
             adFormat: adInfo.AdFormat,
             creativeId: adInfo.CreativeIdentifier
         );
