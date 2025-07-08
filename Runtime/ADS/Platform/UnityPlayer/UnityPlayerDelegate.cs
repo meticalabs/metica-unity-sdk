@@ -67,5 +67,25 @@ internal class UnityPlayerDelegate : PlatformDelegate
         Debug.Log("[MeticaAds Unity] Mock IsRewardedReady - always returns false");
         return false;
     }
+    // Notification methods
+    public void NotifyAdLoadAttempt(string adUnitId)
+    {
+        Debug.Log($"[MeticaAds Unity] Mock NotifyAdLoadAttempt called for adUnitId: {adUnitId}");
+    }
+
+    public void NotifyAdLoadSuccess(MeticaAd meticaAd)
+    {
+        Debug.Log($"[MeticaAds Unity] Mock NotifyAdLoadSuccess called for adUnitId: {meticaAd.adUnitId}");
+    }
+
+    public void NotifyAdLoadFailed(string adUnitId, string error)
+    {
+        Debug.Log($"[MeticaAds Unity] Mock NotifyAdLoadFailed called for adUnitId: {adUnitId}, error: {error}");
+    }
+
+    public void NotifyAdShowSuccess(MeticaAd meticaAd)
+    {
+        Debug.Log($"[MeticaAds Unity] Mock NotifyAdShowSuccess called for adUnitId: {meticaAd.adUnitId}");
+    }
 }
 }

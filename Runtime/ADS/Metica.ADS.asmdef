@@ -1,6 +1,7 @@
 {
   "name": "Metica.ADS",
   "references": [
-    "Metica.SDK"
+    "Metica.SDK",
+    "MaxSdk.Scripts"
   ]
 }
