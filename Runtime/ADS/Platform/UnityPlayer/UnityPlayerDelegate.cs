@@ -83,7 +83,7 @@ internal class UnityPlayerDelegate : PlatformDelegate
         Debug.Log($"[MeticaAds Unity] Mock NotifyAdLoadFailed called for adUnitId: {adUnitId}, error: {error}");
     }
 
-    public void NotifyAdShowSuccess(MeticaAd meticaAd)
+    public void NotifyAdRevenue(MeticaAd meticaAd)
     {
         Debug.Log($"[MeticaAds Unity] Mock NotifyAdShowSuccess called for adUnitId: {meticaAd.adUnitId}");
     }
