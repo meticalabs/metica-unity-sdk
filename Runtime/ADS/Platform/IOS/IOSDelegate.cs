@@ -88,7 +88,7 @@ internal class IOSDelegate : PlatformDelegate
         // TODO: Implement iOS native call
     }
 
-    public void NotifyAdShowSuccess(MeticaAd meticaAd)
+    public void NotifyAdRevenue(MeticaAd meticaAd)
     {
         // TODO: Implement iOS native call
     }

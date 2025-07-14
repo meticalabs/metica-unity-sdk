@@ -44,6 +44,6 @@ internal interface PlatformDelegate
     void NotifyAdLoadAttempt(string adUnitId);
     void NotifyAdLoadSuccess(MeticaAd meticaAd);
     void NotifyAdLoadFailed(string adUnitId, string error);
-    void NotifyAdShowSuccess(MeticaAd meticaAd);
+    void NotifyAdRevenue(MeticaAd meticaAd);
 }
 }

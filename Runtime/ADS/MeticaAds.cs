@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.Threading.Tasks;
+using Metica.ADS.UnityPlayer;
 using Metica.SDK;
 
 namespace Metica.ADS 
@@ -13,7 +14,7 @@ namespace Metica.ADS
         static MeticaAds()
         {
 #if UNITY_EDITOR
-            platformDelegate = new UnityPlayer.UnityPlayerDelegate();
+            platformDelegate = new UnityPlayerDelegate();
 #elif UNITY_ANDROID
             platformDelegate = new Android.AndroidDelegate();
 #elif UNITY_IOS
@@ -95,7 +96,9 @@ namespace Metica.ADS
 
         public static void NotifyAdShowSuccess(MeticaAd meticaAd)
         {
-            platformDelegate.NotifyAdShowSuccess(meticaAd);
+            // Internally we use the NotifyAdRevenue call, but externally as to not
+            // break API we use NotifyAdShowSuccess. Which is similar as both will tel you ad was shown.
+            platformDelegate.NotifyAdRevenue(meticaAd);
         }
     }
 }

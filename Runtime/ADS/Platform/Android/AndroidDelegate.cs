@@ -154,13 +154,13 @@ internal class AndroidDelegate : PlatformDelegate
         MeticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdLoadFailed", adUnitId, error);
     }
 
-    public void NotifyAdShowSuccess(MeticaAd meticaAd)
+    public void NotifyAdRevenue(MeticaAd meticaAd)
     {
-        Debug.Log($"{TAG} NotifyAdShowSuccess called for adUnitId: {meticaAd.adUnitId}");
+        Debug.Log($"{TAG} NotifyAdRevenue called for adUnitId: {meticaAd.adUnitId}");
     
         using (var meticaAdAndroid = meticaAd.ToAndroidJavaObject())
         {
-            MeticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdShowSuccess", meticaAdAndroid);
+            MeticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdRevenue", meticaAdAndroid);
         }
     }
 }
