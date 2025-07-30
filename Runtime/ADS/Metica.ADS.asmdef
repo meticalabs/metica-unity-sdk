@@ -1,7 +1,17 @@
 {
-  "name": "Metica.ADS",
-  "references": [
-    "Metica.SDK",
-    "MaxSdk.Scripts"
-  ]
+    "name": "Metica.ADS",
+    "rootNamespace": "",
+    "references": [
+        "Metica.SDK",
+        "MaxSdk.Scripts"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
