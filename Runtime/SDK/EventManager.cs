@@ -49,7 +49,6 @@ namespace Metica.SDK
 
         private readonly IMeticaAttributesProvider _meticaAttributesProvider;
         private readonly ITimeSource _timeSource = new SystemDateTimeSource();
-        private readonly SdkConfig _sdkConfig;
 
         public const uint DefaultEventQueueCountTrigger = 64; // Rename to DefaultQueueFlushCountTrigger
         private const uint DefaultQueueFlushTimeoutSecondsTrigger = 10;
@@ -202,8 +201,9 @@ namespace Metica.SDK
                 EventDispatchResult result = ResponseToResult<EventDispatchResult>(httpResponse);
                 if (result.Status != HttpResponse.ResultStatus.Success)
                 {
-                    // TODO : does this case need retry or other logic? Queue is cleared at this stage,
-                    // do we need to ensure the event ingestion happened?
+                    // TODO : does this case need retry or other logic? Queue is cleared at this stage
+                    // and we may lose events.
+                    // Do we need to ensure the event ingestion happened?
                     Log.Warning(() => $"EventManager.DispatchEvents: Response indicates failure: {result.Error}. Queue has been cleared.");
                 }
                 result.OriginalRequestBody = body;
