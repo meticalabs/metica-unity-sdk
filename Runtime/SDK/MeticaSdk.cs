@@ -33,7 +33,7 @@ namespace Metica.SDK
 
         public static IMeticaSdk SDK {  get => Registry.Resolve<IMeticaSdk>(); }
 
-        public static string Version { get => "1.8.4"; }
+        public static string Version { get => "1.9.0"; }
 
         public static string CurrentUserId {  get; set; }
         public static string ApiKey { get; private set; }
