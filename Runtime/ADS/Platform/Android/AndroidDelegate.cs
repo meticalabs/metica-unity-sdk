@@ -39,7 +39,10 @@ internal class AndroidDelegate : PlatformDelegate
 
     public void SetLogEnabled(bool logEnabled)
     {
-        // TODO tomi
+        Debug.Log($"{TAG} SetLogEnabled called with: {logEnabled}");
+    
+        var loggerClass = new AndroidJavaClass("com.metica.ads.util.MeticaLogger");
+        loggerClass.CallStatic("enableLogs", logEnabled);
     }
 
     public Task<bool> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
