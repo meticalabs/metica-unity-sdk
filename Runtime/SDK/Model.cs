@@ -90,6 +90,8 @@ namespace Metica.SDK.Model
         public string timezone;
         public string locale;
         public string appVersion;
+        public string osVersion;
+        // public string machineName;
 
         public override string ToString()
         {
