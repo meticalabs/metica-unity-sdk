@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+
+using UnityEngine.Scripting; // TODO : MET-3509 : break dependency from UnityEngine
+using SystemInfo = UnityEngine.Device.SystemInfo;
+
 using Metica.Core;
 using Metica.Network;
 using Metica.SDK.Model;
-using Newtonsoft.Json;
-using UnityEngine;
-using UnityEngine.Scripting;
-using SystemInfo = UnityEngine.Device.SystemInfo;
 
 namespace Metica.SDK
 {
@@ -87,7 +88,7 @@ namespace Metica.SDK
                 settings.NullValueHandling = NullValueHandling.Ignore;
 
                 var httpResponse = await _httpService.PostAsync(url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
-                Debug.Log("MeticaSdk ConfigManager.GetConfigsAsync: Success: {httpResponse.ResponseContent}");
+                Log.Debug(() => $"MeticaSdk ConfigManager.GetConfigsAsync: Success: {httpResponse.ResponseContent}");
                 return ResponseToResult<ConfigResult>(httpResponse);
             }
             catch (System.Net.Http.HttpRequestException exception)
