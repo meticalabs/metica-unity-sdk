@@ -49,10 +49,11 @@ namespace Metica.SDK
 
         private readonly IMeticaAttributesProvider _meticaAttributesProvider;
         private readonly ITimeSource _timeSource = new SystemDateTimeSource();
-        private readonly SdkConfig _sdkConfig;
 
-        public const uint DefaultEventQueueCountTrigger = 64;
+        public const uint DefaultEventQueueCountTrigger = 64; // Rename to DefaultQueueFlushCountTrigger
+        private const uint DefaultQueueFlushTimeoutSecondsTrigger = 10;
         private readonly uint _eventQueueCountTrigger;
+        private long _lastEventDispatchUnixTime = 0;
 
         private List<object> _events;
 
@@ -67,6 +68,7 @@ namespace Metica.SDK
             _events = new List<object>();
             OnEventsDispatch += DispatchHandler;
             _eventQueueCountTrigger = eventQueueCountTrigger;
+            _lastEventDispatchUnixTime = _timeSource.EpochSeconds();
         }
 
         /// <summary>
@@ -75,7 +77,7 @@ namespace Metica.SDK
         /// and
         /// <see cref="QueueEventWithProductId(string, string, string, string, Dictionary{string, object}, Dictionary{string, object})"/>
         /// both use this method but it's perfectly fine to use it directly.
-        /// This method also calls the <see cref="DispatchEvents"/> with a fire and forget style call <code>_ = Dispatch();</code>.
+        /// This method also calls the <see cref="DispatchEvents"/> with a fire and forget style call <code>_ = Dispatch();</code> when certain conditions are met.
         /// </summary>
         internal void QueueEventAsync(string userId, string appId, string eventType, Dictionary<string, object> eventFields, Dictionary<string, object> customPayload)
         {
@@ -99,8 +101,11 @@ namespace Metica.SDK
 
             Log.Debug(() => $"Queueing {eventType} event, id={requestBody[FieldNames.EventId]}");
 
-            if(_events.Count >= _eventQueueCountTrigger)
+            long unixTimeSinceLastDispatch = _timeSource.EpochSeconds() - _lastEventDispatchUnixTime;
+
+            if (_events.Count >= _eventQueueCountTrigger || unixTimeSinceLastDispatch >= DefaultQueueFlushTimeoutSecondsTrigger)
             {
+                // Log.Debug(() => (_events.Count >= _eventQueueCountTrigger)? "Dispatch : reason=count" : "Dispatch : reason=time" );
                 _ = DispatchEvents();
             }
         }
@@ -194,14 +199,22 @@ namespace Metica.SDK
                 var httpResponse = await _httpService.PostAsync(_url, body, "application/json", useCache: false);
                 _events.Clear();
                 EventDispatchResult result = ResponseToResult<EventDispatchResult>(httpResponse);
+                if (result.Status != HttpResponse.ResultStatus.Success)
+                {
+                    // TODO : does this case need retry or other logic? Queue is cleared at this stage
+                    // and we may lose events.
+                    // Do we need to ensure the event ingestion happened?
+                    Log.Warning(() => $"EventManager.DispatchEvents: Response indicates failure: {result.Error}. Queue has been cleared.");
+                }
                 result.OriginalRequestBody = body;
                 OnEventsDispatch?.Invoke(result);
             }
-            catch (System.Net.Http.HttpRequestException exception) 
+            catch (System.Net.Http.HttpRequestException exception)
                 when (exception.InnerException is TimeoutException || exception.Message.Contains("timed out"))
             {
                 Log.Error(() => $"EventManager.DispatchEvents: Request timed out: {exception.Message}");
-                EventDispatchResult result = new EventDispatchResult {
+                EventDispatchResult result = new EventDispatchResult
+                {
                     Status = HttpResponse.ResultStatus.Failure,
                     Error = $"Timeout: {exception.Message}",
                     RawContent = null,
@@ -212,13 +225,18 @@ namespace Metica.SDK
             catch (Exception exception)
             {
                 Log.Error(() => $"EventManager.DispatchEvents: Exception: {exception.Message}");
-                EventDispatchResult result = new EventDispatchResult {
+                EventDispatchResult result = new EventDispatchResult
+                {
                     Status = HttpResponse.ResultStatus.Failure,
                     Error = exception.Message,
                     RawContent = null,
                     OriginalRequestBody = body
                 };
                 OnEventsDispatch?.Invoke(result);
+            }
+            finally
+            {
+                _lastEventDispatchUnixTime = _timeSource.EpochSeconds();
             }
         }
 
