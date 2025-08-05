@@ -109,7 +109,7 @@ namespace Metica.SDK
             if (placements == null)
             {
                 Log.Error(() =>
-                    "Null placements were passed. This could be due to an inconsistent initialization of the SDK.");
+                    "Null placements were passed. This could be due to an inconsistent initialization of the SDK (e.g. a wrong appId).");
                 return;
             }
 
@@ -173,11 +173,9 @@ namespace Metica.SDK
                 JsonSerializerSettings settings = new JsonSerializerSettings();
                 settings.NullValueHandling = NullValueHandling.Ignore;
 
-                var httpResponse = await _httpService.PostAsync(url, JsonConvert.SerializeObject(requestBody, settings),
-                    "application/json");
+                var httpResponse = await _httpService.PostAsync(url, JsonConvert.SerializeObject(requestBody, settings), "application/json");
                 OfferResult offerResult = ResponseToResult<OfferResult>(httpResponse);
-                await AddOrUpdateStorage(offerResult
-                    .placements); // Add or update storage with the new received placements.
+                await AddOrUpdateStorage(offerResult.placements); // Add or update storage with the new received placements.
                 return offerResult;
             }
             catch (System.Net.Http.HttpRequestException exception)
