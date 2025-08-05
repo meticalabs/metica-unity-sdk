@@ -70,7 +70,7 @@ namespace Metica.SDK
                     { FieldNames.ConfigKeys, configKeys },
                     // Use the augmented dictionary here
                     { FieldNames.UserData, finalUserData },
-                    { FieldNames.DeviceInfo, deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
+                    { FieldNames.DeviceInfo, _deviceInfoProvider.GetDeviceInfo() },
                 };
 
                 var url = _url;
