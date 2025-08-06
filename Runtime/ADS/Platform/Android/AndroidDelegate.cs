@@ -12,7 +12,7 @@ internal class AndroidDelegate : PlatformDelegate
 {
     private const string TAG = MeticaAds.TAG;
 
-    private static readonly AndroidJavaClass UnityBridgeAndroidClass =
+    public static readonly AndroidJavaClass UnityBridgeAndroidClass =
         new("com.metica.unity_bridge.UnityBridge");
 
     private static readonly AndroidJavaClass MeticaAdsExternalTrackerAndroidClass =
