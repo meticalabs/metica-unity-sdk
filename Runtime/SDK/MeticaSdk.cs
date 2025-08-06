@@ -10,8 +10,12 @@ namespace Metica.SDK
 {
     public interface IMeticaSdk
     {
-        Task<ConfigResult> GetConfigsAsync(List<string> configKeys = null, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null);
-        Task<OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null);
+        Task<ConfigResult> GetConfigsAsync(List<string> configKeys = null, Dictionary<string, object> userData = null);
+        [Obsolete]
+        Task<ConfigResult> GetConfigsAsync(List<string> configKeys, Dictionary<string, object> userData, DeviceInfo deviceInfo);
+        Task<OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData = null);
+        [Obsolete]
+        Task<OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData, DeviceInfo deviceInfo);
         void LogAdRevenueEvent(string placement, string type, string source, string currencyCode, double totalAmount, Dictionary<string, object> customPayload = null);
         void LogCustomEvent(string customEventType, Dictionary<string, object> customPayload = null);
         void LogInstallEvent(Dictionary<string, object> customPayload = null);
@@ -42,7 +46,6 @@ namespace Metica.SDK
 
         private readonly SdkConfig _sdkConfig;
         private readonly IHttpService _http;
-        private readonly IDeviceInfoProvider _deviceInfoProvider;
         private readonly OfferManager _offerManager;
         private readonly ConfigManager _configManager;
         private readonly EventManager _eventManager;
@@ -107,12 +110,18 @@ namespace Metica.SDK
             Registry.Register<IMeticaSdk>(this);
         }
 
-        public async Task<OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
-            => await _offerManager.GetOffersAsync(CurrentUserId, placements, userData, deviceInfo);
+        public async Task<OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData = null)
+            => await _offerManager.GetOffersAsync(CurrentUserId, placements, userData);
+        [Obsolete]
+        public async Task<OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData, DeviceInfo deviceInfo)
+            => await _offerManager.GetOffersAsync(CurrentUserId, placements, userData);
 
 
-        public async Task<ConfigResult> GetConfigsAsync(List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
-            => await _configManager.GetConfigsAsync(CurrentUserId, configKeys, userProperties, deviceInfo);
+        public async Task<ConfigResult> GetConfigsAsync(List<string> configKeys = null, Dictionary<string, object> userProperties = null)
+            => await _configManager.GetConfigsAsync(CurrentUserId, configKeys, userProperties);
+        [Obsolete]
+        public async Task<ConfigResult> GetConfigsAsync(List<string> configKeys, Dictionary<string, object> userProperties, DeviceInfo deviceInfo)
+            => await _configManager.GetConfigsAsync(CurrentUserId, configKeys, userProperties);
 
 
         public void LogLoginEvent(Dictionary<string, object> customPayload = null)

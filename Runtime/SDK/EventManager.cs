@@ -66,7 +66,10 @@ namespace Metica.SDK
         {
             _meticaAttributesProvider = meticaAttributesProvider;
             _events = new List<object>();
-            OnEventsDispatch += DispatchHandler;
+            if (Log.CurrentLogLevel == LogLevel.Debug)
+            {
+                OnEventsDispatch += DispatchHandler;
+            }
             _eventQueueCountTrigger = eventQueueCountTrigger;
             _lastEventDispatchUnixTime = _timeSource.EpochSeconds();
         }
@@ -201,9 +204,8 @@ namespace Metica.SDK
                 EventDispatchResult result = ResponseToResult<EventDispatchResult>(httpResponse);
                 if (result.Status != HttpResponse.ResultStatus.Success)
                 {
-                    // TODO : does this case need retry or other logic? Queue is cleared at this stage
-                    // and we may lose events.
-                    // Do we need to ensure the event ingestion happened?
+                    // TODO : https://linear.app/metica/issue/MET-3515/
+                    // does this case need retry logic? Queue is cleared at this stage thus events may get lost.
                     Log.Warning(() => $"EventManager.DispatchEvents: Response indicates failure: {result.Error}. Queue has been cleared.");
                 }
                 result.OriginalRequestBody = body;

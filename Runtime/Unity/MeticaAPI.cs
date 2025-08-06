@@ -102,63 +102,73 @@ namespace Metica.Unity
             responseCallback?.Invoke(new SdkResultImpl<T>().WithResult(task.Result));
         }
 
+        [Obsolete]
+        public static void GetConfig(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys, Dictionary<string, object> userProperties, DeviceInfo deviceInfo)
+            => GetConfig(responseCallback, configKeys, userProperties);
+
         /// <summary>
         /// Gets all or the StartConfigs with the given keys.
         /// </summary>
         /// <param name="responseCallback">Callback method to process the result as a dictionary.</param>
         /// <param name="configKeys">List of keys of required SmartConfigs. Leave to null or empty to get all SmartConfigs.</param>
         /// <param name="userProperties">Real-time user state data to override pre-ingested user state attributes, conforms to userStateAttributes.</param>
-        /// <param name="deviceInfo">A <see cref="DeviceInfo"/> object. If null, one will be automatically created to retrieve information about the device.</param>
         /// <remarks>
         /// ## ROADMAP
         /// - TODO : make this obsolete and use a response callback with <see cref="ConfigResult"/> as in
-        /// <see cref="GetConfigAsConfigResult(MeticaSdkDelegate{ConfigResult}, List{string}, Dictionary{string, object}, DeviceInfo)"/>
+        /// <see cref="GetConfigAsConfigResult(MeticaSdkDelegate{ConfigResult}, List{string}, Dictionary{string, object})"/>
         /// </remarks>
-        public static void GetConfig(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        public static void GetConfig(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null)
         {
-            CoroutineRunner.Instance.RunCoroutine(GetConfigAsDictionaryCoroutine(responseCallback, configKeys, userProperties, deviceInfo));
+            CoroutineRunner.Instance.RunCoroutine(GetConfigAsDictionaryCoroutine(responseCallback, configKeys, userProperties));
         }
+
+
+        [Obsolete]
+        public static void GetConfigAsConfigResult(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys, Dictionary<string, object> userProperties, DeviceInfo deviceInfo)
+            => GetConfigAsConfigResult(responseCallback, configKeys, userProperties);
         /// <summary>
         /// Gets all or the StartConfigs with the given keys.
         /// </summary>
         /// <param name="responseCallback">Callback method to process the result as a <see cref="ConfigResult"/>.</param>
         /// <param name="configKeys">List of keys of required SmartConfigs. Leave to null or empty to get all SmartConfigs.</param>
         /// <param name="userProperties">Real-time user state data to override pre-ingested user state attributes, conforms to userStateAttributes.</param>
-        /// <param name="deviceInfo">A <see cref="DeviceInfo"/> object. If null, one will be automatically created to retrieve information about the device.</param>
         /// <remarks>
         /// ## ROADMAP
         /// - TODO [BREAKING CHANGE] : This will be renamed back to GetConfig and will be the only way to get the result.
         /// - TODO : we'll likely introduce static async versions for some or all of the methods as alternatives to the current static void versions.
         /// </remarks>
-        public static void GetConfigAsConfigResult(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        public static void GetConfigAsConfigResult(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null)
         {
-            CoroutineRunner.Instance.RunCoroutine(GetConfigAsConfigResultCoroutine(responseCallback, configKeys, userProperties, deviceInfo));
+            CoroutineRunner.Instance.RunCoroutine(GetConfigAsConfigResultCoroutine(responseCallback, configKeys, userProperties));
         }
 
-        private static IEnumerator GetConfigAsDictionaryCoroutine(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        private static IEnumerator GetConfigAsDictionaryCoroutine(MeticaSdkDelegate<Dictionary<string, object>> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null)
         {
-            yield return RunAsyncTaskCoroutine(() => SDK.GetConfigsAsync(configKeys, userProperties, deviceInfo), (result) =>
+            yield return RunAsyncTaskCoroutine(() => SDK.GetConfigsAsync(configKeys, userProperties), (result) =>
             {
                 responseCallback?.Invoke(new SdkResultImpl<Dictionary<string, object>>().WithResult(result.Result.Configs));
             });
         }
 
-        private static IEnumerator GetConfigAsConfigResultCoroutine(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        private static IEnumerator GetConfigAsConfigResultCoroutine(MeticaSdkDelegate<ConfigResult> responseCallback, List<string> configKeys = null, Dictionary<string, object> userProperties = null)
         {
-            yield return RunAsyncTaskCoroutine(() => SDK.GetConfigsAsync(configKeys, userProperties, deviceInfo), (result) =>
+            yield return RunAsyncTaskCoroutine(() => SDK.GetConfigsAsync(configKeys, userProperties), (result) =>
             {
                 responseCallback?.Invoke(new SdkResultImpl<ConfigResult>().WithResult(result.Result));
             });
         }
 
+
+        [Obsolete]
+        public static void GetOffers(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties, DeviceInfo deviceInfo)
+            => GetOffers(placements, responseCallback, userProperties);
         /// <summary>
         /// Gets the placements with the given IDs. if placement is null or empty, all placements and offers will be fetched.
         /// </summary>
         /// <param name="placements">Ad array of placement IDs. If this field is null or empty, all placements and offers will be fetched.</param>
         /// <param name="responseCallback">A callback method that takes an <see cref="OfferResult"/> to process it when the data is received.</param>
         /// <param name="userProperties">Real-time user state data to override pre-ingested user state attributes, conforms to its userStateAttributes property.</param>
-        /// <param name="deviceInfo">A <see cref="DeviceInfo"/> object. If null, one will be created automatically.</param>
-        /// <seealso cref="GetOffers(string[], MeticaSdkDelegate{Dictionary{string, List{Offer}}}, Dictionary{string, object}, DeviceInfo)"/>
+        /// <seealso cref="GetOffers(string[], MeticaSdkDelegate{Dictionary{string, List{Offer}}}, Dictionary{string, object})"/>
         /// <remarks>
         /// Example call:
         /// <code>
@@ -178,18 +188,22 @@ namespace Metica.Unity
         /// }
         /// </code>
         /// </remarks>
-        public static void GetOffers(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        public static void GetOffers(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null) 
         {
-            CoroutineRunner.Instance.RunCoroutine(GetOffersAsOfferResultCoroutine(placements, responseCallback, userProperties, deviceInfo));
+            CoroutineRunner.Instance.RunCoroutine(GetOffersAsOfferResultCoroutine(placements, responseCallback, userProperties));
         }
+
+
+        [Obsolete]
+        public static void GetOffersAsDictionary(String[] placements, MeticaSdkDelegate<Dictionary<string, List<Offer>>> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+            => GetOffersAsDictionary(placements, responseCallback, userProperties);
         /// <summary>
         /// Gets the placements with the given IDs. if placement is null or empty, all placements and offers will be fetched.
         /// </summary>
         /// <param name="placements">Ad array of placement IDs. If this field is null or empty, all placements and offers will be fetched.</param>
         /// <param name="responseCallback">A callback method that takes a <code>Dictionary<string, List<Offer>></code> to process it when the data is received.</param>
         /// <param name="userProperties">Real-time user state data to override pre-ingested user state attributes, conforms to its userStateAttributes property.</param>
-        /// <param name="deviceInfo">A <see cref="DeviceInfo"/> object. If null, one will be created automatically.</param>
-        /// <seealso cref="GetOffers(string[], MeticaSdkDelegate{OfferResult}, Dictionary{string, object}, DeviceInfo)"/>
+        /// <seealso cref="GetOffers(string[], MeticaSdkDelegate{OfferResult}, Dictionary{string, object})"/>
         /// <remarks>
         /// Example call:
         /// <code>
@@ -211,16 +225,16 @@ namespace Metica.Unity
         /// </code>
         /// ## ROADMAP
         /// 
-        /// - TODO : This call will be removed in favour of <see cref="GetOffers(string[], MeticaSdkDelegate{OfferResult}, Dictionary{string, object}, DeviceInfo)"/>.
+        /// - TODO : This call will be removed in favour of <see cref="GetOffers(string[], MeticaSdkDelegate{OfferResult}, Dictionary{string, object})"/>.
         /// </remarks>
-        public static void GetOffersAsDictionary(String[] placements, MeticaSdkDelegate<Dictionary<string, List<Offer>>> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        public static void GetOffersAsDictionary(String[] placements, MeticaSdkDelegate<Dictionary<string, List<Offer>>> responseCallback, Dictionary<string, object> userProperties)
         {
-            CoroutineRunner.Instance.RunCoroutine(GetOffersAsDictionaryCoroutine(placements, responseCallback, userProperties, deviceInfo));
+            CoroutineRunner.Instance.RunCoroutine(GetOffersAsDictionaryCoroutine(placements, responseCallback, userProperties));
         }
 
-        private static IEnumerator GetOffersAsOfferResultCoroutine(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        private static IEnumerator GetOffersAsOfferResultCoroutine(String[] placements, MeticaSdkDelegate<OfferResult> responseCallback, Dictionary<string, object> userProperties = null)
         {
-            yield return RunAsyncTaskCoroutine(() => SDK.GetOffersAsync(placements, userProperties, deviceInfo), (result) =>
+            yield return RunAsyncTaskCoroutine(() => SDK.GetOffersAsync(placements, userProperties), (result) =>
             {
                 var offerResult = new OfferResult
                 {
@@ -230,9 +244,9 @@ namespace Metica.Unity
             });
         }
 
-        private static IEnumerator GetOffersAsDictionaryCoroutine(String[] placements, MeticaSdkDelegate<Dictionary<string, List<Offer>>> responseCallback, Dictionary<string, object> userProperties = null, DeviceInfo deviceInfo = null)
+        private static IEnumerator GetOffersAsDictionaryCoroutine(String[] placements, MeticaSdkDelegate<Dictionary<string, List<Offer>>> responseCallback, Dictionary<string, object> userProperties = null)
         {
-            yield return RunAsyncTaskCoroutine(() => SDK.GetOffersAsync(placements, userProperties, deviceInfo), (result) =>
+            yield return RunAsyncTaskCoroutine(() => SDK.GetOffersAsync(placements, userProperties), (result) =>
             {
                 responseCallback?.Invoke(new SdkResultImpl<Dictionary<string, List<Offer>>>().WithResult(result.Result.placements));
             });
