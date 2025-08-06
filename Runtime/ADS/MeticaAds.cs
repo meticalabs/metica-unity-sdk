@@ -1,7 +1,7 @@
 #nullable enable
 
 using System.Threading.Tasks;
-using Metica.ADS.UnityPlayer;
+using Metica.ADS.Android;
 using Metica.SDK;
 
 namespace Metica.ADS 
@@ -13,12 +13,12 @@ namespace Metica.ADS
 
         static MeticaAds()
         {
-#if UNITY_EDITOR
-            platformDelegate = new UnityPlayerDelegate();
-#elif UNITY_ANDROID
-            platformDelegate = new Android.AndroidDelegate();
+#if UNITY_ANDROID
+            platformDelegate = new AndroidDelegate(AndroidUnityBridge.UnityBridgeClass, AndroidUnityBridge.MeticaAdsExternalTrackerClass);
 #elif UNITY_IOS
             platformDelegate = new IOS.IOSDelegate();
+#elif UNITY_EDITOR
+            platformDelegate = new UnityPlayerDelegate();
 #else
             throw new PlatformNotSupportedException("MeticaAds is only supported on Android, iOS, and Unity Editor platforms.");
 #endif
