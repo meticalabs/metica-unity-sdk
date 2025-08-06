@@ -34,8 +34,9 @@ public static class AndroidJavaObjectExtensions
         string placementTag = javaObject.Get<string>("placementTag");
         string adFormat = javaObject.Get<string>("adFormat");
         string creativeId = javaObject.Get<string>("creativeId");
+        long latency = javaObject.Get<long>("latency");
 
-        return new MeticaAd(adUnitId, revenue, networkName, placementTag, adFormat, creativeId);
+        return new MeticaAd(adUnitId, revenue, networkName, placementTag, adFormat, creativeId, latency);
     }
     
     /// <summary>
@@ -52,7 +53,9 @@ public static class AndroidJavaObjectExtensions
             meticaAd.networkName, 
             meticaAd.placementTag, 
             meticaAd.adFormat,
-            meticaAd.creativeId);
+            meticaAd.creativeId,
+            meticaAd.latency
+        );
     }
 }
 }
