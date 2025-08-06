@@ -13,9 +13,10 @@ public class MeticaAd
     public string placementTag;
     public string adFormat;
     public string creativeId;
+    public long latency;
 
-    public MeticaAd(string adUnitId, double revenue, string networkName, 
-        string placementTag, string adFormat, string creativeId)
+    public MeticaAd(string adUnitId, double revenue, string networkName,
+        string placementTag, string adFormat, string creativeId, long latency)
     {
         this.adUnitId = adUnitId;
         this.revenue = revenue;
@@ -23,6 +24,7 @@ public class MeticaAd
         this.placementTag = placementTag;
         this.adFormat = adFormat;
         this.creativeId = creativeId;
+        this.latency = latency;
     }
 }
 }
