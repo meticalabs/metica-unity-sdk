@@ -12,11 +12,11 @@ internal class AndroidDelegate : PlatformDelegate
 {
     private const string TAG = MeticaAds.TAG;
 
-    public static readonly AndroidJavaClass UnityBridgeAndroidClass =
-        new("com.metica.unity_bridge.UnityBridge");
+    private static readonly AndroidJavaClass UnityBridgeAndroidClass
+        = AndroidUnityBridge.UnityBridgeClass;
 
-    private static readonly AndroidJavaClass MeticaAdsExternalTrackerAndroidClass =
-        new("com.metica.ads.MeticaAdsExternalTracker");
+    private static readonly AndroidJavaClass MeticaAdsExternalTrackerAndroidClass
+        = AndroidUnityBridge.MeticaAdsExternalTrackerClass;
 
     // Events for interstitial ad lifecycle callbacks - updated signatures
     public event Action<MeticaAd> InterstitialAdLoadSuccess;
@@ -40,7 +40,7 @@ internal class AndroidDelegate : PlatformDelegate
     public void SetLogEnabled(bool logEnabled)
     {
         Debug.Log($"{TAG} SetLogEnabled called with: {logEnabled}");
-        
+
         UnityBridgeAndroidClass.CallStatic("setLogEnabled", logEnabled);
     }
 
@@ -48,7 +48,7 @@ internal class AndroidDelegate : PlatformDelegate
         MeticaConfiguration configuration)
     {
         var tcs = new TaskCompletionSource<bool>();
-        
+
         var callback = new InitializeCallbackProxy(tcs);
         UnityBridgeAndroidClass.CallStatic("initialize", apiKey, appId, userId, callback);
         return tcs.Task;
@@ -132,7 +132,7 @@ internal class AndroidDelegate : PlatformDelegate
     {
         return UnityBridgeAndroidClass.CallStatic<bool>("isRewardedReady");
     }
-    
+
     // Notification methods
     public void NotifyAdLoadAttempt(string adUnitId)
     {
@@ -143,13 +143,13 @@ internal class AndroidDelegate : PlatformDelegate
     public void NotifyAdLoadSuccess(MeticaAd meticaAd)
     {
         Debug.Log($"{TAG} NotifyAdLoadSuccess called for adUnitId: {meticaAd.adUnitId}");
-    
+
         using (var meticaAdAndroid = meticaAd.ToAndroidJavaObject())
         {
             MeticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdLoadSuccess", meticaAdAndroid);
         }
     }
-    
+
     public void NotifyAdLoadFailed(string adUnitId, string error)
     {
         Debug.Log($"{TAG} NotifyAdLoadFailed called for adUnitId: {adUnitId}, error: {error}");
@@ -159,7 +159,7 @@ internal class AndroidDelegate : PlatformDelegate
     public void NotifyAdRevenue(MeticaAd meticaAd)
     {
         Debug.Log($"{TAG} NotifyAdRevenue called for adUnitId: {meticaAd.adUnitId}");
-    
+
         using (var meticaAdAndroid = meticaAd.ToAndroidJavaObject())
         {
             MeticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdRevenue", meticaAdAndroid);

@@ -47,7 +47,7 @@ public static class AndroidJavaObjectExtensions
     /// <returns>AndroidJavaObject representing the MeticaAd on the Android side</returns>
     public static AndroidJavaObject ToAndroidJavaObject(this MeticaAd meticaAd)
     {
-        return AndroidDelegate.UnityBridgeAndroidClass.CallStatic<AndroidJavaObject>("createMeticaAd", 
+        return AndroidUnityBridge.UnityBridgeClass.CallStatic<AndroidJavaObject>("createMeticaAd", 
             meticaAd.adUnitId, 
             meticaAd.revenue, 
             meticaAd.networkName, 
