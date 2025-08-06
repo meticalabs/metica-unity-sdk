@@ -1,5 +1,6 @@
 // AndroidJavaObjectExtensions.cs
 
+using Metica.ADS.Android;
 using UnityEngine;
 
 namespace Metica.ADS
@@ -46,8 +47,7 @@ public static class AndroidJavaObjectExtensions
     /// <returns>AndroidJavaObject representing the MeticaAd on the Android side</returns>
     public static AndroidJavaObject ToAndroidJavaObject(this MeticaAd meticaAd)
     {
-        using var meticaAdClass = new AndroidJavaClass("com.metica.ads.MeticaAdKt");
-        return meticaAdClass.CallStatic<AndroidJavaObject>("createMeticaAd", 
+        return AndroidDelegate.UnityBridgeAndroidClass.CallStatic<AndroidJavaObject>("createMeticaAd", 
             meticaAd.adUnitId, 
             meticaAd.revenue, 
             meticaAd.networkName, 

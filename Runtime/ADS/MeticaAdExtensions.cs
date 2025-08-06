@@ -17,12 +17,12 @@ public static class MeticaAdExtensions
             ["placement"] = meticaAd.placementTag ?? string.Empty,
             ["revenue"] = meticaAd.revenue,
             ["creativeId"] = meticaAd.creativeId,
-                    
+            ["latencyMillis"] = meticaAd.latency,
+
             // Set defaults for unavailable fields
             ["networkPlacement"] = string.Empty,
             ["revenuePrecision"] = string.Empty,
             ["waterfallInfo"] = new Dictionary<string, object>(),
-            ["latencyMillis"] = 0L,
             ["dspName"] = string.Empty
         };
 
@@ -42,7 +42,8 @@ public static class MeticaAdExtensions
             networkName: adInfo.NetworkName,
             placementTag: string.IsNullOrWhiteSpace(adInfo.Placement) ? null : adInfo.Placement,
             adFormat: adInfo.AdFormat,
-            creativeId: adInfo.CreativeIdentifier
+            creativeId: adInfo.CreativeIdentifier,
+            latency: adInfo.LatencyMillis
         );
     }
 }
