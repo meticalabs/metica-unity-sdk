@@ -17,7 +17,7 @@ public class ShowCallbackProxy : AndroidJavaProxy
     public event Action<MeticaAd> AdRevenuePaid;
     
     public ShowCallbackProxy() 
-        : base("com.metica.ads.MeticaShowAdCallback")
+        : base("com.metica.ads.MeticaAdsShowCallback")
     {
         Debug.Log($"{TAG} ShowCallbackProxy created");
     }
