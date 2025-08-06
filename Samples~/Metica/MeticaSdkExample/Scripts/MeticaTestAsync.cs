@@ -35,7 +35,7 @@ public class MeticaTestAsync : MonoBehaviour
         meticaSdk.LogOfferPurchaseEventWithProductId("mega_offer_123", "EUR", 1.99);
         meticaSdk.LogOfferPurchaseEvent("generic", "23851", "EUR", 9.99);
 
-        meticaSdk.LogOfferPurchaseEvent("none", "0000", "EUR", 9.99); // expected failure
+        meticaSdk.LogOfferPurchaseEventWithProductId("none", "EUR", 9.99); // expected failure
         meticaSdk.LogOfferPurchaseEvent("none", "0000", "EUR", 9.99); //expected failure
 
         meticaSdk.LogAdRevenueEvent("top_slot", "popup", "MadAds", "GBP", 1.50);
@@ -75,12 +75,17 @@ public class MeticaTestAsync : MonoBehaviour
                 { "totalDeaths", 982 }
             });
 
+        await Task.Delay(1000); // wait for some time
+
         meticaSdk.LogPartialStateUserUpdateEvent(
             new()
             {
                 { "level", 101.0 },
                 { "totalDeaths", 983 }
             });
+
+        Log.Debug(() => "Completed.");
+
     }
 
 }
