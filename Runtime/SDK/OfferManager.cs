@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Metica.Core;
 using Metica.Network;
@@ -16,8 +18,6 @@ namespace Metica.SDK
         [Preserve]
         [JsonProperty("placements")]
         public Dictionary<string, List<Offer>> placements { get; set; }
-        //[Obsolete("Please use 'Placements'")]
-        //public Dictionary<string, List<Offer>> placements { get => Placements; }
 
         [JsonIgnore] public HttpResponse.ResultStatus Status { get; set; }
         [JsonIgnore] public string Error { get; set; }
@@ -133,28 +133,29 @@ namespace Metica.SDK
             }
         }
 
+        [Obsolete]
+        public async Task<OfferResult> GetOffersAsync(string userId, string[] placements, Dictionary<string, object> userData, DeviceInfo deviceInfo)
+            => await GetOffersAsync(userId, placements, userData);
         /// <summary>
         /// Gets specified placements asynchronously.
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="placements"></param>
         /// <param name="userData"></param>
-        /// <param name="deviceInfo"></param>
         /// <returns></returns>
-        public async Task<OfferResult> GetOffersAsync(string userId, string[] placements,
-            Dictionary<string, object> userData = null, DeviceInfo deviceInfo = null)
+        public async Task<OfferResult> GetOffersAsync(string userId, string[] placements, Dictionary<string, object> userData = null)
         {
             try
             {
                 if (placements == null || placements.Length == 0)
                 {
-                    return await GetAllOffersAsync(userId, userData, deviceInfo);
+                    return await GetAllOffersAsync(userId, userData);
                 }
 
                 var requestBody = new Dictionary<string, object>
                 {
                     { FieldNames.UserId, userId },
-                    { FieldNames.DeviceInfo, deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
+                    { FieldNames.DeviceInfo, _deviceInfoProvider.GetDeviceInfo() },
                     { FieldNames.UserData, userData }
                 };
 
@@ -179,7 +180,7 @@ namespace Metica.SDK
                 return offerResult;
             }
             catch (System.Net.Http.HttpRequestException exception)
-                when (exception.InnerException is System.TimeoutException || exception.Message.Contains("timed out"))
+                when (exception.InnerException is TimeoutException || exception.Message.Contains("timed out"))
             {
                 Log.Error(() => $"OfferManager.GetOffersAsync: Request timed out: {exception.Message}");
                 return new OfferResult
@@ -203,13 +204,12 @@ namespace Metica.SDK
             }
         }
 
-        private async Task<OfferResult> GetAllOffersAsync(string userId, Dictionary<string, object> userData = null,
-            DeviceInfo deviceInfo = null)
+        private async Task<OfferResult> GetAllOffersAsync(string userId, Dictionary<string, object> userData = null)
         {
             var requestBody = new Dictionary<string, object>
             {
                 { FieldNames.UserId, userId },
-                { FieldNames.DeviceInfo, deviceInfo ?? _deviceInfoProvider.GetDeviceInfo() },
+                { FieldNames.DeviceInfo, _deviceInfoProvider.GetDeviceInfo() },
                 { FieldNames.UserData, userData }
             };
 

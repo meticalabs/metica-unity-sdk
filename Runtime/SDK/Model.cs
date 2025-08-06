@@ -83,6 +83,9 @@ namespace Metica.SDK.Model
         GooglePlayStore
     }
 
+    /// <summary>
+    /// Device information.
+    /// </summary>
     [Serializable]
     public class DeviceInfo
     {

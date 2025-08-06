@@ -9,21 +9,27 @@ namespace Metica.Unity
 {
     /// <summary>
     /// Unity implementation of <see cref="IDeviceInfoProvider"/>.
+    /// The obtained information is cached so it is collected <b>once</b> and remains unchanged for the whole application lifetime.
     /// </summary>
     public class DeviceInfoProvider : IDeviceInfoProvider
     {
-        public DeviceInfo GetDeviceInfo()
+        private readonly Lazy<DeviceInfo> _cachedDeviceInfo = new Lazy<DeviceInfo>(() => CreateDeviceInfo());
+
+        public DeviceInfo GetDeviceInfo() => _cachedDeviceInfo.Value;
+
+        private static DeviceInfo CreateDeviceInfo()
         {
             var systemTz = TimeZoneInfo.Local.BaseUtcOffset;
             var timezone = ((systemTz >= TimeSpan.Zero) ? "+" : "-") + systemTz.ToString(@"hh\:mm");
             string locale = Thread.CurrentThread.CurrentCulture.Name;
             var appVersion = Application.version;
 
-            return new DeviceInfo() {
+            return new DeviceInfo()
+            {
                 store = MapRuntimePlatformToStoreType(Application.platform)?.ToString(),
                 timezone = timezone,
                 locale = locale,
-                appVersion = appVersion
+                appVersion = appVersion,
             };
         }
 
