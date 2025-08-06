@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Metica.ADS.Android
+namespace Metica.ADS
 {
 internal static class AndroidUnityBridge
 {

@@ -10,13 +10,16 @@ namespace Metica.ADS.Android
 {
 internal class AndroidDelegate : PlatformDelegate
 {
+    public AndroidDelegate(AndroidJavaClass unityBridgeClass, AndroidJavaClass meticaAdsExternalTrackerClass)
+    {
+        _unityBridgeAndroidClass = unityBridgeClass;
+        _meticaAdsExternalTrackerAndroidClass = meticaAdsExternalTrackerClass;        
+    }
+
     private const string TAG = MeticaAds.TAG;
 
-    private static readonly AndroidJavaClass UnityBridgeAndroidClass
-        = AndroidUnityBridge.UnityBridgeClass;
-
-    private static readonly AndroidJavaClass MeticaAdsExternalTrackerAndroidClass
-        = AndroidUnityBridge.MeticaAdsExternalTrackerClass;
+    private readonly AndroidJavaClass _unityBridgeAndroidClass;
+    private readonly AndroidJavaClass _meticaAdsExternalTrackerAndroidClass;
 
     // Events for interstitial ad lifecycle callbacks - updated signatures
     public event Action<MeticaAd> InterstitialAdLoadSuccess;
@@ -41,7 +44,7 @@ internal class AndroidDelegate : PlatformDelegate
     {
         Debug.Log($"{TAG} SetLogEnabled called with: {logEnabled}");
 
-        UnityBridgeAndroidClass.CallStatic("setLogEnabled", logEnabled);
+        _unityBridgeAndroidClass.CallStatic("setLogEnabled", logEnabled);
     }
 
     public Task<bool> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
@@ -50,7 +53,7 @@ internal class AndroidDelegate : PlatformDelegate
         var tcs = new TaskCompletionSource<bool>();
 
         var callback = new InitializeCallbackProxy(tcs);
-        UnityBridgeAndroidClass.CallStatic("initialize", apiKey, appId, userId, callback);
+        _unityBridgeAndroidClass.CallStatic("initialize", apiKey, appId, userId, callback);
         return tcs.Task;
     }
 
@@ -66,7 +69,7 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdLoadFailed += (error) => InterstitialAdLoadFailed?.Invoke(error);
 
         Debug.Log($"{TAG} About to call Android loadInterstitial method");
-        UnityBridgeAndroidClass.CallStatic("loadInterstitial", callback);
+        _unityBridgeAndroidClass.CallStatic("loadInterstitial", callback);
         Debug.Log($"{TAG} Android loadInterstitial method called");
     }
 
@@ -84,13 +87,13 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdRevenuePaid += (meticaAd) => InterstitialAdRevenuePaid?.Invoke(meticaAd);
 
         Debug.Log($"{TAG} About to call Android showInterstitial method");
-        UnityBridgeAndroidClass.CallStatic("showInterstitial", callback);
+        _unityBridgeAndroidClass.CallStatic("showInterstitial", callback);
         Debug.Log($"{TAG} Android showInterstitial method called");
     }
 
     public bool IsInterstitialReady()
     {
-        return UnityBridgeAndroidClass.CallStatic<bool>("isInterstitialReady");
+        return _unityBridgeAndroidClass.CallStatic<bool>("isInterstitialReady");
     }
 
     // Rewarded methods
@@ -105,7 +108,7 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdLoadFailed += (error) => RewardedAdLoadFailed?.Invoke(error);
 
         Debug.Log($"{TAG} About to call Android loadRewarded method");
-        UnityBridgeAndroidClass.CallStatic("loadRewarded", callback);
+        _unityBridgeAndroidClass.CallStatic("loadRewarded", callback);
         Debug.Log($"{TAG} Android loadRewarded method called");
     }
 
@@ -124,20 +127,20 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdRevenuePaid += (meticaAd) => RewardedAdRevenuePaid?.Invoke(meticaAd);
 
         Debug.Log($"{TAG} About to call Android showRewarded method");
-        UnityBridgeAndroidClass.CallStatic("showRewarded", callback);
+        _unityBridgeAndroidClass.CallStatic("showRewarded", callback);
         Debug.Log($"{TAG} Android showRewarded method called");
     }
 
     public bool IsRewardedReady()
     {
-        return UnityBridgeAndroidClass.CallStatic<bool>("isRewardedReady");
+        return _unityBridgeAndroidClass.CallStatic<bool>("isRewardedReady");
     }
 
     // Notification methods
     public void NotifyAdLoadAttempt(string adUnitId)
     {
         Debug.Log($"{TAG} NotifyAdLoadAttempt called for adUnitId: {adUnitId}");
-        MeticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdLoadAttempt", adUnitId);
+        _meticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdLoadAttempt", adUnitId);
     }
 
     public void NotifyAdLoadSuccess(MeticaAd meticaAd)
@@ -146,14 +149,14 @@ internal class AndroidDelegate : PlatformDelegate
 
         using (var meticaAdAndroid = meticaAd.ToAndroidJavaObject())
         {
-            MeticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdLoadSuccess", meticaAdAndroid);
+            _meticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdLoadSuccess", meticaAdAndroid);
         }
     }
 
     public void NotifyAdLoadFailed(string adUnitId, string error)
     {
         Debug.Log($"{TAG} NotifyAdLoadFailed called for adUnitId: {adUnitId}, error: {error}");
-        MeticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdLoadFailed", adUnitId, error);
+        _meticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdLoadFailed", adUnitId, error);
     }
 
     public void NotifyAdRevenue(MeticaAd meticaAd)
@@ -162,7 +165,7 @@ internal class AndroidDelegate : PlatformDelegate
 
         using (var meticaAdAndroid = meticaAd.ToAndroidJavaObject())
         {
-            MeticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdRevenue", meticaAdAndroid);
+            _meticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdRevenue", meticaAdAndroid);
         }
     }
 }
