@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Metica.Core;
 using Metica.Network;
 using Metica.SDK.Model;
-using UnityEngine;
 
 namespace Metica.SDK
 {
@@ -54,9 +53,11 @@ namespace Metica.SDK
 
         #endregion Fields
 
-        // Ensures static fields are reset when entering Play Mode without Domain Reload
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void ResetStaticFields()
+        /// <summary>
+        ///  Utility, (Unity specific) method that should not be used directly.
+        /// Resets static properties to null.
+        /// </summary>
+        public static void ResetStaticFields()
         {
             CurrentUserId = null;
             ApiKey = null;
