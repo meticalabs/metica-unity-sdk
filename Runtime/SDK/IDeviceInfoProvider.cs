@@ -19,14 +19,18 @@ namespace Metica.SDK
         /// <summary>
         /// Gets the device type.
         /// </summary>
-        public string deviceType { get; }
+        string deviceType { get; }
+        /// <summary>
+        /// Gets a hashed device unique identifier.
+        /// </summary>
+        string deviceUniqueId { get; }
         /// <summary>
         /// Gets the device's operating system.
         /// </summary>
-        public string operatingSystem { get; }
+        string operatingSystem { get; }
         /// <summary>
         /// Gets the device model.
         /// </summary>
-        public string deviceModel { get; }
+        string deviceModel { get; }
     }
 }
