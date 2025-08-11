@@ -17,7 +17,7 @@ namespace Metica.Unity
     internal class DeviceInfoProvider : IDeviceInfoProvider
     {
         private readonly Lazy<DeviceInfo> _cachedDeviceInfo = new Lazy<DeviceInfo>(() => CreateDeviceInfo());
-        private readonly Lazy<string> _hashedDeviceId = new Lazy<string>(() =>
+        private readonly Lazy<string> _cachedHashedDeviceId = new Lazy<string>(() =>
         {
             using var sha = SHA256.Create();
             var bytes = Encoding.UTF8.GetBytes(SystemInfo.deviceUniqueIdentifier);
@@ -27,7 +27,7 @@ namespace Metica.Unity
         /// <inheritdoc/>
         public string deviceType => SystemInfo.deviceType.ToString();
         /// <inheritdoc/>
-        public string deviceUniqueId => _hashedDeviceId.Value;
+        public string deviceUniqueId => _cachedHashedDeviceId.Value;
         /// <inheritdoc/>
         public string operatingSystem => SystemInfo.operatingSystem;
         /// <inheritdoc/>
