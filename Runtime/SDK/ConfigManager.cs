@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 using UnityEngine.Scripting; // TODO : MET-3509 : break dependency from UnityEngine
-using SystemInfo = UnityEngine.Device.SystemInfo;
 
 using Metica.Core;
 using Metica.Network;
@@ -60,9 +59,9 @@ namespace Metica.SDK
 
                 // Inject the additional device information using the SystemInfo class
                 // This will add the keys or update them if they already exist.
-                finalUserData["deviceType"] = SystemInfo.deviceType.ToString();
-                finalUserData["osVersion"] = SystemInfo.operatingSystem;
-                finalUserData["deviceModel"] = SystemInfo.deviceModel;
+                finalUserData["deviceType"] = _deviceInfoProvider.deviceType.ToString();
+                finalUserData["osVersion"] = _deviceInfoProvider.operatingSystem;
+                finalUserData["deviceModel"] = _deviceInfoProvider.deviceModel;
 
                 var requestBody = new Dictionary<string, object>
                 {

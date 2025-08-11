@@ -14,6 +14,9 @@ namespace Metica.Unity
     internal class DeviceInfoProvider : IDeviceInfoProvider
     {
         private readonly Lazy<DeviceInfo> _cachedDeviceInfo = new Lazy<DeviceInfo>(() => CreateDeviceInfo());
+        public string deviceType { get => SystemInfo.deviceType.ToString(); }
+        public string operatingSystem { get => SystemInfo.operatingSystem; }
+        public string deviceModel { get => SystemInfo.deviceModel; }
 
         public DeviceInfo GetDeviceInfo() => _cachedDeviceInfo.Value;
 
