@@ -1,0 +1,5 @@
+<linker>
+  <assembly fullname="Metica.SDK">
+    <type fullname="Metica.SDK.ConfigResult" preserve="all"/>
+  </assembly>
+</linker>
