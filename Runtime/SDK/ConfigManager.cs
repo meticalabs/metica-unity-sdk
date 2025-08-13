@@ -2,21 +2,17 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-using UnityEngine.Scripting; // TODO : MET-3509 : break dependency from UnityEngine
-
 using Metica.Core;
 using Metica.Network;
 using Metica.SDK.Model;
 
 namespace Metica.SDK
 {
-    [Preserve]
     [System.Serializable]
     public class ConfigResult : IMeticaHttpResult
     {
         // TODO : ideally fields should be readonly or with private setter
 
-        [Preserve]
         [JsonExtensionData] // Needed when we want the root (anonymous dictionary in this case) to go in a specific field
         public Dictionary<string, object> Configs { get; set; }
 
