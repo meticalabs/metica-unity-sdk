@@ -6,15 +6,12 @@ using Metica.Core;
 using Metica.Network;
 using Metica.SDK.Model;
 using Newtonsoft.Json;
-using UnityEngine.Scripting;
 
 namespace Metica.SDK
 {
-    [Preserve]
-    [System.Serializable]
+    [Serializable]
     public class OfferResult : IMeticaHttpResult
     {
-        [Preserve]
         [JsonProperty("placements")]
         public Dictionary<string, List<Offer>> placements { get; set; }
 
