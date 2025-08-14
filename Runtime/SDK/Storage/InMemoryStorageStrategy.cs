@@ -11,13 +11,13 @@ namespace Metica.SDK.Storage
     {
         private readonly Dictionary<string, object> _store = new();
 
-        public Task Save<T>(string key, T value)
+        public Task SaveAsync<T>(string key, T value)
         {
             _store[key] = value;
             return Task.CompletedTask;
         }
 
-        public Task<T> Load<T>(string key) => Task.FromResult((T)_store[key]);
+        public Task<T> LoadAsync<T>(string key) => Task.FromResult((T)_store[key]);
         
         public bool Exists(string key) => _store.ContainsKey(key);
 
