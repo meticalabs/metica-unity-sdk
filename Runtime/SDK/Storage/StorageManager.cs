@@ -7,7 +7,7 @@ namespace Metica.SDK.Storage
     /// Facade for storage operations. Delegates work to a chosen storage strategy.
     /// Supports a default strategy and allows injection before first use.
     /// </summary>
-    public class Storage
+    public class StorageManager
     {
         private IStorageStrategy _strategy;
 
@@ -15,7 +15,7 @@ namespace Metica.SDK.Storage
         /// Initializes a new instance of Storage.
         /// Optionally accepts a custom strategy; otherwise, a default, volatile one is used.
         /// </summary>
-        public Storage(IStorageStrategy strategy = null) =>
+        public StorageManager(IStorageStrategy strategy = null) =>
             _strategy = strategy ?? new InMemoryStorageStrategy();
 
         /// <summary>
