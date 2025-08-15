@@ -31,13 +31,13 @@ namespace Metica.SDK.Storage
         /// <summary>
         /// Saves a value for the given key using the current strategy.
         /// </summary>
-        public async Task Save<T>(string key, T value) => await _strategy.SaveAsync(key, value);
+        public async Task SaveAsync<T>(string key, T value) => await _strategy.SaveAsync(key, value);
 
         /// <summary>
         /// Loads a value for the given key using the current strategy.
         /// Returns default(T) if not found.
         /// </summary>
-        public async Task<T> Load<T>(string key) => await _strategy.LoadAsync<T>(key);
+        public async Task<T> LoadAsync<T>(string key) => await _strategy.LoadAsync<T>(key);
 
         /// <summary>
         /// Checks if a value exists for the given key.
