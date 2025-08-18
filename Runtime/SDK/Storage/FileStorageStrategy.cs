@@ -64,9 +64,10 @@ namespace Metica.SDK.Storage
 
         public void Delete(string filename)
         {
-            if (Exists(filename))
+            string filePath = Path.Combine(_dirInfo.FullName, filename);
+            if (Exists(filePath))
             {
-                File.Delete(filename);
+                File.Delete(filePath);
             }
         }
     }
