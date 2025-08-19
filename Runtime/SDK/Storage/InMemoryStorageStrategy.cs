@@ -32,8 +32,10 @@ namespace Metica.SDK.Storage
                 return Task.FromResult(default(T));
         }
         
+        /// <inheritdoc/>
         public bool Exists(string key) => _store.ContainsKey(key);
 
+        /// <inheritdoc/>
         public void Delete(string key) => _store.Remove(key);
     }
 }

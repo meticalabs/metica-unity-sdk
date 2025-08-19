@@ -31,6 +31,8 @@ namespace Metica.SDK.Storage
             Log.Debug(() => $"{nameof(FileStorageStrategy)} folder set to {_dirInfo.FullName}");
         }
 
+
+        /// <inheritdoc/>
         public async Task SaveAsync<T>(string filename, T value)
         {
             string filePath = Path.Combine(_dirInfo.FullName, filename);
@@ -46,6 +48,7 @@ namespace Metica.SDK.Storage
             await File.WriteAllTextAsync(filePath, jsonString);
         }
 
+        /// <inheritdoc/>
         public async Task<T> LoadAsync<T>(string filename)
         {
             string filePath = Path.Combine(_dirInfo.FullName, filename);
@@ -60,11 +63,13 @@ namespace Metica.SDK.Storage
             return JsonConvert.DeserializeObject<T>(jsonString); // can raise JsonSerializationException
         }
 
+        /// <inheritdoc/>
         public bool Exists(string filename)
         {
             return File.Exists(Path.Combine(_dirInfo.FullName, filename));
         }
 
+        /// <inheritdoc/>
         public void Delete(string filename)
         {
             string filePath = Path.Combine(_dirInfo.FullName, filename);
