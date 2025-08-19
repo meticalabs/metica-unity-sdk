@@ -50,7 +50,10 @@ namespace Metica.SDK.Storage
         {
             string filePath = Path.Combine(_dirInfo.FullName, filename);
             if (!File.Exists(filePath))
-                throw new FileLoadException($"The file {filename} could not be found.");
+            {
+                Log.Error(() => $"{nameof(LoadAsync)} could not find the file {filePath}");
+                return default;
+            }
 
             string jsonString = await File.ReadAllTextAsync(filePath);
 

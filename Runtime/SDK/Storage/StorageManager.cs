@@ -19,16 +19,6 @@ namespace Metica.SDK.Storage
             _strategy = strategy ?? new InMemoryStorageStrategy();
 
         /// <summary>
-        /// Sets or replaces the storage strategy before the first operation.
-        /// Throws if the strategy has already been initialized.
-        /// </summary>
-        public void SetStrategy(IStorageStrategy strategy)
-        {
-            if (strategy == null) throw new ArgumentNullException(nameof(strategy));
-            _strategy = strategy;
-        }
-
-        /// <summary>
         /// Saves a value for the given key using the current strategy.
         /// </summary>
         public async Task SaveAsync<T>(string key, T value) => await _strategy.SaveAsync(key, value);
