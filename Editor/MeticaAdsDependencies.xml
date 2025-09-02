@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <dependencies>
     <androidPackages>
-        <androidPackage spec="com.metica.ads:metica-ads:+" />
+        <androidPackage spec="com.metica:metica-sdk:+" />
     </androidPackages>
 </dependencies>
