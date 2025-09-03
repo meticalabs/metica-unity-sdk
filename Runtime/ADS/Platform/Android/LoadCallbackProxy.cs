@@ -12,7 +12,7 @@ public class LoadCallbackProxy : AndroidJavaProxy
     public event Action<string> AdLoadFailed;
 
     public LoadCallbackProxy()
-        : base("com.metica.ads.MeticaLoadAdCallback")
+        : base("com.metica.ads.MeticaAdsLoadCallback")
     {
         Debug.Log($"{TAG} LoadCallbackProxy created");
     }

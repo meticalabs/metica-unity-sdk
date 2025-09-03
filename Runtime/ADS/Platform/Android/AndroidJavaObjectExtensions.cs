@@ -1,5 +1,6 @@
 // AndroidJavaObjectExtensions.cs
 
+using Metica.ADS.Android;
 using UnityEngine;
 
 namespace Metica.ADS
@@ -34,8 +35,9 @@ public static class AndroidJavaObjectExtensions
         string placementTag = javaObject.Get<string>("placementTag");
         string adFormat = javaObject.Get<string>("adFormat");
         string creativeId = javaObject.Get<string>("creativeId");
+        long latency = javaObject.Get<long>("latency");
 
-        return new MeticaAd(adUnitId, revenue, networkName, placementTag, adFormat, creativeId);
+        return new MeticaAd(adUnitId, revenue, networkName, placementTag, adFormat, creativeId, latency);
     }
     
     /// <summary>
@@ -45,14 +47,15 @@ public static class AndroidJavaObjectExtensions
     /// <returns>AndroidJavaObject representing the MeticaAd on the Android side</returns>
     public static AndroidJavaObject ToAndroidJavaObject(this MeticaAd meticaAd)
     {
-        using var meticaAdClass = new AndroidJavaClass("com.metica.ads.MeticaAdKt");
-        return meticaAdClass.CallStatic<AndroidJavaObject>("createMeticaAd", 
+        return AndroidUnityBridge.UnityBridgeClass.CallStatic<AndroidJavaObject>("createMeticaAd", 
             meticaAd.adUnitId, 
             meticaAd.revenue, 
             meticaAd.networkName, 
             meticaAd.placementTag, 
             meticaAd.adFormat,
-            meticaAd.creativeId);
+            meticaAd.creativeId,
+            meticaAd.latency
+        );
     }
 }
 }

@@ -13,17 +13,17 @@ public class InitializeCallbackProxy : AndroidJavaProxy
     private readonly TaskCompletionSource<bool> _tcs;
 
     public InitializeCallbackProxy(TaskCompletionSource<bool> tcs)
-        : base("com.metica.ads.MeticaAdsInitCallback")
+        : base("com.metica.MeticaInitCallback")
     {
         Debug.Log($"{TAG} MeticaAdsInitCallback created");
         _tcs = tcs;
     }
 
     // Called from Android when initialization succeeds
-    public void onInitialized(bool enabled)
+    public void onInitialized(bool adsEnabled)
     {
-        Debug.Log($"{TAG} onInitialized: {enabled}");
-        _tcs.SetResult(enabled);
+        Debug.Log($"{TAG} onInitialized: {adsEnabled}");
+        _tcs.SetResult(adsEnabled);
     }
 
     // Called from Android when initialization fails
