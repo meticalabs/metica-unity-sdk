@@ -51,9 +51,15 @@ namespace Metica.ADS
             platformDelegate.SetLogEnabled(logEnabled);
         }
         
+        public static void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
+        {
+            platformDelegate.CreateBanner(bannerAdUnitId, position);
+        }
+        
         // Banner ad methods
         public static void ShowBanner(int yPosition)
         {
+            
             platformDelegate.ShowBanner(yPosition);
         }
         public static void HideBanner()

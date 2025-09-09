@@ -58,6 +58,20 @@ internal class AndroidDelegate : PlatformDelegate
     }
 
     // Banner methods
+    public void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
+    {
+        var yPosition = position switch
+        {
+            MeticaBannerPosition.Bottom => -1,
+            MeticaBannerPosition.Top => 0,
+            _ => 0,
+        };
+        
+        
+        Debug.Log($"{TAG} About to call Android createBanner method");
+        _unityBridgeAndroidClass.CallStatic("createBanner", yPosition);
+        Debug.Log($"{TAG} Android createBanner method called");
+    }
     public void ShowBanner(int yPosition)
     {
         Debug.Log($"{TAG} About to call Android showBanner method");

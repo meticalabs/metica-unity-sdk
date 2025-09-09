@@ -31,6 +31,7 @@ internal interface PlatformDelegate
     void SetLogEnabled(bool logEnabled);
             
     // Banner methods
+    void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position);
     void ShowBanner(int yPosition);
     void HideBanner();
     void DestroyBanner();

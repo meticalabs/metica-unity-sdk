@@ -34,6 +34,10 @@ internal class IOSDelegate : PlatformDelegate
     {
     }
 
+    public void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
+    {
+    }
+
     public void ShowBanner(int yPosition)
     {
     }
