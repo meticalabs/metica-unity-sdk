@@ -60,24 +60,28 @@ internal class AndroidDelegate : PlatformDelegate
     // Banner methods
     public void ShowBanner(int yPosition)
     {
-        throw new NotImplementedException();
+        Debug.Log($"{TAG} About to call Android showBanner method");
+        _unityBridgeAndroidClass.CallStatic("showBanner", yPosition);
+        Debug.Log($"{TAG} Android showBanner method called");
     }
 
     public void HideBanner()
     {
-        throw new NotImplementedException();
+        Debug.Log($"{TAG} About to call Android hideBanner method");
+        _unityBridgeAndroidClass.CallStatic("hideBanner");
+        Debug.Log($"{TAG} Android hideBanner method called");
     }
 
     public void DestroyBanner()
     {
-        throw new NotImplementedException();
+        Debug.Log($"{TAG} About to call Android destroyBanner method");
+        _unityBridgeAndroidClass.CallStatic("destroyBanner");
+        Debug.Log($"{TAG} Android destroyBanner method called");
     }
     
     // Interstitial methods
     public void LoadInterstitial()
     {
-        Debug.Log($"{TAG} LoadInterstitial called");
-
         var callback = new LoadCallbackProxy();
 
         // Wire up all events - now using MeticaAd and string directly
@@ -91,8 +95,6 @@ internal class AndroidDelegate : PlatformDelegate
 
     public void ShowInterstitial()
     {
-        Debug.Log($"{TAG} ShowInterstitial called");
-
         var callback = new ShowCallbackProxy();
 
         // Wire up all events - now using MeticaAd objects directly
@@ -115,8 +117,6 @@ internal class AndroidDelegate : PlatformDelegate
     // Rewarded methods
     public void LoadRewarded()
     {
-        Debug.Log($"{TAG} LoadRewarded called");
-
         var callback = new LoadCallbackProxy();
 
         // Wire up all events - now using MeticaAd and string directly
@@ -130,8 +130,6 @@ internal class AndroidDelegate : PlatformDelegate
 
     public void ShowRewarded()
     {
-        Debug.Log($"{TAG} ShowRewarded called");
-
         var callback = new ShowCallbackProxy();
 
         // Wire up all events - now using MeticaAd objects directly
