@@ -57,6 +57,22 @@ internal class AndroidDelegate : PlatformDelegate
         return tcs.Task;
     }
 
+    // Banner methods
+    public void ShowBanner(int yPosition)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void HideBanner()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void DestroyBanner()
+    {
+        throw new NotImplementedException();
+    }
+    
     // Interstitial methods
     public void LoadInterstitial()
     {

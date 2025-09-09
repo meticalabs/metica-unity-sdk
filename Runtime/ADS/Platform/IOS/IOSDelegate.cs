@@ -34,6 +34,18 @@ internal class IOSDelegate : PlatformDelegate
     {
     }
 
+    public void ShowBanner(int yPosition)
+    {
+    }
+
+    public void HideBanner()
+    {
+    }
+
+    public void DestroyBanner()
+    {
+    }
+
     public Task<bool> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
         MeticaConfiguration configuration)
     {

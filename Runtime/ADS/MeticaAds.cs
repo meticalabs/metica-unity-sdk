@@ -51,6 +51,21 @@ namespace Metica.ADS
             platformDelegate.SetLogEnabled(logEnabled);
         }
         
+        // Banner ad methods
+        public static void ShowBanner(int yPosition)
+        {
+            platformDelegate.ShowBanner(yPosition);
+        }
+        public static void HideBanner()
+        {
+            platformDelegate.HideBanner();
+        }
+        
+        public static void DestroyBanner()
+        {
+            platformDelegate.DestroyBanner();
+        }
+        
         // Interstitial ad methods
         public static void LoadInterstitial()
         {

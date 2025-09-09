@@ -30,6 +30,11 @@ internal interface PlatformDelegate
         MeticaConfiguration configuration);
     void SetLogEnabled(bool logEnabled);
             
+    // Banner methods
+    void ShowBanner(int yPosition);
+    void HideBanner();
+    void DestroyBanner();
+
     // Interstitial methods
     void LoadInterstitial();
     void ShowInterstitial();

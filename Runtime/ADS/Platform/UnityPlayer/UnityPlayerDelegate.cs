@@ -36,6 +36,22 @@ internal class UnityPlayerDelegate : PlatformDelegate
         Debug.Log($"[MeticaAds Unity] Mock SetLogEnabled: {logEnabled}");
     }
 
+    public void ShowBanner(int yPosition)
+    {
+        Debug.Log("[MeticaAds Unity] Mock ShowBanner called");
+    }
+
+    public void HideBanner()
+    {
+        Debug.Log("[MeticaAds Unity] Mock HideBanner called");
+
+    }
+
+    public void DestroyBanner()
+    {
+        Debug.Log("[MeticaAds Unity] Mock DestroyBanner called");
+    }
+
     public void LoadInterstitial()
     {
         Debug.Log("[MeticaAds Unity] Mock LoadInterstitial called");
