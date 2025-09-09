@@ -32,9 +32,9 @@ internal interface PlatformDelegate
             
     // Banner methods
     void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position);
-    void ShowBanner(int yPosition);
-    void HideBanner();
-    void DestroyBanner();
+    void ShowBanner(string adUnitId);
+    void HideBanner(string adUnitId);
+    void DestroyBanner(string adUnitId);
 
     // Interstitial methods
     void LoadInterstitial();

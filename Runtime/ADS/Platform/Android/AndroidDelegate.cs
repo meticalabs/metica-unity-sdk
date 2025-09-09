@@ -58,8 +58,11 @@ internal class AndroidDelegate : PlatformDelegate
     }
 
     // Banner methods
-    public void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
+    public void CreateBanner(string adUnitId, MeticaBannerPosition position)
     {
+        // On Native side the matrix is:
+        //  0 -> top position
+        // -1 -> bottom position
         var yPosition = position switch
         {
             MeticaBannerPosition.Bottom => -1,
@@ -69,27 +72,27 @@ internal class AndroidDelegate : PlatformDelegate
         
         
         Debug.Log($"{TAG} About to call Android createBanner method");
-        _unityBridgeAndroidClass.CallStatic("createBanner", yPosition);
+        _unityBridgeAndroidClass.CallStatic("createBanner", adUnitId, yPosition);
         Debug.Log($"{TAG} Android createBanner method called");
     }
-    public void ShowBanner(int yPosition)
+    public void ShowBanner(string adUnitId)
     {
         Debug.Log($"{TAG} About to call Android showBanner method");
-        _unityBridgeAndroidClass.CallStatic("showBanner", yPosition);
+        _unityBridgeAndroidClass.CallStatic("showBanner", adUnitId);
         Debug.Log($"{TAG} Android showBanner method called");
     }
 
-    public void HideBanner()
+    public void HideBanner(string adUnitId)
     {
         Debug.Log($"{TAG} About to call Android hideBanner method");
-        _unityBridgeAndroidClass.CallStatic("hideBanner");
+        _unityBridgeAndroidClass.CallStatic("hideBanner", adUnitId);
         Debug.Log($"{TAG} Android hideBanner method called");
     }
 
-    public void DestroyBanner()
+    public void DestroyBanner(string adUnitId)
     {
         Debug.Log($"{TAG} About to call Android destroyBanner method");
-        _unityBridgeAndroidClass.CallStatic("destroyBanner");
+        _unityBridgeAndroidClass.CallStatic("destroyBanner", adUnitId);
         Debug.Log($"{TAG} Android destroyBanner method called");
     }
     

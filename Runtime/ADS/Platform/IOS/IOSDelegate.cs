@@ -38,15 +38,15 @@ internal class IOSDelegate : PlatformDelegate
     {
     }
 
-    public void ShowBanner(int yPosition)
+    public void ShowBanner(string adUnitId)
     {
     }
 
-    public void HideBanner()
+    public void HideBanner(string adUnitId)
     {
     }
 
-    public void DestroyBanner()
+    public void DestroyBanner(string adUnitId)
     {
     }
 

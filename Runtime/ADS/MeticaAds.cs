@@ -57,19 +57,19 @@ namespace Metica.ADS
         }
         
         // Banner ad methods
-        public static void ShowBanner(int yPosition)
+        public static void ShowBanner(string adUnitId)
         {
             
-            platformDelegate.ShowBanner(yPosition);
+            platformDelegate.ShowBanner(adUnitId);
         }
-        public static void HideBanner()
+        public static void HideBanner(string adUnitId)
         {
-            platformDelegate.HideBanner();
+            platformDelegate.HideBanner(adUnitId);
         }
         
-        public static void DestroyBanner()
+        public static void DestroyBanner(string adUnitId)
         {
-            platformDelegate.DestroyBanner();
+            platformDelegate.DestroyBanner(adUnitId);
         }
         
         // Interstitial ad methods
