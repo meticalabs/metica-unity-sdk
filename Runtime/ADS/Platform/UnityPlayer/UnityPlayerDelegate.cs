@@ -7,6 +7,10 @@ namespace Metica.ADS.UnityPlayer
 internal class UnityPlayerDelegate : PlatformDelegate
 {
     // Mock events - these won't actually fire in editor
+    public event Action<MeticaAd> BannerAdLoadSuccess;
+    public event Action<string> BannerAdLoadFailed;
+    public event Action<MeticaAd> BannerAdClicked;
+    public event Action<MeticaAd> BannerAdRevenuePaid;
     public event Action<MeticaAd> InterstitialAdLoadSuccess;
     public event Action<string> InterstitialAdLoadFailed;
     public event Action<MeticaAd> InterstitialAdShowSuccess;

@@ -21,7 +21,13 @@ internal class AndroidDelegate : PlatformDelegate
     private readonly AndroidJavaClass _unityBridgeAndroidClass;
     private readonly AndroidJavaClass _meticaAdsExternalTrackerAndroidClass;
 
-    // Events for interstitial ad lifecycle callbacks - updated signatures
+    // Events for banner ad lifecycle callbacks
+    public event Action<MeticaAd> BannerAdLoadSuccess;
+    public event Action<string> BannerAdLoadFailed;
+    public event Action<MeticaAd> BannerAdClicked;
+    public event Action<MeticaAd> BannerAdRevenuePaid;
+    
+    // Events for interstitial ad lifecycle callbacks
     public event Action<MeticaAd> InterstitialAdLoadSuccess;
     public event Action<string> InterstitialAdLoadFailed;
     public event Action<MeticaAd> InterstitialAdShowSuccess;
@@ -30,7 +36,7 @@ internal class AndroidDelegate : PlatformDelegate
     public event Action<MeticaAd> InterstitialAdClicked;
     public event Action<MeticaAd> InterstitialAdRevenuePaid;
 
-    // Events for rewarded ad lifecycle callbacks - updated signatures
+    // Events for rewarded ad lifecycle callbacks
     public event Action<MeticaAd> RewardedAdLoadSuccess;
     public event Action<string> RewardedAdLoadFailed;
     public event Action<MeticaAd> RewardedAdShowSuccess;
