@@ -66,6 +66,12 @@ internal class AndroidDelegate : PlatformDelegate
     // Banner methods
     public void CreateBanner(string adUnitId, MeticaBannerPosition position)
     {
+        var callback = new BannerCallbackProxy();
+        callback.AdLoadSuccess += (meticaAd) => BannerAdLoadSuccess?.Invoke(meticaAd);
+        callback.AdLoadFailed += (error) => BannerAdLoadFailed?.Invoke(error);
+        callback.AdClicked += (meticaAd) => BannerAdClicked?.Invoke(meticaAd);
+        callback.AdRevenuePaid += (meticaAd) => BannerAdRevenuePaid?.Invoke(meticaAd);
+
         // On Native side the matrix is:
         //  0 -> top position
         // -1 -> bottom position
@@ -78,7 +84,7 @@ internal class AndroidDelegate : PlatformDelegate
         
         
         Debug.Log($"{TAG} About to call Android createBanner method");
-        _unityBridgeAndroidClass.CallStatic("createBanner", adUnitId, yPosition);
+        _unityBridgeAndroidClass.CallStatic("createBanner", adUnitId, yPosition, callback);
         Debug.Log($"{TAG} Android createBanner method called");
     }
     public void ShowBanner(string adUnitId)
@@ -107,7 +113,7 @@ internal class AndroidDelegate : PlatformDelegate
     {
         var callback = new LoadCallbackProxy();
 
-        // Wire up all events - now using MeticaAd and string directly
+        // Wire up all events
         callback.AdLoadSuccess += (meticaAd) => InterstitialAdLoadSuccess?.Invoke(meticaAd);
         callback.AdLoadFailed += (error) => InterstitialAdLoadFailed?.Invoke(error);
 
