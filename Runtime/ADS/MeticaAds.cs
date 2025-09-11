@@ -1,131 +1,134 @@
 #nullable enable
 
 using System.Threading.Tasks;
-using Metica.ADS.Android;
+using Metica.ADS.UnityPlayer;
 using Metica.SDK;
 
+// ReSharper disable once CheckNamespace
 namespace Metica.ADS 
 {
     public static class MeticaAds
     {   
         public const string TAG = "MeticaUnityPlugin";
-        private static readonly PlatformDelegate platformDelegate;
+        private static readonly PlatformDelegate PlatformDelegate;
 
         static MeticaAds()
         {
-#if UNITY_ANDROID
-            platformDelegate = new AndroidDelegate(AndroidUnityBridge.UnityBridgeClass, AndroidUnityBridge.MeticaAdsExternalTrackerClass);
-#elif UNITY_IOS
-            platformDelegate = new IOS.IOSDelegate();
-#elif UNITY_EDITOR
-            platformDelegate = new UnityPlayerDelegate();
+
+#if UNITY_EDITOR
+            // Check for Unity Editor first since the editor also responds to the currently selected platform.
+            PlatformDelegate = new UnityPlayerDelegate();
+#elif UNITY_ANDROID
+            PlatformDelegate = new Android.AndroidDelegate(AndroidUnityBridge.UnityBridgeClass, AndroidUnityBridge.MeticaAdsExternalTrackerClass);
+#elif UNITY_IPHONE || UNITY_IOS
+            PlatformDelegate = new IOS.IOSDelegate();
 #else
-            throw new PlatformNotSupportedException("MeticaAds is only supported on Android, iOS, and Unity Editor platforms.");
+            PlatformDelegate = new UnityPlayer.UnityPlayerDelegate();
 #endif
             // Banner ad callbacks
-            platformDelegate.BannerAdLoadSuccess += MeticaAdsCallbacks.Banner.OnAdLoadSuccessInternal;
-            platformDelegate.BannerAdLoadFailed += MeticaAdsCallbacks.Banner.OnAdLoadFailedInternal;
-            platformDelegate.BannerAdClicked += MeticaAdsCallbacks.Banner.OnAdClickedInternal;
-            platformDelegate.BannerAdRevenuePaid += MeticaAdsCallbacks.Banner.OnAdRevenuePaidInternal;
+            PlatformDelegate.BannerAdLoadSuccess += MeticaAdsCallbacks.Banner.OnAdLoadSuccessInternal;
+            PlatformDelegate.BannerAdLoadFailed += MeticaAdsCallbacks.Banner.OnAdLoadFailedInternal;
+            PlatformDelegate.BannerAdClicked += MeticaAdsCallbacks.Banner.OnAdClickedInternal;
+            PlatformDelegate.BannerAdRevenuePaid += MeticaAdsCallbacks.Banner.OnAdRevenuePaidInternal;
             
             // Interstitial ad callbacks
-            platformDelegate.InterstitialAdLoadSuccess += MeticaAdsCallbacks.Interstitial.OnAdLoadSuccessInternal;
-            platformDelegate.InterstitialAdLoadFailed += MeticaAdsCallbacks.Interstitial.OnAdLoadFailedInternal;
-            platformDelegate.InterstitialAdShowSuccess += MeticaAdsCallbacks.Interstitial.OnAdShowSuccessInternal;
-            platformDelegate.InterstitialAdShowFailed += MeticaAdsCallbacks.Interstitial.OnAdShowFailedInternal;
-            platformDelegate.InterstitialAdHidden += MeticaAdsCallbacks.Interstitial.OnAdHiddenInternal;
-            platformDelegate.InterstitialAdClicked += MeticaAdsCallbacks.Interstitial.OnAdClickedInternal;
-            platformDelegate.InterstitialAdRevenuePaid += MeticaAdsCallbacks.Interstitial.OnAdRevenuePaidInternal;
+            PlatformDelegate.InterstitialAdLoadSuccess += MeticaAdsCallbacks.Interstitial.OnAdLoadSuccessInternal;
+            PlatformDelegate.InterstitialAdLoadFailed += MeticaAdsCallbacks.Interstitial.OnAdLoadFailedInternal;
+            PlatformDelegate.InterstitialAdShowSuccess += MeticaAdsCallbacks.Interstitial.OnAdShowSuccessInternal;
+            PlatformDelegate.InterstitialAdShowFailed += MeticaAdsCallbacks.Interstitial.OnAdShowFailedInternal;
+            PlatformDelegate.InterstitialAdHidden += MeticaAdsCallbacks.Interstitial.OnAdHiddenInternal;
+            PlatformDelegate.InterstitialAdClicked += MeticaAdsCallbacks.Interstitial.OnAdClickedInternal;
+            PlatformDelegate.InterstitialAdRevenuePaid += MeticaAdsCallbacks.Interstitial.OnAdRevenuePaidInternal;
             
             // Rewarded ad callbacks
-            platformDelegate.RewardedAdLoadSuccess += MeticaAdsCallbacks.Rewarded.OnAdLoadSuccessInternal;
-            platformDelegate.RewardedAdLoadFailed += MeticaAdsCallbacks.Rewarded.OnAdLoadFailedInternal;
-            platformDelegate.RewardedAdShowSuccess += MeticaAdsCallbacks.Rewarded.OnAdShowSuccessInternal;
-            platformDelegate.RewardedAdShowFailed += MeticaAdsCallbacks.Rewarded.OnAdShowFailedInternal;
-            platformDelegate.RewardedAdHidden += MeticaAdsCallbacks.Rewarded.OnAdHiddenInternal;
-            platformDelegate.RewardedAdClicked += MeticaAdsCallbacks.Rewarded.OnAdClickedInternal;
-            platformDelegate.RewardedAdRewarded += MeticaAdsCallbacks.Rewarded.OnAdRewardedInternal;
-            platformDelegate.RewardedAdRevenuePaid += MeticaAdsCallbacks.Rewarded.OnAdRevenuePaidInternal;
+            PlatformDelegate.RewardedAdLoadSuccess += MeticaAdsCallbacks.Rewarded.OnAdLoadSuccessInternal;
+            PlatformDelegate.RewardedAdLoadFailed += MeticaAdsCallbacks.Rewarded.OnAdLoadFailedInternal;
+            PlatformDelegate.RewardedAdShowSuccess += MeticaAdsCallbacks.Rewarded.OnAdShowSuccessInternal;
+            PlatformDelegate.RewardedAdShowFailed += MeticaAdsCallbacks.Rewarded.OnAdShowFailedInternal;
+            PlatformDelegate.RewardedAdHidden += MeticaAdsCallbacks.Rewarded.OnAdHiddenInternal;
+            PlatformDelegate.RewardedAdClicked += MeticaAdsCallbacks.Rewarded.OnAdClickedInternal;
+            PlatformDelegate.RewardedAdRewarded += MeticaAdsCallbacks.Rewarded.OnAdRewardedInternal;
+            PlatformDelegate.RewardedAdRevenuePaid += MeticaAdsCallbacks.Rewarded.OnAdRevenuePaidInternal;
         }
 
         public static async Task<bool> InitializeAsync(MeticaConfiguration configuration)
         {
-            return await platformDelegate.InitializeAsync(MeticaSdk.ApiKey, MeticaSdk.AppId, MeticaSdk.CurrentUserId, MeticaSdk.Version, MeticaSdk.BaseEndpoint, configuration);
+            return await PlatformDelegate.InitializeAsync(MeticaSdk.ApiKey, MeticaSdk.AppId, MeticaSdk.CurrentUserId, MeticaSdk.Version, MeticaSdk.BaseEndpoint, configuration);
         }
         public static void SetLogEnabled(bool logEnabled) 
         {
-            platformDelegate.SetLogEnabled(logEnabled);
+            PlatformDelegate.SetLogEnabled(logEnabled);
         }
         
         public static void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
         {
-            platformDelegate.CreateBanner(bannerAdUnitId, position);
+            PlatformDelegate.CreateBanner(bannerAdUnitId, position);
         }
         
         // Banner ad methods
         public static void ShowBanner(string adUnitId)
         {
             
-            platformDelegate.ShowBanner(adUnitId);
+            PlatformDelegate.ShowBanner(adUnitId);
         }
         public static void HideBanner(string adUnitId)
         {
-            platformDelegate.HideBanner(adUnitId);
+            PlatformDelegate.HideBanner(adUnitId);
         }
         
         public static void DestroyBanner(string adUnitId)
         {
-            platformDelegate.DestroyBanner(adUnitId);
+            PlatformDelegate.DestroyBanner(adUnitId);
         }
         
         // Interstitial ad methods
         public static void LoadInterstitial()
         {
-            platformDelegate.LoadInterstitial();
+            PlatformDelegate.LoadInterstitial();
         }
         public static void ShowInterstitial()
         {
-            platformDelegate.ShowInterstitial();
+            PlatformDelegate.ShowInterstitial();
         }
         public static bool IsInterstitialReady()
         {
-            return platformDelegate.IsInterstitialReady();
+            return PlatformDelegate.IsInterstitialReady();
         }
         
         // Rewarded ad methods
         public static void LoadRewarded()
         {
-            platformDelegate.LoadRewarded();
+            PlatformDelegate.LoadRewarded();
         }
         public static void ShowRewarded()
         {
-            platformDelegate.ShowRewarded();
+            PlatformDelegate.ShowRewarded();
         }
         public static bool IsRewardedReady()
         {
-            return platformDelegate.IsRewardedReady();
+            return PlatformDelegate.IsRewardedReady();
         }
 
         public static void NotifyAdLoadAttempt(string interstitialAdUnitId)
         {
-            platformDelegate.NotifyAdLoadAttempt(interstitialAdUnitId);
+            PlatformDelegate.NotifyAdLoadAttempt(interstitialAdUnitId);
         }
 
         public static void NotifyAdLoadSuccess(MeticaAd meticaAd)
         {
-            platformDelegate.NotifyAdLoadSuccess(meticaAd);
+            PlatformDelegate.NotifyAdLoadSuccess(meticaAd);
         }
 
         public static void NotifyAdLoadFailed(string adUnitId, string error)
         {
-            platformDelegate.NotifyAdLoadFailed(adUnitId, error);
+            PlatformDelegate.NotifyAdLoadFailed(adUnitId, error);
         }
 
         public static void NotifyAdShowSuccess(MeticaAd meticaAd)
         {
             // Internally we use the NotifyAdRevenue call, but externally as to not
             // break API we use NotifyAdShowSuccess. Which is similar as both will tel you ad was shown.
-            platformDelegate.NotifyAdRevenue(meticaAd);
+            PlatformDelegate.NotifyAdRevenue(meticaAd);
         }
     }
 }

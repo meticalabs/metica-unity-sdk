@@ -14,7 +14,7 @@ namespace Metica.Unity
     /// Unity implementation of <see cref="IDeviceInfoProvider"/>.
     /// The obtained information is cached so it is collected <b>once</b> and remains unchanged for the whole application lifetime.
     /// </summary>
-    internal class DeviceInfoProvider : IDeviceInfoProvider
+    public class DeviceInfoProvider : IDeviceInfoProvider
     {
         private readonly Lazy<DeviceInfo> _cachedDeviceInfo = new Lazy<DeviceInfo>(() => CreateDeviceInfo());
         private readonly Lazy<string> _cachedHashedDeviceId = new Lazy<string>(() =>
