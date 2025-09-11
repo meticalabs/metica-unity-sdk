@@ -7,6 +7,12 @@ namespace Metica.ADS
 {
 internal interface PlatformDelegate 
 {
+    // Events for banner ad lifecycle callbacks
+    public event Action<MeticaAd> BannerAdLoadSuccess;
+    public event Action<string> BannerAdLoadFailed;
+    public event Action<MeticaAd> BannerAdClicked;
+    public event Action<MeticaAd> BannerAdRevenuePaid;
+    
     // Events for interstitial ad lifecycle callbacks
     public event Action<MeticaAd> InterstitialAdLoadSuccess;
     public event Action<string> InterstitialAdLoadFailed;
@@ -30,6 +36,12 @@ internal interface PlatformDelegate
         MeticaConfiguration configuration);
     void SetLogEnabled(bool logEnabled);
             
+    // Banner methods
+    void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position);
+    void ShowBanner(string adUnitId);
+    void HideBanner(string adUnitId);
+    void DestroyBanner(string adUnitId);
+
     // Interstitial methods
     void LoadInterstitial();
     void ShowInterstitial();

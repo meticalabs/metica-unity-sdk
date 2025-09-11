@@ -19,12 +19,17 @@ namespace Metica.ADS
             // Check for Unity Editor first since the editor also responds to the currently selected platform.
             PlatformDelegate = new UnityPlayerDelegate();
 #elif UNITY_ANDROID
-            platformDelegate = new Android.AndroidDelegate(AndroidUnityBridge.UnityBridgeClass, AndroidUnityBridge.MeticaAdsExternalTrackerClass);
+            PlatformDelegate = new Android.AndroidDelegate(AndroidUnityBridge.UnityBridgeClass, AndroidUnityBridge.MeticaAdsExternalTrackerClass);
 #elif UNITY_IPHONE || UNITY_IOS
-            platformDelegate = new IOS.IOSDelegate();
+            PlatformDelegate = new IOS.IOSDelegate();
 #else
-            platformDelegate = new UnityPlayer.UnityPlayerDelegate();
+            PlatformDelegate = new UnityPlayer.UnityPlayerDelegate();
 #endif
+            // Banner ad callbacks
+            PlatformDelegate.BannerAdLoadSuccess += MeticaAdsCallbacks.Banner.OnAdLoadSuccessInternal;
+            PlatformDelegate.BannerAdLoadFailed += MeticaAdsCallbacks.Banner.OnAdLoadFailedInternal;
+            PlatformDelegate.BannerAdClicked += MeticaAdsCallbacks.Banner.OnAdClickedInternal;
+            PlatformDelegate.BannerAdRevenuePaid += MeticaAdsCallbacks.Banner.OnAdRevenuePaidInternal;
             
             // Interstitial ad callbacks
             PlatformDelegate.InterstitialAdLoadSuccess += MeticaAdsCallbacks.Interstitial.OnAdLoadSuccessInternal;
@@ -53,6 +58,27 @@ namespace Metica.ADS
         public static void SetLogEnabled(bool logEnabled) 
         {
             PlatformDelegate.SetLogEnabled(logEnabled);
+        }
+        
+        public static void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
+        {
+            PlatformDelegate.CreateBanner(bannerAdUnitId, position);
+        }
+        
+        // Banner ad methods
+        public static void ShowBanner(string adUnitId)
+        {
+            
+            PlatformDelegate.ShowBanner(adUnitId);
+        }
+        public static void HideBanner(string adUnitId)
+        {
+            PlatformDelegate.HideBanner(adUnitId);
+        }
+        
+        public static void DestroyBanner(string adUnitId)
+        {
+            PlatformDelegate.DestroyBanner(adUnitId);
         }
         
         // Interstitial ad methods

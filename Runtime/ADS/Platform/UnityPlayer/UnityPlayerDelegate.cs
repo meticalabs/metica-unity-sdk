@@ -7,6 +7,10 @@ namespace Metica.ADS.UnityPlayer
 internal class UnityPlayerDelegate : PlatformDelegate
 {
     // Mock events - these won't actually fire in editor
+    public event Action<MeticaAd> BannerAdLoadSuccess;
+    public event Action<string> BannerAdLoadFailed;
+    public event Action<MeticaAd> BannerAdClicked;
+    public event Action<MeticaAd> BannerAdRevenuePaid;
     public event Action<MeticaAd> InterstitialAdLoadSuccess;
     public event Action<string> InterstitialAdLoadFailed;
     public event Action<MeticaAd> InterstitialAdShowSuccess;
@@ -34,6 +38,27 @@ internal class UnityPlayerDelegate : PlatformDelegate
     public void SetLogEnabled(bool logEnabled)
     {
         Debug.Log($"[MeticaAds Unity] Mock SetLogEnabled: {logEnabled}");
+    }
+
+    public void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
+    {
+        Debug.Log("[MeticaAds Unity] Mock CreateBanner called");
+    }
+
+    public void ShowBanner(string adUnitId)
+    {
+        Debug.Log("[MeticaAds Unity] Mock ShowBanner called");
+    }
+
+    public void HideBanner(string adUnitId)
+    {
+        Debug.Log("[MeticaAds Unity] Mock HideBanner called");
+
+    }
+
+    public void DestroyBanner(string adUnitId)
+    {
+        Debug.Log("[MeticaAds Unity] Mock DestroyBanner called");
     }
 
     public void LoadInterstitial()

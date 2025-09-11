@@ -21,7 +21,13 @@ internal class AndroidDelegate : PlatformDelegate
     private readonly AndroidJavaClass _unityBridgeAndroidClass;
     private readonly AndroidJavaClass _meticaAdsExternalTrackerAndroidClass;
 
-    // Events for interstitial ad lifecycle callbacks - updated signatures
+    // Events for banner ad lifecycle callbacks
+    public event Action<MeticaAd> BannerAdLoadSuccess;
+    public event Action<string> BannerAdLoadFailed;
+    public event Action<MeticaAd> BannerAdClicked;
+    public event Action<MeticaAd> BannerAdRevenuePaid;
+    
+    // Events for interstitial ad lifecycle callbacks
     public event Action<MeticaAd> InterstitialAdLoadSuccess;
     public event Action<string> InterstitialAdLoadFailed;
     public event Action<MeticaAd> InterstitialAdShowSuccess;
@@ -30,7 +36,7 @@ internal class AndroidDelegate : PlatformDelegate
     public event Action<MeticaAd> InterstitialAdClicked;
     public event Action<MeticaAd> InterstitialAdRevenuePaid;
 
-    // Events for rewarded ad lifecycle callbacks - updated signatures
+    // Events for rewarded ad lifecycle callbacks
     public event Action<MeticaAd> RewardedAdLoadSuccess;
     public event Action<string> RewardedAdLoadFailed;
     public event Action<MeticaAd> RewardedAdShowSuccess;
@@ -57,14 +63,57 @@ internal class AndroidDelegate : PlatformDelegate
         return tcs.Task;
     }
 
+    // Banner methods
+    public void CreateBanner(string adUnitId, MeticaBannerPosition position)
+    {
+        var callback = new BannerCallbackProxy();
+        callback.AdLoadSuccess += (meticaAd) => BannerAdLoadSuccess?.Invoke(meticaAd);
+        callback.AdLoadFailed += (error) => BannerAdLoadFailed?.Invoke(error);
+        callback.AdClicked += (meticaAd) => BannerAdClicked?.Invoke(meticaAd);
+        callback.AdRevenuePaid += (meticaAd) => BannerAdRevenuePaid?.Invoke(meticaAd);
+
+        // On Native side the matrix is:
+        //  0 -> top position
+        // -1 -> bottom position
+        var yPosition = position switch
+        {
+            MeticaBannerPosition.Bottom => -1,
+            MeticaBannerPosition.Top => 0,
+            _ => 0,
+        };
+        
+        
+        Debug.Log($"{TAG} About to call Android createBanner method");
+        _unityBridgeAndroidClass.CallStatic("createBanner", adUnitId, yPosition, callback);
+        Debug.Log($"{TAG} Android createBanner method called");
+    }
+    public void ShowBanner(string adUnitId)
+    {
+        Debug.Log($"{TAG} About to call Android showBanner method");
+        _unityBridgeAndroidClass.CallStatic("showBanner", adUnitId);
+        Debug.Log($"{TAG} Android showBanner method called");
+    }
+
+    public void HideBanner(string adUnitId)
+    {
+        Debug.Log($"{TAG} About to call Android hideBanner method");
+        _unityBridgeAndroidClass.CallStatic("hideBanner", adUnitId);
+        Debug.Log($"{TAG} Android hideBanner method called");
+    }
+
+    public void DestroyBanner(string adUnitId)
+    {
+        Debug.Log($"{TAG} About to call Android destroyBanner method");
+        _unityBridgeAndroidClass.CallStatic("destroyBanner", adUnitId);
+        Debug.Log($"{TAG} Android destroyBanner method called");
+    }
+    
     // Interstitial methods
     public void LoadInterstitial()
     {
-        Debug.Log($"{TAG} LoadInterstitial called");
-
         var callback = new LoadCallbackProxy();
 
-        // Wire up all events - now using MeticaAd and string directly
+        // Wire up all events
         callback.AdLoadSuccess += (meticaAd) => InterstitialAdLoadSuccess?.Invoke(meticaAd);
         callback.AdLoadFailed += (error) => InterstitialAdLoadFailed?.Invoke(error);
 
@@ -75,8 +124,6 @@ internal class AndroidDelegate : PlatformDelegate
 
     public void ShowInterstitial()
     {
-        Debug.Log($"{TAG} ShowInterstitial called");
-
         var callback = new ShowCallbackProxy();
 
         // Wire up all events - now using MeticaAd objects directly
@@ -99,8 +146,6 @@ internal class AndroidDelegate : PlatformDelegate
     // Rewarded methods
     public void LoadRewarded()
     {
-        Debug.Log($"{TAG} LoadRewarded called");
-
         var callback = new LoadCallbackProxy();
 
         // Wire up all events - now using MeticaAd and string directly
@@ -114,8 +159,6 @@ internal class AndroidDelegate : PlatformDelegate
 
     public void ShowRewarded()
     {
-        Debug.Log($"{TAG} ShowRewarded called");
-
         var callback = new ShowCallbackProxy();
 
         // Wire up all events - now using MeticaAd objects directly
