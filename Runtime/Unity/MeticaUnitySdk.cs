@@ -17,14 +17,18 @@ namespace Metica.Unity
 
         private void Awake()
         {
-            // Register implementations before anything else. These are Unity implementations.
-            Registry.Register<IDeviceInfoProvider>(new DeviceInfoProvider());
-            Registry.Register<ILog>(new MeticaLogger(_sdkConfigProvider.SdkConfig.logLevel));
-
+            RegisterUnityServices(_sdkConfigProvider.SdkConfig);
             // Initialize Metica SDK.
             _meticaSdk = new MeticaSdk(_sdkConfigProvider.SdkConfig);
 
             DontDestroyOnLoad(this);
+        }
+
+        public static void RegisterUnityServices(SdkConfig sdkConfig)
+        {
+            // Register implementations before anything else. These are Unity implementations.
+            Registry.Register<IDeviceInfoProvider>(new DeviceInfoProvider());
+            Registry.Register<ILog>(new MeticaLogger(sdkConfig.logLevel));
         }
 
         private async void OnApplicationFocus(bool focus)

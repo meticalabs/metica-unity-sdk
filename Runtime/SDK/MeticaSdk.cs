@@ -7,7 +7,7 @@ using Metica.SDK.Model;
 
 namespace Metica.SDK
 {
-    public interface IMeticaSdk
+    public interface IMeticaSdk : IAsyncDisposable
     {
         Task<ConfigResult> GetConfigsAsync(List<string> configKeys = null, Dictionary<string, object> userData = null);
         [Obsolete]
@@ -30,7 +30,7 @@ namespace Metica.SDK
         void RequestDispatchEvents();
     }
 
-    public class MeticaSdk : IMeticaSdk, IAsyncDisposable
+    public class MeticaSdk : IMeticaSdk
     {
         #region Fields
 
