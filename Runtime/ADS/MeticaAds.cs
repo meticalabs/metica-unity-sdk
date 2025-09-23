@@ -1,7 +1,6 @@
 #nullable enable
 
 using System.Threading.Tasks;
-using Metica.ADS.UnityPlayer;
 using Metica.SDK;
 
 // ReSharper disable once CheckNamespace
@@ -17,13 +16,13 @@ namespace Metica.ADS
 
 #if UNITY_EDITOR
             // Check for Unity Editor first since the editor also responds to the currently selected platform.
-            PlatformDelegate = new UnityPlayerDelegate();
+            PlatformDelegate = GetUnityPlayerDelegate();
 #elif UNITY_ANDROID
             PlatformDelegate = new Android.AndroidDelegate(AndroidUnityBridge.UnityBridgeClass, AndroidUnityBridge.MeticaAdsExternalTrackerClass);
 #elif UNITY_IPHONE || UNITY_IOS
             PlatformDelegate = new IOS.IOSDelegate();
 #else
-            PlatformDelegate = new UnityPlayer.UnityPlayerDelegate();
+            PlatformDelegate = GetUnityPlayerDelegate();
 #endif
             // Banner ad callbacks
             PlatformDelegate.BannerAdLoadSuccess += MeticaAdsCallbacks.Banner.OnAdLoadSuccessInternal;
@@ -129,6 +128,13 @@ namespace Metica.ADS
             // Internally we use the NotifyAdRevenue call, but externally as to not
             // break API we use NotifyAdShowSuccess. Which is similar as both will tel you ad was shown.
             PlatformDelegate.NotifyAdRevenue(meticaAd);
+        }
+        
+        private static UnityPlayer.UnityPlayerDelegate GetUnityPlayerDelegate()
+        {
+            // IMPORTANT: DO NOT IMPORT THE QUALIFIER  `UnityPlayer.`. 
+            // Otherwise, Jetbrains Rider could remove unused qualifiers when commiting.
+            return new UnityPlayer.UnityPlayerDelegate();
         }
     }
 }
