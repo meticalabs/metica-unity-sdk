@@ -102,7 +102,7 @@ namespace Metica.SDK
             // Initialize an EventManager with _offerManager as IMeticaAttributesProvider
             _eventManager = new EventManager(_http, $"{Config.baseEndpoint}/ingest/v1/events", _offerManager, config.eventsLogDispatchMaxQueueSize);
             // Set the current (mutable) CurrentUserId with the initial value given in the configuration
-            CurrentUserId = Config.initialUserId;
+            CurrentUserId = null; // Config.initialUserId;
             ApiKey = Config.apiKey;
             AppId = Config.appId;
             BaseEndpoint = Config.baseEndpoint;
