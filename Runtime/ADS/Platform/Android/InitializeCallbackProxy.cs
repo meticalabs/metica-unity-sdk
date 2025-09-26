@@ -1,36 +1,42 @@
-// InitializeCallbackProxy.cs
-
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Metica.ADS
+namespace Metica.ADS.Android
 {
-[SuppressMessage("ReSharper", "InconsistentNaming")]
-public class InitializeCallbackProxy : AndroidJavaProxy
-{
-    private const string TAG = MeticaAds.TAG;
-    private readonly TaskCompletionSource<bool> _tcs;
-
-    public InitializeCallbackProxy(TaskCompletionSource<bool> tcs)
-        : base("com.metica.MeticaInitCallback")
+    internal class InitializeCallbackProxy : AndroidJavaProxy
     {
-        Debug.Log($"{TAG} MeticaAdsInitCallback created");
-        _tcs = tcs;
-    }
+        private readonly TaskCompletionSource<MeticaAdsInitializationResult> _taskCompletionSource;
 
-    // Called from Android when initialization succeeds
-    public void onInitialized(bool adsEnabled)
-    {
-        Debug.Log($"{TAG} onInitialized: {adsEnabled}");
-        _tcs.SetResult(adsEnabled);
-    }
+        public InitializeCallbackProxy(TaskCompletionSource<MeticaAdsInitializationResult> taskCompletionSource)
+            : base("com.metica.ads.unity.InitializeCallback")
+        {
+            _taskCompletionSource = taskCompletionSource;
+        }
 
-    // Called from Android when initialization fails
-    public void onFailed(string reason)
-    {
-        Debug.Log($"{TAG} onFailed: {reason}");
-        _tcs.SetResult(false);
+        public void onInitializeSuccess(bool isEnabled, string status)
+        {
+            Debug.Log($"[Metica] Initialize success: isEnabled={isEnabled}, status={status}");
+
+            if (isEnabled)
+            {
+                var result = new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.Normal);
+                _taskCompletionSource.SetResult(result);
+            }
+            else
+            {
+                var result = new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.Holdout);
+                _taskCompletionSource.SetResult(result);
+            }
+        }
+
+        public void onInitializeFailed(string error)
+        {
+            Debug.LogError($"[Metica] Initialize failed: {error}");
+
+            // On failure, we could set a specific status or create a failed result
+            // For now, let's use a hypothetical "Failed" status or handle as exception
+            var result = new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError);
+            _taskCompletionSource.SetResult(result);
+        }
     }
-}
 }
