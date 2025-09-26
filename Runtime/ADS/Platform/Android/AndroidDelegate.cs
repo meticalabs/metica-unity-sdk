@@ -170,7 +170,7 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdRevenuePaid += (meticaAd) => RewardedAdRevenuePaid?.Invoke(meticaAd);
 
         Debug.Log($"{TAG} About to call Android showRewarded method");
-        _unityBridgeAndroidClass.CallStatic("showRewarded", callback);
+        MaxSdk.ShowRewardedAd("0fdedfeb3c56e0c3"); // Used our test ID
         Debug.Log($"{TAG} Android showRewarded method called");
     }
 
