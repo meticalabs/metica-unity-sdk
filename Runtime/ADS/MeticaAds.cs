@@ -52,15 +52,7 @@ namespace Metica.ADS
 
         public static async Task<bool> InitializeAsync(MeticaConfiguration configuration)
         {
-            MeticaAdsInitializationResult result = await PlatformDelegate.InitializeAsync(
-                MeticaSdk.ApiKey,
-                MeticaSdk.AppId,
-                MeticaSdk.CurrentUserId,
-                MeticaSdk.Version,
-                MeticaSdk.BaseEndpoint,
-                configuration
-            );
-            return result.IsMeticaAdsEnabled;
+            return InitializeWithResultAsync(configuration).Result.IsMeticaAdsEnabled;
         }
 
         public static async Task<MeticaAdsInitializationResult> InitializeWithResultAsync(MeticaConfiguration configuration)
