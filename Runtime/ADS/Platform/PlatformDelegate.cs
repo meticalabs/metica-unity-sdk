@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 
 namespace Metica.ADS
 {
-internal interface PlatformDelegate
+internal interface PlatformDelegate 
 {
     // Events for banner ad lifecycle callbacks
     public event Action<MeticaAd> BannerAdLoadSuccess;
     public event Action<string> BannerAdLoadFailed;
     public event Action<MeticaAd> BannerAdClicked;
     public event Action<MeticaAd> BannerAdRevenuePaid;
-
+    
     // Events for interstitial ad lifecycle callbacks
     public event Action<MeticaAd> InterstitialAdLoadSuccess;
     public event Action<string> InterstitialAdLoadFailed;
@@ -21,7 +21,7 @@ internal interface PlatformDelegate
     public event Action<MeticaAd> InterstitialAdHidden;
     public event Action<MeticaAd> InterstitialAdClicked;
     public event Action<MeticaAd> InterstitialAdRevenuePaid;
-
+            
     // Events for rewarded ad lifecycle callbacks
     public event Action<MeticaAd> RewardedAdLoadSuccess;
     public event Action<string> RewardedAdLoadFailed;
@@ -32,16 +32,10 @@ internal interface PlatformDelegate
     public event Action<MeticaAd> RewardedAdRewarded;
     public event Action<MeticaAd> RewardedAdRevenuePaid;
 
-    Task<MeticaAdsInitializationResult> InitializeAsync(
-        string apiKey,
-        string appId,
-        string userId,
-        string version,
-        string baseEndpoint,
-        MeticaConfiguration configuration
-    );
+    Task<bool> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
+        MeticaConfiguration configuration);
     void SetLogEnabled(bool logEnabled);
-
+            
     // Banner methods
     void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position);
     void ShowBanner(string adUnitId);
@@ -52,13 +46,13 @@ internal interface PlatformDelegate
     void LoadInterstitial();
     void ShowInterstitial();
     bool IsInterstitialReady();
-
+            
     // Rewarded methods
     void LoadRewarded();
     void ShowRewarded();
     bool IsRewardedReady();
-
-    // Notification methods
+    
+    // Notification methods  
     void NotifyAdLoadAttempt(string adUnitId);
     void NotifyAdLoadSuccess(MeticaAd meticaAd);
     void NotifyAdLoadFailed(string adUnitId, string error);

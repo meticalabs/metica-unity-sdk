@@ -16,7 +16,7 @@ internal class IOSDelegate : PlatformDelegate
     public event Action<string> BannerAdLoadFailed;
     public event Action<MeticaAd> BannerAdClicked;
     public event Action<MeticaAd> BannerAdRevenuePaid;
-
+    
     // Events for interstitial ad lifecycle callbacks
     public event Action<MeticaAd> InterstitialAdLoadSuccess;
     public event Action<string> InterstitialAdLoadFailed;
@@ -56,13 +56,11 @@ internal class IOSDelegate : PlatformDelegate
     {
     }
 
-    public Task<MeticaAdsInitializationResult> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
+    public Task<bool> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
         MeticaConfiguration configuration)
     {
-        var tcs = new TaskCompletionSource<MeticaAdsInitializationResult>();
-        tcs.SetResult(
-            new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
-        );
+        var tcs = new TaskCompletionSource<bool>();
+        tcs.SetResult(false);
         return tcs.Task;
     }
 
@@ -83,12 +81,12 @@ internal class IOSDelegate : PlatformDelegate
     // Rewarded methods
     public void LoadRewarded()
     {
-
+     
     }
 
     public void ShowRewarded()
     {
-
+    
     }
 
     public bool IsRewardedReady()
