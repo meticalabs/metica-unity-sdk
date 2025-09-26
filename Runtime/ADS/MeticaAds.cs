@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Metica.SDK;
 
 // ReSharper disable once CheckNamespace
-namespace Metica.ADS 
+namespace Metica.ADS
 {
     public static class MeticaAds
     {   
@@ -52,8 +52,22 @@ namespace Metica.ADS
 
         public static async Task<bool> InitializeAsync(MeticaConfiguration configuration)
         {
-            return await PlatformDelegate.InitializeAsync(MeticaSdk.ApiKey, MeticaSdk.AppId, MeticaSdk.CurrentUserId, MeticaSdk.Version, MeticaSdk.BaseEndpoint, configuration);
+            var result = await InitializeWithResultAsync(configuration);
+            return result.IsMeticaAdsEnabled;
         }
+
+        public static async Task<MeticaAdsInitializationResult> InitializeWithResultAsync(MeticaConfiguration configuration)
+        {
+            return await PlatformDelegate.InitializeAsync(
+                MeticaSdk.ApiKey,
+                MeticaSdk.AppId,
+                MeticaSdk.CurrentUserId,
+                MeticaSdk.Version,
+                MeticaSdk.BaseEndpoint,
+                configuration
+            );
+        }
+
         public static void SetLogEnabled(bool logEnabled) 
         {
             PlatformDelegate.SetLogEnabled(logEnabled);

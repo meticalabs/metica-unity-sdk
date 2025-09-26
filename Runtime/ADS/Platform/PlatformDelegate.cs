@@ -32,8 +32,14 @@ internal interface PlatformDelegate
     public event Action<MeticaAd> RewardedAdRewarded;
     public event Action<MeticaAd> RewardedAdRevenuePaid;
 
-    Task<bool> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
-        MeticaConfiguration configuration);
+    Task<MeticaAdsInitializationResult> InitializeAsync(
+        string apiKey,
+        string appId,
+        string userId,
+        string version,
+        string baseEndpoint,
+        MeticaConfiguration configuration
+    );
     void SetLogEnabled(bool logEnabled);
             
     // Banner methods
