@@ -22,6 +22,6 @@ namespace Metica.ADS
             }
         }
 
-        private MeticaAdsAssignmentStatus Status { get; }
+        public MeticaAdsAssignmentStatus Status { get; }
     }
 }
