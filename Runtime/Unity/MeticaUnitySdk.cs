@@ -2,6 +2,7 @@ using UnityEngine;
 
 using Metica.Core;
 using Metica.SDK;
+using System;
 
 namespace Metica.Unity
 {
@@ -17,23 +18,33 @@ namespace Metica.Unity
 
         private void Awake()
         {
-            RegisterUnityServices(_sdkConfigProvider.SdkConfig);
             // Initialize Metica SDK.
-            _meticaSdk = new MeticaSdk(_sdkConfigProvider.SdkConfig);
+            _meticaSdk = Initialize(_sdkConfigProvider.SdkConfig);
 
             DontDestroyOnLoad(this);
         }
 
-        public static void RegisterUnityServices(SdkConfig sdkConfig)
+        private static void RegisterUnityServices(SdkConfig sdkConfig)
         {
             // Register implementations before anything else. These are Unity implementations.
             Registry.Register<IDeviceInfoProvider>(new DeviceInfoProvider());
             Registry.Register<ILog>(new MeticaLogger(sdkConfig.logLevel));
         }
 
+        /// <summary>
+        /// Creates and returns an instance of <see cref="MeticaSdk"/> with Unity implementations of needed services.
+        /// </summary>
+        /// <param name="sdkConfig">A Metica SDK configuration object.</param>
+        /// <returns>A new <see cref="MeticaSdk"/> instance.</returns>
+        public static MeticaSdk Initialize(SdkConfig sdkConfig)
+        {
+            RegisterUnityServices(sdkConfig);
+            return new MeticaSdk(sdkConfig);
+        }
+
         private async void OnApplicationFocus(bool focus)
         {
-            if(focus == false) // focus lost
+            if (focus == false) // focus lost
             {
                 _meticaSdk.RequestDispatchEvents();
             }

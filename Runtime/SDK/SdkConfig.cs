@@ -5,6 +5,7 @@ namespace Metica.SDK
     {
         public string apiKey;
         public string appId;
+        public string userId;
 
         private const string DefaultEndpoint = "https://api-gateway.prod-eu.metica.com";
 
@@ -78,6 +79,7 @@ namespace Metica.SDK
                 // Parameters for MeticaContext
                 apiKey = string.Empty,
                 appId = string.Empty,
+                userId = string.Empty,
                 // - - - - - - - - - -
                 baseEndpoint = DefaultEndpoint,
                 //maxDisplayLogEntries = 256,
