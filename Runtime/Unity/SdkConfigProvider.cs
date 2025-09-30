@@ -22,13 +22,13 @@ namespace Metica.Unity
             }
         }
 
-        private void OnValidate()
-        {
-            if (_sdkConfig.baseEndpoint.EndsWith('/'))
-            {
-                _sdkConfig.baseEndpoint = _sdkConfig.baseEndpoint.TrimEnd('/');
-            }
-        }
+        // private void OnValidate()
+        // {
+        //     if (_sdkConfig.baseEndpoint.EndsWith('/'))
+        //     {
+        //         _sdkConfig.baseEndpoint = _sdkConfig.baseEndpoint.TrimEnd('/');
+        //     }
+        // }
 #endif
 
     }

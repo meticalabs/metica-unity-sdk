@@ -91,7 +91,7 @@ namespace Metica.SDK
             // In the following code we compose our SDK
 
             _http = new HttpServiceDotnet(
-                requestTimeoutSeconds: config.httpRequestTimeout,
+                requestTimeoutSeconds: 60,
                 cacheGCTimeoutSeconds: 10,
                 cacheTTLSeconds: 60
                 ).WithPersistentHeaders(new Dictionary<string, string> { { "X-API-Key", Config.apiKey } });
@@ -100,7 +100,7 @@ namespace Metica.SDK
             // Initialize a ConfigManager
             _configManager = new ConfigManager(_http, $"{Config.baseEndpoint}/configs/v1/apps/{Config.appId}");
             // Initialize an EventManager with _offerManager as IMeticaAttributesProvider
-            _eventManager = new EventManager(_http, $"{Config.baseEndpoint}/ingest/v1/events", _offerManager, config.eventsLogDispatchMaxQueueSize);
+            _eventManager = new EventManager(_http, $"{Config.baseEndpoint}/ingest/v1/events", _offerManager);
             // Set the CurrentUserId with the initial value given in the configuration
             CurrentUserId = Config.userId;
             ApiKey = Config.apiKey;
