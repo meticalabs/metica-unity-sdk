@@ -1,8 +1,6 @@
 using UnityEngine;
 
-using Metica.SDK;
-
-namespace Metica.Unity
+namespace Metica.SDK.Unity
 {
     [CreateAssetMenu(fileName = "MeticaSdkConfiguration", menuName = "Metica/SDK/New SDK Configuration")]
     public class SdkConfigProvider: ScriptableObject, ISdkConfigProvider

@@ -1,8 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using System.IO;
-
-using Metica.Unity;
+using Metica.SDK.Unity;
 
 namespace Metica.UnityEd
 {

@@ -1,7 +1,6 @@
 #nullable enable
 
 using System.Threading.Tasks;
-using Metica.SDK;
 
 // ReSharper disable once CheckNamespace
 namespace Metica.ADS
@@ -50,6 +49,7 @@ namespace Metica.ADS
             PlatformDelegate.RewardedAdRevenuePaid += MeticaAdsCallbacks.Rewarded.OnAdRevenuePaidInternal;
         }
 
+        // TODO: unify following two initializations
         public static async Task<bool> InitializeAsync(MeticaConfiguration configuration)
         {
             var result = await InitializeWithResultAsync(configuration);
@@ -59,11 +59,11 @@ namespace Metica.ADS
         public static async Task<MeticaAdsInitializationResult> InitializeWithResultAsync(MeticaConfiguration configuration)
         {
             return await PlatformDelegate.InitializeAsync(
-                MeticaSdk.ApiKey,
-                MeticaSdk.AppId,
-                MeticaSdk.CurrentUserId,
-                MeticaSdk.Version,
-                MeticaSdk.BaseEndpoint,
+                configuration.ApiKey,
+                configuration.AppId,
+                configuration.UserId,
+                configuration.Version,
+                configuration.BaseEndpoint,
                 configuration
             );
         }

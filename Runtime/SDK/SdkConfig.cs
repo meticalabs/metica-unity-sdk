@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Metica.SDK
 {
     [System.Serializable]
@@ -7,6 +9,7 @@ namespace Metica.SDK
         public string appId;
         public string userId;
         public string baseEndpoint;
+        public Dictionary<string, string> customParameters;
 
         public static string ProductionEndpoint = "https://api-gateway.prod-eu.metica.com";
 

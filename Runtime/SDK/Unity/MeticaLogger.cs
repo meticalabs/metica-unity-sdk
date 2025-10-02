@@ -1,8 +1,7 @@
-using Metica.SDK;
 using System;
 using UnityEngine;
 
-namespace Metica.Unity
+namespace Metica.SDK.Unity
 {
     internal class MeticaLogger : ILog
     {

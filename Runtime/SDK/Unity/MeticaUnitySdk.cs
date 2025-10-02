@@ -1,10 +1,7 @@
 using UnityEngine;
-
 using Metica.Core;
-using Metica.SDK;
-using System;
 
-namespace Metica.Unity
+namespace Metica.SDK.Unity
 {
     public class MeticaUnitySdk : MonoBehaviour
     {
@@ -24,13 +21,6 @@ namespace Metica.Unity
             DontDestroyOnLoad(this);
         }
 
-        private static void RegisterUnityServices(SdkConfig sdkConfig)
-        {
-            // Register implementations before anything else. These are Unity implementations.
-            Registry.Register<IDeviceInfoProvider>(new DeviceInfoProvider());
-            Registry.Register<ILog>(new MeticaLogger(sdkConfig.logLevel));
-        }
-
         /// <summary>
         /// Creates and returns an instance of <see cref="MeticaSdk"/> with Unity implementations of needed services.
         /// </summary>
@@ -38,7 +28,8 @@ namespace Metica.Unity
         /// <returns>A new <see cref="MeticaSdk"/> instance.</returns>
         public static MeticaSdk Initialize(SdkConfig sdkConfig)
         {
-            RegisterUnityServices(sdkConfig);
+            Registry.Register<IDeviceInfoProvider>(new DeviceInfoProvider());
+            Registry.Register<ILog>(new MeticaLogger(sdkConfig.logLevel));
             return new MeticaSdk(sdkConfig);
         }
 
