@@ -49,7 +49,6 @@ namespace Metica.ADS
             PlatformDelegate.RewardedAdRevenuePaid += MeticaAdsCallbacks.Rewarded.OnAdRevenuePaidInternal;
         }
 
-        // TODO: unify following two initializations
         public static async Task<bool> InitializeAsync(MeticaConfiguration configuration)
         {
             var result = await InitializeWithResultAsync(configuration);

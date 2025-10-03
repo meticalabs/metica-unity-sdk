@@ -39,7 +39,7 @@ namespace Metica.SDK
 
         public static string Version { get => "1.13.4"; }
 
-        public static string CurrentUserId {  get; set; }
+        public static string UserId {  get; set; } // TODO: set should become private and require a reinitialization to cheange user id
         public static string ApiKey { get; private set; }
         public static string AppId { get; private set; }
         // TODO: remove apploving key fromm here in favour of
@@ -63,7 +63,7 @@ namespace Metica.SDK
         /// </summary>
         public static void ResetStaticFields()
         {
-            CurrentUserId = null;
+            UserId = null;
             ApiKey = null;
             AppId = null;
             BaseEndpoint = null;
@@ -127,7 +127,8 @@ namespace Metica.SDK
         /// <param name="config">Metica SDK configuration object.</param>
         public MeticaSdk(SdkConfig config)
         {
-            // 
+            // The following part will be soon be obsolete as
+            // it'll be implemented in MeticaAds.
             _http = new HttpServiceDotnet(
                 requestTimeoutSeconds: 60,
                 cacheGCTimeoutSeconds: 10,
@@ -140,21 +141,24 @@ namespace Metica.SDK
             // Initialize an EventManager with _offerManager as IMeticaAttributesProvider
             _eventManager = new EventManager(_http, $"{config.baseEndpoint}/ingest/v1/events", _offerManager);
             // Set the CurrentUserId with the initial value given in the configuration
-            CurrentUserId = config.userId;
+
+            //--/--/--/--/--/--/--/--/
+
+            UserId = config.userId;
             ApiKey = config.apiKey;
             AppId = config.appId;
             BaseEndpoint = config.baseEndpoint;
         }
 
         public async Task<OfferResult> GetOffersAsync(string[] placements, Dictionary<string, object> userData = null)
-            => await _offerManager.GetOffersAsync(CurrentUserId, placements, userData);
+            => await _offerManager.GetOffersAsync(UserId, placements, userData);
 
         internal async Task<ConfigResult> GetConfigsAsync(List<string> configKeys = null, Dictionary<string, object> userProperties = null)
-            => await _configManager.GetConfigsAsync(CurrentUserId, configKeys, userProperties);
+            => await _configManager.GetConfigsAsync(UserId, configKeys, userProperties);
 
         public void LogLoginEvent(Dictionary<string, object> customPayload = null)
             => _eventManager.QueueEventAsync(
-                CurrentUserId,
+                UserId,
                 AppId,
                 EventTypes.Login,
                 null,
@@ -163,7 +167,7 @@ namespace Metica.SDK
 
         public void LogInstallEvent(Dictionary<string, object> customPayload = null)
             => _eventManager.QueueEventAsync(
-                CurrentUserId,
+                UserId,
                 AppId,
                 EventTypes.Install,
                 null,
@@ -172,7 +176,7 @@ namespace Metica.SDK
 
         public void LogOfferPurchaseEvent(string placementId, string offerId, string currencyCode, double totalAmount, Dictionary<string, object> customPayload = null)
             => _ = _eventManager.QueueEventWithMeticaAttributesAsync(
-                CurrentUserId,
+                UserId,
                 AppId,
                 placementId,
                 offerId,
@@ -186,7 +190,7 @@ namespace Metica.SDK
 
         public void LogOfferPurchaseEventWithProductId(string productId, string currencyCode, double totalAmount, Dictionary<string, object> customPayload = null)
             => _eventManager.QueueEventWithProductId(
-                CurrentUserId,
+                UserId,
                 AppId,
                 productId,
                 EventTypes.OfferPurchase,
@@ -199,7 +203,7 @@ namespace Metica.SDK
 
         public void LogOfferInteractionEvent(string placementId, string offerId, string interactionType, Dictionary<string, object> customPayload = null)
             => _ = _eventManager.QueueEventWithMeticaAttributesAsync(
-                CurrentUserId,
+                UserId,
                 AppId,
                 placementId,
                 offerId,
@@ -210,7 +214,7 @@ namespace Metica.SDK
 
         public void LogOfferInteractionEventWithProductId(string productId, string interactionType, Dictionary<string, object> customPayload = null)
             => _eventManager.QueueEventWithProductId(
-                CurrentUserId,
+                UserId,
                 AppId,
                 productId,
                 EventTypes.OfferInteraction,
@@ -220,7 +224,7 @@ namespace Metica.SDK
 
         public void LogOfferImpressionEvent(string placementId, string offerId, Dictionary<string, object> customPayload = null)
             => _ = _eventManager.QueueEventWithMeticaAttributesAsync(
-                CurrentUserId,
+                UserId,
                 AppId,
                 placementId,
                 offerId,
@@ -231,7 +235,7 @@ namespace Metica.SDK
 
         public void LogOfferImpressionEventWithProductId(string productId, Dictionary<string, object> customPayload = null)
             => _eventManager.QueueEventWithProductId(
-                CurrentUserId,
+                UserId,
                 AppId,
                 productId,
                 EventTypes.OfferImpression,
@@ -241,7 +245,7 @@ namespace Metica.SDK
 
         public void LogAdRevenueEvent(string placement, string type, string source, string currencyCode, double totalAmount, Dictionary<string, object> customPayload = null)
             => _eventManager.QueueEventAsync(
-                CurrentUserId,
+                UserId,
                 AppId,
                 EventTypes.AdRevenue,
                 new() {
@@ -256,7 +260,7 @@ namespace Metica.SDK
 
         public void LogFullStateUserUpdateEvent(Dictionary<string, object> userStateAttributes, Dictionary<string, object> customPayload = null)
             => _eventManager.QueueEventAsync(
-                CurrentUserId,
+                UserId,
                 AppId,
                 EventTypes.FullStateUpdate,
                 new() { { nameof (userStateAttributes), userStateAttributes }, },
@@ -265,7 +269,7 @@ namespace Metica.SDK
 
         public void LogPartialStateUserUpdateEvent(Dictionary<string, object> userStateAttributes, Dictionary<string, object> customPayload = null)
             => _eventManager.QueueEventAsync(
-                CurrentUserId,
+                UserId,
                 AppId,
                 EventTypes.PartialStateUpdate,
                 new() { { nameof(userStateAttributes), userStateAttributes } },
@@ -279,7 +283,7 @@ namespace Metica.SDK
                 return;
             }
             _eventManager.QueueEventAsync(
-            CurrentUserId,
+            UserId,
             AppId,
             customEventType,
             null,
