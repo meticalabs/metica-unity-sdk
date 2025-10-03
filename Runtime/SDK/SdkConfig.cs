@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Metica.ADS;
 
 namespace Metica.SDK
 {
@@ -16,6 +17,7 @@ namespace Metica.SDK
         public string apiKey;
         public string appId;
         public string userId;
+        public string version;
         public string baseEndpoint;
         public List<KeyMap> customKeys;
 
@@ -34,10 +36,23 @@ namespace Metica.SDK
                 apiKey = string.Empty,
                 appId = string.Empty,
                 userId = string.Empty,
+                version = string.Empty,
                 // - - - - - - - - - -
                 baseEndpoint = ProductionEndpoint,
                 logLevel = LogLevel.Error
             };
         }
+
+        // TODO this was fitted in for compatibility with MeticaAds' MeticaConfiguration.
+        // We should upgrade this to substitute SdkConfig completely.
+        public MeticaConfiguration ToMeticaConfiguration()
+            => new()
+            {
+                ApiKey = apiKey,
+                AppId = appId,
+                UserId = userId,
+                Version = version,
+                BaseEndpoint = baseEndpoint
+            };
     }
 }
