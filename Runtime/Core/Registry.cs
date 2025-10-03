@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine.Assertions;
 
 namespace Metica.Core
@@ -29,12 +30,54 @@ namespace Metica.Core
             }
         }
 
+        /// <summary>
+        /// Registers an implementation for the type <typeparamref name="T"/>.
+        /// Replaces the previous implementation if present.
+        /// </summary>
+        /// <typeparam name="T">An interface type</typeparam>
+        /// <param name="implementation">An instance that implements <typeparamref name="T"/>.</param>
         public static void Register<T>(T implementation)
         {
             Assert.IsTrue(typeof(T).IsInterface);
 
             Instance.RegisterType(implementation);
         }
+
+        /// <summary>
+        /// Like <see cref="Register"/> but does not replace the current implementation.
+        /// </summary>
+        /// <typeparam name="T">An interface type</typeparam>
+        /// <param name="implementation">An instance that implements <typeparamref name="T"/>.</param>
+        public static void RegisterIfNull<T>(T implementation)
+        {
+            Assert.IsTrue(typeof(T).IsInterface);
+
+            if (Instance.ResolveType<T>(allowNull: true) == null)
+            {
+                Instance.RegisterType(implementation);
+            }
+        }
+
+        /// <summary>
+        /// Registers an implementation for the type <typeparamref name="T"/>.
+        /// Fails if an implementation for the type <typeparamref name="T"/> is already registered.
+        /// </summary>
+        /// <typeparam name="T">An interface type</typeparam>
+        /// <param name="implementation">An instance that implements <typeparamref name="T"/>.</param>
+        /// <exception cref="InvalidOperationException"></exception>
+        // /// <seealso cref="Register"/>
+        // public static void TryRegister<T>(T implementation)
+        // {
+        //     if (Instance.ResolveType<T>() != null)
+        //     {
+        //         throw new InvalidOperationException($"Type {nameof(T)} is already registered with implementation {implementation.GetType().Name}");
+        //     }
+        //     else
+        //     {
+        //         Register(implementation);
+        //     }
+        // }
+
 
         public static T Resolve<T>()
         {
@@ -54,7 +97,7 @@ namespace Metica.Core
             }
         }
 
-        private T ResolveType<T>()
+        private T ResolveType<T>(bool allowNull = false)
         {
             Assert.IsTrue(typeof(T).IsInterface);
 
@@ -65,6 +108,10 @@ namespace Metica.Core
             }
             else
             {
+                if (allowNull)
+                {
+                    return default;
+                }
                 throw new InvalidOperationException($"Service of type {serviceType} is not registered.");
             }
         }
