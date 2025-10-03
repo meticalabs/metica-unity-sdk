@@ -7,7 +7,6 @@ namespace Metica.SDK.Unity
     public class MeticaUnitySdk : MonoBehaviour
     {
         [SerializeField] private SdkConfigProvider _sdkConfigProvider;
-        private MeticaSdk _meticaSdk;
 
 #if UNITY_EDITOR
         /// <summary>EDITOR ONLY</summary>
@@ -17,7 +16,7 @@ namespace Metica.SDK.Unity
         private void Awake()
         {
             // Initialize Metica SDK.
-            _meticaSdk = Initialize(_sdkConfigProvider.SdkConfig);
+            var result = MeticaSdk.InitializeAsync(_sdkConfigProvider.SdkConfig);
 
             DontDestroyOnLoad(this);
         }
@@ -28,18 +27,12 @@ namespace Metica.SDK.Unity
         /// </summary>
         /// <param name="sdkConfig">A Metica SDK configuration object.</param>
         /// <returns>A new <see cref="MeticaSdk"/> instance.</returns>
-        public static MeticaSdk Initialize(SdkConfig sdkConfig)
-        {
-            Registry.Register<IDeviceInfoProvider>(new DeviceInfoProvider());
-            Registry.Register<ILog>(new MeticaLogger(sdkConfig.logLevel));
-            return new MeticaSdk(sdkConfig);
-        }
 
         private async void OnApplicationFocus(bool focus)
         {
             if (focus == false) // focus lost
             {
-                _meticaSdk.RequestDispatchEvents();
+                MeticaSdk.Events.RequestDispatchEvents();
             }
         }
 
@@ -47,13 +40,13 @@ namespace Metica.SDK.Unity
         {
             if (pause == true) // paused
             {
-                _meticaSdk.RequestDispatchEvents();
+                MeticaSdk.Events.RequestDispatchEvents();
             }
         }
 
         private async void OnDestroy()
         {
-            await _meticaSdk.DisposeAsync();
+            await MeticaSdk.DisposeAsync();
         }
     }
 }
