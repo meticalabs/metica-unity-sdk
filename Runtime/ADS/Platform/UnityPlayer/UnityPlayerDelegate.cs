@@ -28,13 +28,13 @@ internal class UnityPlayerDelegate : PlatformDelegate
     public event Action<MeticaAd> RewardedAdRewarded;
     public event Action<MeticaAd> RewardedAdRevenuePaid;
 
-    public Task<MeticaAdsInitializationResult> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
+    public Task<MeticaInitializationResult> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
         MeticaConfiguration meticaConfiguration)
     {
         Debug.Log("[MeticaAds Unity] Mock initialization - always returns HoldoutDueToError");
-        var tcs = new TaskCompletionSource<MeticaAdsInitializationResult>();
+        var tcs = new TaskCompletionSource<MeticaInitializationResult>();
         tcs.SetResult(
-            new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
+            new MeticaInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
         );
         return tcs.Task;
     }

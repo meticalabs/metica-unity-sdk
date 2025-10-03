@@ -10,9 +10,9 @@ namespace Metica.ADS
 public class InitializeCallbackProxy : AndroidJavaProxy
 {
     private const string TAG = MeticaAds.TAG;
-    private readonly TaskCompletionSource<MeticaAdsInitializationResult> _tcs;
+    private readonly TaskCompletionSource<MeticaInitializationResult> _tcs;
 
-    public InitializeCallbackProxy(TaskCompletionSource<MeticaAdsInitializationResult> tcs)
+    public InitializeCallbackProxy(TaskCompletionSource<MeticaInitializationResult> tcs)
         : base("com.metica.MeticaInitCallback")
     {
         Debug.Log($"{TAG} MeticaAdsInitCallback created");
@@ -26,13 +26,13 @@ public class InitializeCallbackProxy : AndroidJavaProxy
         if (adsEnabled)
         {
             _tcs.SetResult(
-                new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.Normal)
+                new MeticaInitializationResult(MeticaAdsAssignmentStatus.Normal)
             );
         }
         else
         {
             _tcs.SetResult(
-                new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.Holdout)
+                new MeticaInitializationResult(MeticaAdsAssignmentStatus.Holdout)
             );
         }
     }
@@ -42,7 +42,7 @@ public class InitializeCallbackProxy : AndroidJavaProxy
     {
         Debug.Log($"{TAG} onFailed: {reason}");
         _tcs.SetResult(
-            new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
+            new MeticaInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
         );
     }
 }

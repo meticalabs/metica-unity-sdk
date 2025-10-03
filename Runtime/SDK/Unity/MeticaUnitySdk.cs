@@ -1,5 +1,6 @@
 using UnityEngine;
 using Metica.Core;
+using System;
 
 namespace Metica.SDK.Unity
 {
@@ -21,6 +22,7 @@ namespace Metica.SDK.Unity
             DontDestroyOnLoad(this);
         }
 
+        [Obsolete]
         /// <summary>
         /// Creates and returns an instance of <see cref="MeticaSdk"/> with Unity implementations of needed services.
         /// </summary>

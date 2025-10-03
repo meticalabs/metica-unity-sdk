@@ -87,9 +87,8 @@ namespace Metica.SDK
 
         /// <summary>
         /// NEW INITIALIZATION
-        /// TODO: return result
-        /// </summary>
-        public static async Task InitializeAsync(SdkConfig config)
+        /// /// </summary>
+        public static async Task<MeticaInitializationResult> InitializeAsync(SdkConfig config)
         {
             RegisterServices(config);
             CheckConfig(config);
@@ -100,7 +99,9 @@ namespace Metica.SDK
             SDK = new MeticaSdk(config);
 
             // ADS
-            IsMeticaAdsEnabled = await MeticaAds.InitializeAsync(new MeticaConfiguration()); // TODO: placeholder for configuration (should be SdkConfig)
+            var result = await MeticaAds.InitializeAsync(new MeticaConfiguration()); // TODO: placeholder for configuration (should be SdkConfig)
+            IsMeticaAdsEnabled = result.IsMeticaAdsEnabled;
+            return result;
         }
 
         /// <summary>

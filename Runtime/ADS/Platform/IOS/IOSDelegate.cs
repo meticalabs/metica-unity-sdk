@@ -56,12 +56,12 @@ internal class IOSDelegate : PlatformDelegate
     {
     }
 
-    public Task<MeticaAdsInitializationResult> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
+    public Task<MeticaInitializationResult> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
         MeticaConfiguration configuration)
     {
-        var tcs = new TaskCompletionSource<MeticaAdsInitializationResult>();
+        var tcs = new TaskCompletionSource<MeticaInitializationResult>();
         tcs.SetResult(
-            new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
+            new MeticaInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
         );
         return tcs.Task;
     }

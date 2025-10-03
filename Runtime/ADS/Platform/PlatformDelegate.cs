@@ -32,7 +32,7 @@ internal interface PlatformDelegate
     public event Action<MeticaAd> RewardedAdRewarded;
     public event Action<MeticaAd> RewardedAdRevenuePaid;
 
-    Task<MeticaAdsInitializationResult> InitializeAsync(
+    Task<MeticaInitializationResult> InitializeAsync(
         string apiKey,
         string appId,
         string userId,
