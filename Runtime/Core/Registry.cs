@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using UnityEngine.Assertions;
 
 namespace Metica.Core
@@ -52,7 +51,7 @@ namespace Metica.Core
         {
             Assert.IsTrue(typeof(T).IsInterface);
 
-            if (Instance.ResolveType<T>(allowNull: true) == null)
+            if (Instance.ResolveType<T>(allowDefault: true) == null)
             {
                 Instance.RegisterType(implementation);
             }
@@ -97,7 +96,7 @@ namespace Metica.Core
             }
         }
 
-        private T ResolveType<T>(bool allowNull = false)
+        private T ResolveType<T>(bool allowDefault = false)
         {
             Assert.IsTrue(typeof(T).IsInterface);
 
@@ -108,7 +107,7 @@ namespace Metica.Core
             }
             else
             {
-                if (allowNull)
+                if (allowDefault)
                 {
                     return default;
                 }

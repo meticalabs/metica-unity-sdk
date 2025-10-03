@@ -114,7 +114,7 @@ namespace Metica.SDK
         /// Registration of implementation of services.
         /// </summary>
         /// <param name="config"></param>
-        /// <remarks>Call this before <see cref="InitializeAsync(SdkConfig)"/>
+        /// <remarks>Call this <i>before</i> <see cref="InitializeAsync(SdkConfig)"/>
         /// if and only if you want to use your own implementations of services known
         /// to <see cref="MeticaSdk"/>, for example to mock them in unit testing.</remarks>
         public static void RegisterServices(SdkConfig config)
@@ -305,6 +305,7 @@ namespace Metica.SDK
             if (_offerManager != null) await _offerManager.DisposeAsync();
             if (_configManager != null) await _configManager.DisposeAsync();
             _http?.Dispose();
+            // TODO MeticaAds should have a Dispose call too.
             Sdk = null;
         }
 

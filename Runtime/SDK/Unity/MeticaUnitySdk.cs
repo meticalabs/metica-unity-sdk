@@ -1,5 +1,4 @@
 using UnityEngine;
-using Metica.Core;
 using System;
 
 namespace Metica.SDK.Unity
