@@ -51,7 +51,7 @@ namespace Metica.Core
         {
             Assert.IsTrue(typeof(T).IsInterface);
 
-            if (Instance.ResolveType<T>(allowDefault: true) == null)
+            if (Instance.ResolveType<T>() == null)
             {
                 Instance.RegisterType(implementation);
             }
@@ -96,7 +96,7 @@ namespace Metica.Core
             }
         }
 
-        private T ResolveType<T>(bool allowDefault = false)
+        private T ResolveType<T>()
         {
             Assert.IsTrue(typeof(T).IsInterface);
 
@@ -107,11 +107,7 @@ namespace Metica.Core
             }
             else
             {
-                if (allowDefault)
-                {
-                    return default;
-                }
-                throw new InvalidOperationException($"Service of type {serviceType} is not registered.");
+                return default;
             }
         }
 
