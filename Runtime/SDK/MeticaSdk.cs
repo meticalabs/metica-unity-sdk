@@ -69,7 +69,7 @@ namespace Metica.SDK
             BaseEndpoint = null;
         }
 
-        private static bool CheckConfig(SdkConfig config)
+        private static bool CheckConfig(MeticaConfiguration config)
         {
             if (string.IsNullOrEmpty(config.ApiKey) || string.IsNullOrEmpty(config.AppId) || string.IsNullOrEmpty(config.BaseEndpoint))
             {
@@ -87,7 +87,7 @@ namespace Metica.SDK
         /// <summary>
         /// NEW INITIALIZATION
         /// /// </summary>
-        public static async Task<MeticaInitializationResult> InitializeAsync(SdkConfig config)
+        public static async Task<MeticaInitializationResult> InitializeAsync(MeticaConfiguration config)
         {
             RegisterServices(config);
             CheckConfig(config);
@@ -98,7 +98,7 @@ namespace Metica.SDK
             Sdk = new MeticaSdk(config);
 
             // ADS
-            var result = await MeticaAds.InitializeAsync(config.ToMeticaConfiguration()); // TODO: placeholder for configuration (should be SdkConfig)
+            var result = await MeticaAds.InitializeAsync(config); // TODO: placeholder for configuration (should be SdkConfig)
             IsMeticaAdsEnabled = result.IsMeticaAdsEnabled;
             return result;
         }
@@ -118,7 +118,7 @@ namespace Metica.SDK
         /// <remarks>Call this <i>before</i> <see cref="InitializeAsync(SdkConfig)"/>
         /// if and only if you want to use your own implementations of services known
         /// to <see cref="MeticaSdk"/>, for example to mock them in unit testing.</remarks>
-        public static void RegisterServices(SdkConfig config)
+        public static void RegisterServices(MeticaConfiguration config)
         {
             Registry.RegisterIfNull<IDeviceInfoProvider>(new DeviceInfoProvider());
             Registry.RegisterIfNull<ILog>(new MeticaLogger(LogLevel));
@@ -128,7 +128,7 @@ namespace Metica.SDK
         /// ORIGINAL SDK INITIALIZATION
         /// </summary>
         /// <param name="config">Metica SDK configuration object.</param>
-        private MeticaSdk(SdkConfig config)
+        private MeticaSdk(MeticaConfiguration config)
         {
             // The following part will be soon be obsolete as
             // it'll be implemented in MeticaAds.

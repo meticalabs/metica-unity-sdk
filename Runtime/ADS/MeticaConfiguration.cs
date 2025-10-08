@@ -1,11 +1,12 @@
-namespace Metica.ADS 
+namespace Metica.ADS
 {
+    [System.Serializable]
     public struct MeticaConfiguration
     {
-        public string ApiKey { get; set; }
-        public string AppId { get; set; }
-        public string UserId { get; set; }
-        public string Version { get; set; }
-        public string BaseEndpoint { get; set; }
+        public string ApiKey;
+        public string AppId;
+        public string UserId;
+        public string Version;
+        public string BaseEndpoint;
     }
 }
