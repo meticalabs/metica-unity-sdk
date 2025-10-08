@@ -46,6 +46,7 @@ namespace Metica.SDK
         // more configurability considering possible additions of other ad providers.
         public static string BaseEndpoint { get; private set; }
         public static string ApplovinKey { get; private set; }
+        public static LogLevel LogLevel { get; set; } = LogLevel.Info;
 
         private readonly IHttpService _http;
         private readonly OfferManager _offerManager;
@@ -70,12 +71,12 @@ namespace Metica.SDK
 
         private static bool CheckConfig(SdkConfig config)
         {
-            if (string.IsNullOrEmpty(config.apiKey) || string.IsNullOrEmpty(config.appId) || string.IsNullOrEmpty(config.baseEndpoint))
+            if (string.IsNullOrEmpty(config.ApiKey) || string.IsNullOrEmpty(config.AppId) || string.IsNullOrEmpty(config.BaseEndpoint))
             {
                 Log.Error(() => "The given SDK configuration is not valid. Please make sure all fields are filled.");
                 return false;
             }
-            if (config.baseEndpoint.EndsWith('/'))
+            if (config.BaseEndpoint.EndsWith('/'))
             {
                 Log.Error(() => "Please remove the '/' character at the end of the endpoint URL");
                 return false;
@@ -120,7 +121,7 @@ namespace Metica.SDK
         public static void RegisterServices(SdkConfig config)
         {
             Registry.RegisterIfNull<IDeviceInfoProvider>(new DeviceInfoProvider());
-            Registry.RegisterIfNull<ILog>(new MeticaLogger(config.logLevel));
+            Registry.RegisterIfNull<ILog>(new MeticaLogger(LogLevel));
         }
 
         /// <summary>
@@ -135,21 +136,21 @@ namespace Metica.SDK
                 requestTimeoutSeconds: 60,
                 cacheGCTimeoutSeconds: 10,
                 cacheTTLSeconds: 60
-                ).WithPersistentHeaders(new Dictionary<string, string> { { "X-API-Key", config.apiKey } });
+                ).WithPersistentHeaders(new Dictionary<string, string> { { "X-API-Key", config.ApiKey } });
             // Initialize an OfferManager
-            _offerManager = new OfferManager(_http, $"{config.baseEndpoint}/offers/v1/apps/{config.appId}");
+            _offerManager = new OfferManager(_http, $"{config.BaseEndpoint}/offers/v1/apps/{config.AppId}");
             // Initialize a ConfigManager
-            _configManager = new ConfigManager(_http, $"{config.baseEndpoint}/configs/v1/apps/{config.appId}");
+            _configManager = new ConfigManager(_http, $"{config.BaseEndpoint}/configs/v1/apps/{config.AppId}");
             // Initialize an EventManager with _offerManager as IMeticaAttributesProvider
-            _eventManager = new EventManager(_http, $"{config.baseEndpoint}/ingest/v1/events", _offerManager);
+            _eventManager = new EventManager(_http, $"{config.BaseEndpoint}/ingest/v1/events", _offerManager);
             // Set the CurrentUserId with the initial value given in the configuration
 
             //--/--/--/--/--/--/--/--/
 
-            UserId = config.userId;
-            ApiKey = config.apiKey;
-            AppId = config.appId;
-            BaseEndpoint = config.baseEndpoint;
+            UserId = config.UserId;
+            ApiKey = config.ApiKey;
+            AppId = config.AppId;
+            BaseEndpoint = config.BaseEndpoint;
         }
 
 

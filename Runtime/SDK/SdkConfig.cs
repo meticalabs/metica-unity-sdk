@@ -14,32 +14,29 @@ namespace Metica.SDK
             public string Key;
             public string Value;
         }
-        public string apiKey;
-        public string appId;
-        public string userId;
-        public string version;
-        public string baseEndpoint;
-        public List<KeyMap> customKeys;
+        public string ApiKey;
+        public string AppId;
+        public string UserId;
+        public string BaseEndpoint;
+        public List<KeyMap> CustomKeys;
 
         public static string ProductionEndpoint = "https://api-gateway.prod-eu.metica.com";
 
         /// <summary>
         /// The log level for the SDK.
         /// </summary>
-        public LogLevel logLevel;
 
-        public static SdkConfig Default()
+        // Only used to initialize scriptable object wrappers
+        internal static SdkConfig Default()
         {
             return new SdkConfig()
             {
                 // Parameters for MeticaContext
-                apiKey = string.Empty,
-                appId = string.Empty,
-                userId = string.Empty,
-                version = string.Empty,
+                ApiKey = string.Empty,
+                AppId = string.Empty,
+                UserId = string.Empty,
                 // - - - - - - - - - -
-                baseEndpoint = ProductionEndpoint,
-                logLevel = LogLevel.Error
+                BaseEndpoint = ProductionEndpoint,
             };
         }
 
@@ -48,11 +45,10 @@ namespace Metica.SDK
         public MeticaConfiguration ToMeticaConfiguration()
             => new()
             {
-                ApiKey = apiKey,
-                AppId = appId,
-                UserId = userId,
-                Version = version,
-                BaseEndpoint = baseEndpoint
+                ApiKey = ApiKey,
+                AppId = AppId,
+                UserId = UserId,
+                BaseEndpoint = BaseEndpoint
             };
     }
 }
