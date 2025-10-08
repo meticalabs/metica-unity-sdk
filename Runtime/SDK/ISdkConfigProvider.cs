@@ -2,8 +2,8 @@ using Metica.ADS;
 
 namespace Metica.SDK
 {
-    public interface ISdkConfigProvider
+    public interface IMeticaConfigProvider
     {
-        public MeticaConfiguration SdkConfig { get; }
+        public MeticaConfiguration Config { get; }
     }
 }

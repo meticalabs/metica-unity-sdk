@@ -5,17 +5,17 @@ namespace Metica.SDK.Unity
 {
     public class MeticaUnitySdk : MonoBehaviour
     {
-        [SerializeField] private SdkConfigProvider _sdkConfigProvider;
+        [SerializeField] private MeticaConfigProvider _sdkConfigProvider;
 
 #if UNITY_EDITOR
         /// <summary>EDITOR ONLY</summary>
-        public SdkConfigProvider SdkConfigProviderEditor { get { return _sdkConfigProvider; } set { _sdkConfigProvider = value; } }
+        public MeticaConfigProvider SdkConfigProviderEditor { get { return _sdkConfigProvider; } set { _sdkConfigProvider = value; } }
 #endif
 
         private void Awake()
         {
             // Initialize Metica SDK.
-            var result = MeticaSdk.InitializeAsync(_sdkConfigProvider.SdkConfig);
+            var result = MeticaSdk.InitializeAsync(_sdkConfigProvider.Config);
 
             DontDestroyOnLoad(this);
         }

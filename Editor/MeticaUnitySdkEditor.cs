@@ -9,7 +9,7 @@ namespace Metica.UnityEd
     public class MeticaUnitySdkEditor : Editor
     {
         MeticaUnitySdk m_sdk = null;
-        SdkConfigProvider m_configProvider = null;
+        MeticaConfigProvider m_configProvider = null;
 
         private const string MeticaDataFolder = "Assets/Metica/Data";
 
@@ -39,7 +39,7 @@ namespace Metica.UnityEd
 
                     if (!string.IsNullOrEmpty(assetPath))
                     {
-                        m_configProvider = ScriptableObject.CreateInstance<SdkConfigProvider>();
+                        m_configProvider = ScriptableObject.CreateInstance<MeticaConfigProvider>();
 
                         AssetDatabase.CreateAsset(m_configProvider, assetPath);
                         AssetDatabase.Refresh();
