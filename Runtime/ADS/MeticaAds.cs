@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 // ReSharper disable once CheckNamespace
 namespace Metica.ADS
 {
-    public static class MeticaAds
+    internal static class MeticaAds
     {   
         public const string TAG = "MeticaUnityPlugin";
         private static readonly PlatformDelegate PlatformDelegate;

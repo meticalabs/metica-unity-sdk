@@ -75,7 +75,7 @@ namespace Metica.SDK
             Sdk = new MeticaSdk(config);
 
             // ADS
-            var result = await MeticaAds.InitializeAsync(config);
+            var result = await InitializeAsync(config);
             IsMeticaAdsEnabled = result.IsMeticaAdsEnabled;
             return result;
         }
@@ -290,46 +290,45 @@ namespace Metica.SDK
         // ADS bridge
         public static class Ads
         {
-            public const string TAG = MeticaAds.TAG;
 
             // public static Task<MeticaInitializationResult> InitializeAsync(MeticaConfiguration configuration)
-            //     => MeticaAds.InitializeAsync(configuration);
+            //     => InitializeAsync(configuration);
 
             // public static Task<MeticaInitializationResult> InitializeWithResultAsync(MeticaConfiguration configuration)
-            //     => MeticaAds.InitializeWithResultAsync(configuration);
+            //     => InitializeWithResultAsync(configuration);
 
             public static void SetLogEnabled(bool logEnabled)
-                => MeticaAds.SetLogEnabled(logEnabled);
+                => SetLogEnabled(logEnabled);
 
             public static void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
-                => MeticaAds.CreateBanner(bannerAdUnitId, position);
+                => CreateBanner(bannerAdUnitId, position);
 
             public static void ShowBanner(string adUnitId)
-                => MeticaAds.ShowBanner(adUnitId);
+                => ShowBanner(adUnitId);
 
             public static void HideBanner(string adUnitId)
-                => MeticaAds.HideBanner(adUnitId);
+                => HideBanner(adUnitId);
 
             public static void DestroyBanner(string adUnitId)
-                => MeticaAds.DestroyBanner(adUnitId);
+                => DestroyBanner(adUnitId);
 
             public static void LoadInterstitial()
-                => MeticaAds.LoadInterstitial();
+                => LoadInterstitial();
 
             public static void ShowInterstitial()
-                => MeticaAds.ShowInterstitial();
+                => ShowInterstitial();
 
             public static bool IsInterstitialReady()
-                => MeticaAds.IsInterstitialReady();
+                => IsInterstitialReady();
 
             public static void LoadRewarded()
-                => MeticaAds.LoadRewarded();
+                => LoadRewarded();
 
             public static void ShowRewarded()
-                => MeticaAds.ShowRewarded();
+                => ShowRewarded();
 
             public static bool IsRewardedReady()
-                => MeticaAds.IsRewardedReady();
+                => IsRewardedReady();
         }
     }
 }
