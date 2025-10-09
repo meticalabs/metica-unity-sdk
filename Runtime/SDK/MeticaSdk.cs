@@ -273,7 +273,7 @@ namespace Metica.SDK
             if (_offerManager != null) await _offerManager.DisposeAsync();
             if (_configManager != null) await _configManager.DisposeAsync();
             _http?.Dispose();
-            // TODO MeticaAds should have a Dispose call too.
+            Ads.Dispose(); // TODO
             Sdk = null;
         }
 
@@ -313,7 +313,7 @@ namespace Metica.SDK
             public static bool IsRewardedReady()
                 => IsRewardedReady();
 
-            public static void Dispose()
+            internal static void Dispose()
                 // TODO
                 => Log.Info(() => "Metica.Sdk.Ads.Dispose called but not yet implemented.");
         }
