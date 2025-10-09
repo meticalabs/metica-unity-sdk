@@ -81,14 +81,6 @@ namespace Metica.SDK
         }
 
         /// <summary>
-        /// OLD INITIALIZATION
-        /// </summary>
-        // public static MeticaSdk Initialize(SdkConfig sdkConfig)
-        // {
-        //     return new MeticaSdk(sdkConfig);
-        // }
-
-        /// <summary>
         /// Registration of implementation of services.
         /// </summary>
         /// <param name="config"></param>
@@ -107,8 +99,6 @@ namespace Metica.SDK
         /// <param name="config">Metica SDK configuration object.</param>
         private MeticaSdk(MeticaConfiguration config)
         {
-            // The following part will be soon be obsolete as
-            // it'll be implemented in MeticaAds.
             _http = new HttpServiceDotnet(
                 requestTimeoutSeconds: 60,
                 cacheGCTimeoutSeconds: 10,
@@ -290,13 +280,6 @@ namespace Metica.SDK
         // ADS bridge
         public static class Ads
         {
-
-            // public static Task<MeticaInitializationResult> InitializeAsync(MeticaConfiguration configuration)
-            //     => InitializeAsync(configuration);
-
-            // public static Task<MeticaInitializationResult> InitializeWithResultAsync(MeticaConfiguration configuration)
-            //     => InitializeWithResultAsync(configuration);
-
             public static void SetLogEnabled(bool logEnabled)
                 => SetLogEnabled(logEnabled);
 
@@ -329,6 +312,10 @@ namespace Metica.SDK
 
             public static bool IsRewardedReady()
                 => IsRewardedReady();
+
+            public static void Dispose()
+                // TODO
+                => Log.Info(() => "Metica.Sdk.Ads.Dispose called but not yet implemented.");
         }
     }
 }
