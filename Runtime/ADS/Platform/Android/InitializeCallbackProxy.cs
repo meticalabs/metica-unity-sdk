@@ -20,8 +20,13 @@ public class InitializeCallbackProxy : AndroidJavaProxy
     }
 
     // Called from Android when initialization succeeds
-    public void onInitialized(bool adsEnabled)
+    public void onInitialized(AndroidJavaObject initResponse)
     {
+        // TODO: currently we force trial user group
+        _tcs.SetResult(
+            new MeticaInitializationResult(MeticaAdsAssignmentStatus.Normal)
+        );
+        /*
         Debug.Log($"{TAG} onInitialized: {adsEnabled}");
         if (adsEnabled)
         {
@@ -35,15 +40,8 @@ public class InitializeCallbackProxy : AndroidJavaProxy
                 new MeticaInitializationResult(MeticaAdsAssignmentStatus.Holdout)
             );
         }
+    */
     }
 
-    // Called from Android when initialization fails
-    public void onFailed(string reason)
-    {
-        Debug.Log($"{TAG} onFailed: {reason}");
-        _tcs.SetResult(
-            new MeticaInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
-        );
-    }
 }
 }
