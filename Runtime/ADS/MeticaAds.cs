@@ -17,7 +17,7 @@ namespace Metica.ADS
             // Check for Unity Editor first since the editor also responds to the currently selected platform.
             PlatformDelegate = GetUnityPlayerDelegate();
 #elif UNITY_ANDROID
-            PlatformDelegate = new Android.AndroidDelegate(AndroidUnityBridge.UnityBridgeClass, AndroidUnityBridge.MeticaAdsExternalTrackerClass);
+            PlatformDelegate = new Android.AndroidDelegate(AndroidUnityBridge.UnityBridgeClass);
 #elif UNITY_IPHONE || UNITY_IOS
             PlatformDelegate = new IOS.IOSDelegate();
 #else
@@ -117,28 +117,6 @@ namespace Metica.ADS
         public static bool IsRewardedReady()
         {
             return PlatformDelegate.IsRewardedReady();
-        }
-
-        public static void NotifyAdLoadAttempt(string interstitialAdUnitId)
-        {
-            PlatformDelegate.NotifyAdLoadAttempt(interstitialAdUnitId);
-        }
-
-        public static void NotifyAdLoadSuccess(MeticaAd meticaAd)
-        {
-            PlatformDelegate.NotifyAdLoadSuccess(meticaAd);
-        }
-
-        public static void NotifyAdLoadFailed(string adUnitId, string error)
-        {
-            PlatformDelegate.NotifyAdLoadFailed(adUnitId, error);
-        }
-
-        public static void NotifyAdShowSuccess(MeticaAd meticaAd)
-        {
-            // Internally we use the NotifyAdRevenue call, but externally as to not
-            // break API we use NotifyAdShowSuccess. Which is similar as both will tel you ad was shown.
-            PlatformDelegate.NotifyAdRevenue(meticaAd);
         }
         
         private static UnityPlayer.UnityPlayerDelegate GetUnityPlayerDelegate()

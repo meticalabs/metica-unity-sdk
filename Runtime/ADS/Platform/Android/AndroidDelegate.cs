@@ -10,16 +10,14 @@ namespace Metica.ADS.Android
 {
 internal class AndroidDelegate : PlatformDelegate
 {
-    public AndroidDelegate(AndroidJavaClass unityBridgeClass, AndroidJavaClass meticaAdsExternalTrackerClass)
+    public AndroidDelegate(AndroidJavaClass unityBridgeClass)
     {
         _unityBridgeAndroidClass = unityBridgeClass;
-        _meticaAdsExternalTrackerAndroidClass = meticaAdsExternalTrackerClass;        
     }
 
     private const string TAG = MeticaAds.TAG;
 
     private readonly AndroidJavaClass _unityBridgeAndroidClass;
-    private readonly AndroidJavaClass _meticaAdsExternalTrackerAndroidClass;
 
     // Events for banner ad lifecycle callbacks
     public event Action<MeticaAd> BannerAdLoadSuccess;
@@ -177,39 +175,6 @@ internal class AndroidDelegate : PlatformDelegate
     public bool IsRewardedReady()
     {
         return _unityBridgeAndroidClass.CallStatic<bool>("isRewardedReady");
-    }
-
-    // Notification methods
-    public void NotifyAdLoadAttempt(string adUnitId)
-    {
-        Debug.Log($"{TAG} NotifyAdLoadAttempt called for adUnitId: {adUnitId}");
-        _meticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdLoadAttempt", adUnitId);
-    }
-
-    public void NotifyAdLoadSuccess(MeticaAd meticaAd)
-    {
-        Debug.Log($"{TAG} NotifyAdLoadSuccess called for adUnitId: {meticaAd.adUnitId}");
-
-        using (var meticaAdAndroid = meticaAd.ToAndroidJavaObject())
-        {
-            _meticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdLoadSuccess", meticaAdAndroid);
-        }
-    }
-
-    public void NotifyAdLoadFailed(string adUnitId, string error)
-    {
-        Debug.Log($"{TAG} NotifyAdLoadFailed called for adUnitId: {adUnitId}, error: {error}");
-        _meticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdLoadFailed", adUnitId, error);
-    }
-
-    public void NotifyAdRevenue(MeticaAd meticaAd)
-    {
-        Debug.Log($"{TAG} NotifyAdRevenue called for adUnitId: {meticaAd.adUnitId}");
-
-        using (var meticaAdAndroid = meticaAd.ToAndroidJavaObject())
-        {
-            _meticaAdsExternalTrackerAndroidClass.CallStatic("notifyAdRevenue", meticaAdAndroid);
-        }
     }
 }
 }

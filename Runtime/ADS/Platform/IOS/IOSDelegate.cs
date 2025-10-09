@@ -95,25 +95,5 @@ internal class IOSDelegate : PlatformDelegate
     {
         return false;
     }
-    // Notification methods
-    public void NotifyAdLoadAttempt(string adUnitId)
-    {
-        // TODO: Implement iOS native call
-    }
-
-    public void NotifyAdLoadSuccess(MeticaAd meticaAd)
-    {
-        // TODO: Implement iOS native call
-    }
-
-    public void NotifyAdLoadFailed(string adUnitId, string error)
-    {
-        // TODO: Implement iOS native call
-    }
-
-    public void NotifyAdRevenue(MeticaAd meticaAd)
-    {
-        // TODO: Implement iOS native call
-    }
 }
 }

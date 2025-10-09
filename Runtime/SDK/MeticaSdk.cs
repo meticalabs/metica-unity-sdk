@@ -330,18 +330,6 @@ namespace Metica.SDK
 
             public static bool IsRewardedReady()
                 => MeticaAds.IsRewardedReady();
-
-            public static void NotifyAdLoadAttempt(string interstitialAdUnitId)
-                => MeticaAds.NotifyAdLoadAttempt(interstitialAdUnitId);
-
-            public static void NotifyAdLoadSuccess(MeticaAd meticaAd)
-                => MeticaAds.NotifyAdLoadSuccess(meticaAd);
-
-            public static void NotifyAdLoadFailed(string adUnitId, string error)
-                => MeticaAds.NotifyAdLoadFailed(adUnitId, error);
-
-            public static void NotifyAdShowSuccess(MeticaAd meticaAd)
-                => MeticaAds.NotifyAdShowSuccess(meticaAd);
         }
     }
 }

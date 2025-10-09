@@ -57,11 +57,5 @@ internal interface PlatformDelegate
     void LoadRewarded();
     void ShowRewarded();
     bool IsRewardedReady();
-    
-    // Notification methods  
-    void NotifyAdLoadAttempt(string adUnitId);
-    void NotifyAdLoadSuccess(MeticaAd meticaAd);
-    void NotifyAdLoadFailed(string adUnitId, string error);
-    void NotifyAdRevenue(MeticaAd meticaAd);
 }
 }
