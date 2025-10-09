@@ -75,7 +75,7 @@ namespace Metica.SDK
             Sdk = new MeticaSdk(config);
 
             // ADS
-            var result = await MeticaAds.InitializeAsync(config); // TODO: placeholder for configuration (should be SdkConfig)
+            var result = await MeticaAds.InitializeAsync(config);
             IsMeticaAdsEnabled = result.IsMeticaAdsEnabled;
             return result;
         }
