@@ -19,9 +19,9 @@ namespace Metica.SDK
         public static string UserId { get; set; } // TODO: set should become private and require a reinitialization to cheange user id
         public static string ApiKey { get; private set; }
         public static string AppId { get; private set; }
-        // TODO: remove apploving key fromm here in favour of
-        // more configurability considering possible additions of other ad providers.
         public static string BaseEndpoint { get; private set; }
+        // TODO: remove apploving key from here in favour of
+        // more configurability considering possible additions of other ad providers.
         public static string ApplovinKey { get; private set; }
         public static LogLevel LogLevel { get; set; } = LogLevel.Info;
 
@@ -34,8 +34,10 @@ namespace Metica.SDK
 
         #endregion Fields
 
+        #region Methods
+
         /// <summary>
-        ///  Utility, (Unity specific) method that should not be used directly.
+        /// Utility, (Unity specific) method that should not be used directly.
         /// Resets static properties to null.
         /// </summary>
         public static void ResetStaticFields()
@@ -62,8 +64,8 @@ namespace Metica.SDK
         }
 
         /// <summary>
-        /// NEW INITIALIZATION
-        /// /// </summary>
+        /// Registers services and initializes all SDK components.
+        /// </summary>
         public static async Task<MeticaInitializationResult> InitializeAsync(MeticaConfiguration config)
         {
             RegisterServices();
@@ -83,8 +85,7 @@ namespace Metica.SDK
         /// <summary>
         /// Registration of implementation of services.
         /// </summary>
-        /// <param name="config"></param>
-        /// <remarks>Call this <i>before</i> <see cref="InitializeAsync(SdkConfig)"/>
+        /// <remarks>Call this <i>before</i> <see cref="InitializeAsync"/>
         /// if and only if you want to use your own implementations of services known
         /// to <see cref="MeticaSdk"/>, for example to mock them in unit testing.</remarks>
         public static void RegisterServices()
@@ -112,7 +113,7 @@ namespace Metica.SDK
             _eventManager = new EventManager(_http, $"{config.BaseEndpoint}/ingest/v1/events", _offerManager);
             // Set the CurrentUserId with the initial value given in the configuration
 
-            //--/--/--/--/--/--/--/--/
+            // - - - - - - - - - - -
 
             UserId = config.UserId;
             ApiKey = config.ApiKey;
@@ -120,6 +121,24 @@ namespace Metica.SDK
             BaseEndpoint = config.BaseEndpoint;
         }
 
+        public static async ValueTask DisposeAsync()
+            => await Sdk.SdkDisposeAsync();
+
+        private async ValueTask SdkDisposeAsync()
+        {
+            if (_eventManager != null) await _eventManager.DisposeAsync();
+            if (_offerManager != null) await _offerManager.DisposeAsync();
+            if (_configManager != null) await _configManager.DisposeAsync();
+            _http?.Dispose();
+            Ads.Dispose(); // TODO
+            Sdk = null;
+        }
+
+        #endregion Methods
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        #region Offers
 
         public static class Offers
         {
@@ -127,11 +146,24 @@ namespace Metica.SDK
                 => await Sdk._offerManager.GetOffersAsync(UserId, placements, userData);
         }
 
+        #endregion Offers
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        #region SmartConfig
+
         public static class SmartConfig
         {
             public static async Task<ConfigResult> GetConfigsAsync(List<string> configKeys = null, Dictionary<string, object> userProperties = null)
                 => await Sdk._configManager.GetConfigsAsync(UserId, configKeys, userProperties);
         }
+
+        #endregion SmartConfig
+
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        #region Events
 
         public static class Events
         {
@@ -264,18 +296,11 @@ namespace Metica.SDK
             }
         }
 
-        public static async ValueTask DisposeAsync()
-            => await Sdk.SdkDisposeAsync();
+        #endregion Events
 
-        private async ValueTask SdkDisposeAsync()
-        {
-            if (_eventManager != null) await _eventManager.DisposeAsync();
-            if (_offerManager != null) await _offerManager.DisposeAsync();
-            if (_configManager != null) await _configManager.DisposeAsync();
-            _http?.Dispose();
-            Ads.Dispose(); // TODO
-            Sdk = null;
-        }
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        #region Ads
 
         // ADS bridge
         public static class Ads
@@ -317,5 +342,7 @@ namespace Metica.SDK
                 // TODO
                 => Log.Info(() => "Metica.Sdk.Ads.Dispose called but not yet implemented.");
         }
+
+        #endregion Ads
     }
 }
