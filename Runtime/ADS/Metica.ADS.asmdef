@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "Metica.SDK",
-        "MaxSdk.Scripts"
+        "MaxSdk.Scripts",
+        "Metica.Core"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

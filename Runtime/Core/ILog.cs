@@ -1,6 +1,6 @@
 using System;
 
-namespace Metica.SDK
+namespace Metica.Core
 {
     public enum LogLevel
     {
