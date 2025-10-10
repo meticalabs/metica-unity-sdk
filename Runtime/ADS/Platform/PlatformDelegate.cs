@@ -2,7 +2,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Codice.LogWrapper;
 
 namespace Metica.ADS
 {
