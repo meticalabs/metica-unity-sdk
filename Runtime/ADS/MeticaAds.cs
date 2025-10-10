@@ -3,6 +3,7 @@
 using System.Threading.Tasks;
 using Metica.Core;
 using Metica.SDK;
+using UnityEngine.Assertions;
 
 // ReSharper disable once CheckNamespace
 namespace Metica.ADS
@@ -16,6 +17,7 @@ namespace Metica.ADS
         static MeticaAds()
         {
             Log = Registry.Resolve<ILog>();
+            Assert.IsNotNull(Log, $"No implementations of {nameof(ILog)} were found in the {nameof(Registry)}. Make sure that an implementation of {nameof(ILog)} has been registered first.");
 
 #if UNITY_EDITOR
             // Check for Unity Editor first since the editor also responds to the currently selected platform.
