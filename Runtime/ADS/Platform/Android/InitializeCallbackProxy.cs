@@ -20,7 +20,7 @@ public class InitializeCallbackProxy : AndroidJavaProxy
     }
 
     // Called from Android when initialization succeeds
-    public void onInitialized(AndroidJavaObject initResponse)
+    public void onInit(AndroidJavaObject initResponse)
     {
         // TODO: currently we force trial user group
         _tcs.SetResult(
