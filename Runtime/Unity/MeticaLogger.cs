@@ -1,6 +1,6 @@
-using Metica.SDK;
 using System;
 using UnityEngine;
+using Metica.Core;
 
 namespace Metica.Unity
 {

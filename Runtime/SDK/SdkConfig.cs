@@ -1,3 +1,5 @@
+using Metica.Core;
+
 namespace Metica.SDK
 {
     [System.Serializable]
