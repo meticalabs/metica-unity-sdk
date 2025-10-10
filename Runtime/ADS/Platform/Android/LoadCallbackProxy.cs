@@ -1,5 +1,3 @@
-// LoadCallbackProxy.cs
-
 using System;
 using UnityEngine;
 
@@ -14,7 +12,7 @@ public class LoadCallbackProxy : AndroidJavaProxy
     public LoadCallbackProxy()
         : base("com.metica.ads.MeticaAdsLoadCallback")
     {
-        Debug.Log($"{TAG} LoadCallbackProxy created");
+        MeticaAds.Log.LogDebug(() => $"{TAG} LoadCallbackProxy created");
     }
 
     // Called from Android when ad loads successfully - now receives MeticaAd object
@@ -22,14 +20,14 @@ public class LoadCallbackProxy : AndroidJavaProxy
     {
         // Convert AndroidJavaObject to C# MeticaAd object
         var meticaAd = meticaAdObject.ToMeticaAd();
-        Debug.Log($"{TAG} onAdLoadSuccess callback received for adUnitId={meticaAd.adUnitId}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadSuccess callback received for adUnitId={meticaAd.adUnitId}");
         AdLoadSuccess?.Invoke(meticaAd);
     }
 
     // Called from Android when ad load fails - now only receives error string
     public void onAdLoadFailed(string error)
     {
-        Debug.Log($"{TAG} onAdLoadFailed callback received, error={error}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadFailed callback received, error={error}");
         AdLoadFailed?.Invoke(error);
     }
 

@@ -31,7 +31,7 @@ internal class UnityPlayerDelegate : PlatformDelegate
     public Task<MeticaInitializationResult> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
         MeticaConfiguration meticaConfiguration)
     {
-        Debug.Log("[MeticaAds Unity] Mock initialization - always returns HoldoutDueToError");
+        MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock initialization - always returns HoldoutDueToError");
         var tcs = new TaskCompletionSource<MeticaInitializationResult>();
         tcs.SetResult(
             new MeticaInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
@@ -41,59 +41,59 @@ internal class UnityPlayerDelegate : PlatformDelegate
 
     public void SetLogEnabled(bool logEnabled)
     {
-        Debug.Log($"[MeticaAds Unity] Mock SetLogEnabled: {logEnabled}");
+        MeticaAds.Log.LogDebug(() => $"[MeticaAds Unity] Mock SetLogEnabled: {logEnabled}");
     }
 
     public void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
     {
-        Debug.Log("[MeticaAds Unity] Mock CreateBanner called");
+        MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock CreateBanner called");
     }
 
     public void ShowBanner(string adUnitId)
     {
-        Debug.Log("[MeticaAds Unity] Mock ShowBanner called");
+        MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock ShowBanner called");
     }
 
     public void HideBanner(string adUnitId)
     {
-        Debug.Log("[MeticaAds Unity] Mock HideBanner called");
+        MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock HideBanner called");
 
     }
 
     public void DestroyBanner(string adUnitId)
     {
-        Debug.Log("[MeticaAds Unity] Mock DestroyBanner called");
+        MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock DestroyBanner called");
     }
 
     public void LoadInterstitial()
     {
-        Debug.Log("[MeticaAds Unity] Mock LoadInterstitial called");
+        MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock LoadInterstitial called");
     }
 
     public void ShowInterstitial()
     {
-        Debug.Log("[MeticaAds Unity] Mock ShowInterstitial called");
+        MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock ShowInterstitial called");
     }
 
     public bool IsInterstitialReady()
     {
-        Debug.Log("[MeticaAds Unity] Mock IsInterstitialReady - always returns false");
+        MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock IsInterstitialReady - always returns false");
         return false;
     }
 
     public void LoadRewarded()
     {
-        Debug.Log("[MeticaAds Unity] Mock LoadRewarded called");
+        MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock LoadRewarded called");
     }
 
     public void ShowRewarded()
     {
-        Debug.Log("[MeticaAds Unity] Mock ShowRewarded called");
+        MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock ShowRewarded called");
     }
 
     public bool IsRewardedReady()
     {
-        Debug.Log("[MeticaAds Unity] Mock IsRewardedReady - always returns false");
+        MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock IsRewardedReady - always returns false");
         return false;
     }
 }

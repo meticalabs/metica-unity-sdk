@@ -15,7 +15,7 @@ public class InitializeCallbackProxy : AndroidJavaProxy
     public InitializeCallbackProxy(TaskCompletionSource<MeticaInitializationResult> tcs)
         : base("com.metica.MeticaInitCallback")
     {
-        Debug.Log($"{TAG} MeticaAdsInitCallback created");
+        MeticaAds.Log.LogDebug(() => $"{TAG} MeticaAdsInitCallback created");
         _tcs = tcs;
     }
 
@@ -27,7 +27,7 @@ public class InitializeCallbackProxy : AndroidJavaProxy
             new MeticaInitializationResult(MeticaAdsAssignmentStatus.Normal)
         );
         /*
-        Debug.Log($"{TAG} onInitialized: {adsEnabled}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} onInitialized: {adsEnabled}");
         if (adsEnabled)
         {
             _tcs.SetResult(

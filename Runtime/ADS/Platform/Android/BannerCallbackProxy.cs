@@ -17,7 +17,7 @@ public class BannerCallbackProxy : AndroidJavaProxy
     public BannerCallbackProxy() 
         : base("com.metica.ads.MeticaAdsBannerCallback")
     {
-        Debug.Log($"{TAG} BannerCallbackProxy created");
+        MeticaAds.Log.LogDebug(() => $"{TAG} BannerCallbackProxy created");
     }
     
     // Called from Android when ad loads successfully - now receives MeticaAd object
@@ -25,14 +25,14 @@ public class BannerCallbackProxy : AndroidJavaProxy
     {
         // Convert AndroidJavaObject to C# MeticaAd object
         var meticaAd = meticaAdObject.ToMeticaAd();
-        Debug.Log($"{TAG} onAdLoadSuccess callback received for adUnitId={meticaAd.adUnitId}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadSuccess callback received for adUnitId={meticaAd.adUnitId}");
         AdLoadSuccess?.Invoke(meticaAd);
     }
 
     // Called from Android when ad load fails - now only receives error string
     public void onAdLoadFailed(string error)
     {
-        Debug.Log($"{TAG} onAdLoadFailed callback received, error={error}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadFailed callback received, error={error}");
         AdLoadFailed?.Invoke(error);
     }
     
@@ -40,7 +40,7 @@ public class BannerCallbackProxy : AndroidJavaProxy
     public void onAdClicked(AndroidJavaObject meticaAdObject)
     {
         var meticaAd = meticaAdObject.ToMeticaAd();
-        Debug.Log($"{TAG} onAdClicked callback received for adUnitId={meticaAd.adUnitId}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} onAdClicked callback received for adUnitId={meticaAd.adUnitId}");
         AdClicked?.Invoke(meticaAd);
     }
     
@@ -48,7 +48,7 @@ public class BannerCallbackProxy : AndroidJavaProxy
     public void onAdRevenuePaid(AndroidJavaObject meticaAdObject)
     {
         var meticaAd = meticaAdObject.ToMeticaAd();
-        Debug.Log($"{TAG} onAdRevenuePaid callback received for adUnitId={meticaAd.adUnitId}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} onAdRevenuePaid callback received for adUnitId={meticaAd.adUnitId}");
         AdRevenuePaid?.Invoke(meticaAd);
     }
 }
