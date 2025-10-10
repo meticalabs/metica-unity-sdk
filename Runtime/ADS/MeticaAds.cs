@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.Threading.Tasks;
+using Metica.Core;
 using Metica.SDK;
 
 // ReSharper disable once CheckNamespace
@@ -10,9 +11,11 @@ namespace Metica.ADS
     {   
         public const string TAG = "MeticaUnityPlugin";
         private static readonly PlatformDelegate PlatformDelegate;
+        internal static readonly ILog Log;
 
         static MeticaAds()
         {
+            Log = Registry.Resolve<ILog>();
 
 #if UNITY_EDITOR
             // Check for Unity Editor first since the editor also responds to the currently selected platform.

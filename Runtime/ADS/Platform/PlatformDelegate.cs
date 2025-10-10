@@ -2,10 +2,11 @@
 
 using System;
 using System.Threading.Tasks;
+using Codice.LogWrapper;
 
 namespace Metica.ADS
 {
-internal interface PlatformDelegate 
+internal interface PlatformDelegate
 {
     // Events for banner ad lifecycle callbacks
     public event Action<MeticaAd> BannerAdLoadSuccess;

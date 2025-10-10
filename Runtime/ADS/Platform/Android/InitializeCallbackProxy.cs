@@ -15,14 +15,14 @@ public class InitializeCallbackProxy : AndroidJavaProxy
     public InitializeCallbackProxy(TaskCompletionSource<MeticaAdsInitializationResult> tcs)
         : base("com.metica.MeticaInitCallback")
     {
-        Debug.Log($"{TAG} MeticaAdsInitCallback created");
+        MeticaAds.Log.LogDebug(() => $"{TAG} MeticaAdsInitCallback created");
         _tcs = tcs;
     }
 
     // Called from Android when initialization succeeds
     public void onInitialized(bool adsEnabled)
     {
-        Debug.Log($"{TAG} onInitialized: {adsEnabled}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} onInitialized: {adsEnabled}");
         if (adsEnabled)
         {
             _tcs.SetResult(
@@ -40,7 +40,7 @@ public class InitializeCallbackProxy : AndroidJavaProxy
     // Called from Android when initialization fails
     public void onFailed(string reason)
     {
-        Debug.Log($"{TAG} onFailed: {reason}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} onFailed: {reason}");
         _tcs.SetResult(
             new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
         );

@@ -19,14 +19,14 @@ public class ShowCallbackProxy : AndroidJavaProxy
     public ShowCallbackProxy() 
         : base("com.metica.ads.MeticaAdsShowCallback")
     {
-        Debug.Log($"{TAG} ShowCallbackProxy created");
+        MeticaAds.Log.LogDebug(() => $"{TAG} ShowCallbackProxy created");
     }
     
     // Called when ad shows successfully - now receives MeticaAd object
     public void onAdShowSuccess(AndroidJavaObject meticaAdObject)
     {
         var meticaAd = meticaAdObject.ToMeticaAd();
-        Debug.Log($"{TAG} onAdShowSuccess callback received for adUnitId={meticaAd.adUnitId}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} onAdShowSuccess callback received for adUnitId={meticaAd.adUnitId}");
         AdShowSuccess?.Invoke(meticaAd);
     }
     
@@ -34,7 +34,7 @@ public class ShowCallbackProxy : AndroidJavaProxy
     public void onAdShowFailed(AndroidJavaObject meticaAdObject, string error)
     {
         var meticaAd = meticaAdObject.ToMeticaAd();
-        Debug.Log($"{TAG} onAdShowFailed callback received for adUnitId={meticaAd.adUnitId}, error={error}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} onAdShowFailed callback received for adUnitId={meticaAd.adUnitId}, error={error}");
         AdShowFailed?.Invoke(meticaAd, error);
     }
     
@@ -42,7 +42,7 @@ public class ShowCallbackProxy : AndroidJavaProxy
     public void onAdHidden(AndroidJavaObject meticaAdObject)
     {
         var meticaAd = meticaAdObject.ToMeticaAd();
-        Debug.Log($"{TAG} onAdHidden callback received for adUnitId={meticaAd.adUnitId}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} onAdHidden callback received for adUnitId={meticaAd.adUnitId}");
         AdHidden?.Invoke(meticaAd);
     }
     
@@ -50,7 +50,7 @@ public class ShowCallbackProxy : AndroidJavaProxy
     public void onAdClicked(AndroidJavaObject meticaAdObject)
     {
         var meticaAd = meticaAdObject.ToMeticaAd();
-        Debug.Log($"{TAG} onAdClicked callback received for adUnitId={meticaAd.adUnitId}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} onAdClicked callback received for adUnitId={meticaAd.adUnitId}");
         AdClicked?.Invoke(meticaAd);
     }
     
@@ -58,7 +58,7 @@ public class ShowCallbackProxy : AndroidJavaProxy
     public void onAdRewarded(AndroidJavaObject meticaAdObject)
     {
         var meticaAd = meticaAdObject.ToMeticaAd();
-        Debug.Log($"{TAG} onAdRewarded callback received for adUnitId={meticaAd.adUnitId}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} onAdRewarded callback received for adUnitId={meticaAd.adUnitId}");
         AdRewarded?.Invoke(meticaAd);
     }
     
@@ -66,7 +66,7 @@ public class ShowCallbackProxy : AndroidJavaProxy
     public void onAdRevenuePaid(AndroidJavaObject meticaAdObject)
     {
         var meticaAd = meticaAdObject.ToMeticaAd();
-        Debug.Log($"{TAG} onAdRevenuePaid callback received for adUnitId={meticaAd.adUnitId}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} onAdRevenuePaid callback received for adUnitId={meticaAd.adUnitId}");
         AdRevenuePaid?.Invoke(meticaAd);
     }
 }
