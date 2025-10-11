@@ -56,7 +56,7 @@ internal class AndroidDelegate : PlatformDelegate
     {
         var tcs = new TaskCompletionSource<MeticaInitializationResult>();
 
-        var callback = new InitializeCallbackProxy(tcs);
+        var callback = new InitCallbackProxy(tcs);
        
         // TODO: pass it in the function
         const string applovinSdkKey = "CZ_XxS0v1pDXVdV2yDXaxO4dOV8849QwTq7iDFlGLsJZngU95AEyaq2z8lF0GRlSvdknWDpTDp1GmprFC1FiJ1";
