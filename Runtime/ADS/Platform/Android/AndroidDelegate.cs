@@ -44,6 +44,12 @@ internal class AndroidDelegate : PlatformDelegate
     public event Action<MeticaAd> RewardedAdRewarded;
     public event Action<MeticaAd> RewardedAdRevenuePaid;
 
+    // TODO should be passed from consumer.
+    private const string BannerAdUnitId = "f4132e45724d47fe";
+    private const string InterstitialAdUnitId = "8c63ff91a4a47584";
+    private const string RewardedAdUnitId = "0fdedfeb3c56e0c3";
+
+    
     public void SetLogEnabled(bool logEnabled)
     {
         Debug.Log($"{TAG} SetLogEnabled called with: {logEnabled}");
