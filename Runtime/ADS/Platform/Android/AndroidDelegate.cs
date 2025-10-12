@@ -45,7 +45,6 @@ internal class AndroidDelegate : PlatformDelegate
     public event Action<MeticaAd> RewardedAdRevenuePaid;
 
     // TODO should be passed from consumer.
-    private const string BannerAdUnitId = "f4132e45724d47fe";
     private const string InterstitialAdUnitId = "8c63ff91a4a47584";
     private const string RewardedAdUnitId = "0fdedfeb3c56e0c3";
 
@@ -126,7 +125,7 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdLoadFailed += (error) => InterstitialAdLoadFailed?.Invoke(error);
 
         Debug.Log($"{TAG} About to call Android loadInterstitial method");
-        _unityBridgeAndroidClass.CallStatic("loadInterstitial", callback);
+        _unityBridgeAndroidClass.CallStatic("loadInterstitial", InterstitialAdUnitId, callback);
         Debug.Log($"{TAG} Android loadInterstitial method called");
     }
 
@@ -142,13 +141,13 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdRevenuePaid += (meticaAd) => InterstitialAdRevenuePaid?.Invoke(meticaAd);
 
         Debug.Log($"{TAG} About to call Android showInterstitial method");
-        _unityBridgeAndroidClass.CallStatic("showInterstitial", callback);
+        _unityBridgeAndroidClass.CallStatic("showInterstitial", InterstitialAdUnitId, callback);
         Debug.Log($"{TAG} Android showInterstitial method called");
     }
 
     public bool IsInterstitialReady()
     {
-        return _unityBridgeAndroidClass.CallStatic<bool>("isInterstitialReady");
+        return _unityBridgeAndroidClass.CallStatic<bool>("isInterstitialReady", InterstitialAdUnitId);
     }
 
     // Rewarded methods
@@ -161,7 +160,7 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdLoadFailed += (error) => RewardedAdLoadFailed?.Invoke(error);
 
         Debug.Log($"{TAG} About to call Android loadRewarded method");
-        _unityBridgeAndroidClass.CallStatic("loadRewarded", callback);
+        _unityBridgeAndroidClass.CallStatic("loadRewarded", RewardedAdUnitId, callback);
         Debug.Log($"{TAG} Android loadRewarded method called");
     }
 
@@ -178,13 +177,13 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdRevenuePaid += (meticaAd) => RewardedAdRevenuePaid?.Invoke(meticaAd);
 
         Debug.Log($"{TAG} About to call Android showRewarded method");
-        _unityBridgeAndroidClass.CallStatic("showRewarded", callback);
+        _unityBridgeAndroidClass.CallStatic("showRewarded", RewardedAdUnitId, callback);
         Debug.Log($"{TAG} Android showRewarded method called");
     }
 
     public bool IsRewardedReady()
     {
-        return _unityBridgeAndroidClass.CallStatic<bool>("isRewardedReady");
+        return _unityBridgeAndroidClass.CallStatic<bool>("isRewardedReady", RewardedAdUnitId);
     }
 }
 }
