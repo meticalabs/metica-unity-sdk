@@ -50,23 +50,5 @@ public static class AndroidJavaObjectExtensions
 
         return new MeticaSmartFloors(userGroup, isSuccess);
     }
-    
-    /// <summary>
-    /// Converts a MeticaAd object to an AndroidJavaObject for Unity-Android interop.
-    /// </summary>
-    /// <param name="meticaAd">The MeticaAd object to convert</param>
-    /// <returns>AndroidJavaObject representing the MeticaAd on the Android side</returns>
-    public static AndroidJavaObject ToAndroidJavaObject(this MeticaAd meticaAd)
-    {
-        return AndroidUnityBridge.UnityBridgeClass.CallStatic<AndroidJavaObject>("createMeticaAd", 
-            meticaAd.adUnitId, 
-            meticaAd.revenue, 
-            meticaAd.networkName, 
-            meticaAd.placementTag, 
-            meticaAd.adFormat,
-            meticaAd.creativeId,
-            meticaAd.latency
-        );
-    }
 }
 }
