@@ -22,14 +22,17 @@ public class InitCallbackProxy : AndroidJavaProxy
     // Called from Android when initialization succeeds
     public void onInit(AndroidJavaObject initResponseJavaObject)
     {
+        Debug.Log($"{TAG} InitCallbackProxy onInit");
+        var smartFloorsJavaObject = initResponseJavaObject.Call<AndroidJavaObject>("getSmartFloors");
+
+        Debug.Log($"{TAG} InitCallbackProxy smartFloorsObj = {smartFloorsJavaObject.ToMeticaSmartFloors()}");
         
-        var initResponse = new InitResponseProxy(initResponseJavaObject);
-        Debug.Log($"{TAG} OnInit $initResponse: {initResponse}");
         
         // TODO: currently we force trial user group
         _tcs.SetResult(
             new MeticaInitializationResult(MeticaAdsAssignmentStatus.Normal)
         );
+        
         /*
         Debug.Log($"{TAG} onInitialized: {adsEnabled}");
         if (adsEnabled)

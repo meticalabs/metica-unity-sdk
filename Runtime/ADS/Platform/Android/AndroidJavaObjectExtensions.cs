@@ -40,6 +40,17 @@ public static class AndroidJavaObjectExtensions
         return new MeticaAd(adUnitId, revenue, networkName, placementTag, adFormat, creativeId, latency);
     }
     
+    public static MeticaSmartFloors ToMeticaSmartFloors(this AndroidJavaObject javaObject)
+    {
+        var userGroupJavaObject = javaObject.Call<AndroidJavaObject>("getUserGroup");
+        var userGroupName = userGroupJavaObject.Call<string>("name");
+        var userGroup = (MeticaUserGroup)System.Enum.Parse(typeof(MeticaUserGroup), userGroupName);
+
+        var isSuccess = javaObject.Call<bool>("isSuccess");
+
+        return new MeticaSmartFloors(userGroup, isSuccess);
+    }
+    
     /// <summary>
     /// Converts a MeticaAd object to an AndroidJavaObject for Unity-Android interop.
     /// </summary>
