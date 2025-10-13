@@ -19,9 +19,9 @@ namespace Metica.SDK
         public static string UserId { get; set; } // TODO: set should become private and require a reinitialization to cheange user id
         public static string ApiKey { get; private set; }
         public static string AppId { get; private set; }
-        // TODO: remove apploving key fromm here in favour of
-        // more configurability considering possible additions of other ad providers.
         public static string BaseEndpoint { get; private set; }
+        // TODO: remove apploving key from here in favour of
+        // more configurability considering possible additions of other ad providers.
         public static string ApplovinKey { get; private set; }
         public static LogLevel LogLevel { get; set; } = LogLevel.Info;
 
@@ -34,8 +34,10 @@ namespace Metica.SDK
 
         #endregion Fields
 
+        #region Methods
+
         /// <summary>
-        ///  Utility, (Unity specific) method that should not be used directly.
+        /// Utility, (Unity specific) method that should not be used directly.
         /// Resets static properties to null.
         /// </summary>
         public static void ResetStaticFields()
@@ -62,8 +64,8 @@ namespace Metica.SDK
         }
 
         /// <summary>
-        /// NEW INITIALIZATION
-        /// /// </summary>
+        /// Registers services and initializes all SDK components.
+        /// </summary>
         public static async Task<MeticaInitializationResult> InitializeAsync(MeticaConfiguration config)
         {
             RegisterServices();
@@ -75,24 +77,15 @@ namespace Metica.SDK
             Sdk = new MeticaSdk(config);
 
             // ADS
-            var result = await MeticaAds.InitializeAsync(config);
+            var result = await MeticaAds.InitializeAsync(config);//InitializeAsync(config);
             IsMeticaAdsEnabled = result.IsMeticaAdsEnabled;
             return result;
         }
 
         /// <summary>
-        /// OLD INITIALIZATION
-        /// </summary>
-        // public static MeticaSdk Initialize(SdkConfig sdkConfig)
-        // {
-        //     return new MeticaSdk(sdkConfig);
-        // }
-
-        /// <summary>
         /// Registration of implementation of services.
         /// </summary>
-        /// <param name="config"></param>
-        /// <remarks>Call this <i>before</i> <see cref="InitializeAsync(SdkConfig)"/>
+        /// <remarks>Call this <i>before</i> <see cref="InitializeAsync"/>
         /// if and only if you want to use your own implementations of services known
         /// to <see cref="MeticaSdk"/>, for example to mock them in unit testing.</remarks>
         public static void RegisterServices()
@@ -107,8 +100,6 @@ namespace Metica.SDK
         /// <param name="config">Metica SDK configuration object.</param>
         private MeticaSdk(MeticaConfiguration config)
         {
-            // The following part will be soon be obsolete as
-            // it'll be implemented in MeticaAds.
             _http = new HttpServiceDotnet(
                 requestTimeoutSeconds: 60,
                 cacheGCTimeoutSeconds: 10,
@@ -122,7 +113,7 @@ namespace Metica.SDK
             _eventManager = new EventManager(_http, $"{config.BaseEndpoint}/ingest/v1/events", _offerManager);
             // Set the CurrentUserId with the initial value given in the configuration
 
-            //--/--/--/--/--/--/--/--/
+            // - - - - - - - - - - -
 
             UserId = config.UserId;
             ApiKey = config.ApiKey;
@@ -130,6 +121,24 @@ namespace Metica.SDK
             BaseEndpoint = config.BaseEndpoint;
         }
 
+        public static async ValueTask DisposeAsync()
+            => await Sdk.SdkDisposeAsync();
+
+        private async ValueTask SdkDisposeAsync()
+        {
+            if (_eventManager != null) await _eventManager.DisposeAsync();
+            if (_offerManager != null) await _offerManager.DisposeAsync();
+            if (_configManager != null) await _configManager.DisposeAsync();
+            _http?.Dispose();
+            Ads.Dispose(); // TODO
+            Sdk = null;
+        }
+
+        #endregion Methods
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        #region Offers
 
         public static class Offers
         {
@@ -137,11 +146,24 @@ namespace Metica.SDK
                 => await Sdk._offerManager.GetOffersAsync(UserId, placements, userData);
         }
 
+        #endregion Offers
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        #region SmartConfig
+
         public static class SmartConfig
         {
             public static async Task<ConfigResult> GetConfigsAsync(List<string> configKeys = null, Dictionary<string, object> userProperties = null)
                 => await Sdk._configManager.GetConfigsAsync(UserId, configKeys, userProperties);
         }
+
+        #endregion SmartConfig
+
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        #region Events
 
         public static class Events
         {
@@ -274,30 +296,15 @@ namespace Metica.SDK
             }
         }
 
-        public static async ValueTask DisposeAsync()
-            => await Sdk.SdkDisposeAsync();
+        #endregion Events
 
-        private async ValueTask SdkDisposeAsync()
-        {
-            if (_eventManager != null) await _eventManager.DisposeAsync();
-            if (_offerManager != null) await _offerManager.DisposeAsync();
-            if (_configManager != null) await _configManager.DisposeAsync();
-            _http?.Dispose();
-            // TODO MeticaAds should have a Dispose call too.
-            Sdk = null;
-        }
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        #region Ads
 
         // ADS bridge
         public static class Ads
         {
-            public const string TAG = MeticaAds.TAG;
-
-            // public static Task<MeticaInitializationResult> InitializeAsync(MeticaConfiguration configuration)
-            //     => MeticaAds.InitializeAsync(configuration);
-
-            // public static Task<MeticaInitializationResult> InitializeWithResultAsync(MeticaConfiguration configuration)
-            //     => MeticaAds.InitializeWithResultAsync(configuration);
-
             public static void SetLogEnabled(bool logEnabled)
                 => MeticaAds.SetLogEnabled(logEnabled);
 
@@ -330,6 +337,12 @@ namespace Metica.SDK
 
             public static bool IsRewardedReady()
                 => MeticaAds.IsRewardedReady();
+
+            internal static void Dispose()
+                // TODO
+                => Log.Info(() => "Metica.Sdk.Ads.Dispose called but not yet implemented.");
         }
+
+        #endregion Ads
     }
 }
