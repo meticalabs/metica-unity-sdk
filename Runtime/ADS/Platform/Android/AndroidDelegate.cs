@@ -46,7 +46,7 @@ namespace Metica.ADS.Android
 
         public void SetLogEnabled(bool logEnabled)
         {
-            Debug.Log($"{TAG} SetLogEnabled called with: {logEnabled}");
+            MeticaAds.Log.LogDebug(() => $"{TAG} SetLogEnabled called with: {logEnabled}");
 
             _unityBridgeAndroidClass.CallStatic("setLogEnabled", logEnabled);
         }
@@ -81,29 +81,29 @@ namespace Metica.ADS.Android
             };
             
             
-            Debug.Log($"{TAG} About to call Android createBanner method");
+            MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android createBanner method");
             _unityBridgeAndroidClass.CallStatic("createBanner", adUnitId, yPosition, callback);
-            Debug.Log($"{TAG} Android createBanner method called");
+            MeticaAds.Log.LogDebug(() => $"{TAG} Android createBanner method called");
         }
         public void ShowBanner(string adUnitId)
         {
-            Debug.Log($"{TAG} About to call Android showBanner method");
+            MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android showBanner method");
             _unityBridgeAndroidClass.CallStatic("showBanner", adUnitId);
-            Debug.Log($"{TAG} Android showBanner method called");
+            MeticaAds.Log.LogDebug(() => $"{TAG} Android showBanner method called");
         }
 
         public void HideBanner(string adUnitId)
         {
-            Debug.Log($"{TAG} About to call Android hideBanner method");
+            MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android hideBanner method");
             _unityBridgeAndroidClass.CallStatic("hideBanner", adUnitId);
-            Debug.Log($"{TAG} Android hideBanner method called");
+            MeticaAds.Log.LogDebug(() => $"{TAG} Android hideBanner method called");
         }
 
         public void DestroyBanner(string adUnitId)
         {
-            Debug.Log($"{TAG} About to call Android destroyBanner method");
+            MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android destroyBanner method");
             _unityBridgeAndroidClass.CallStatic("destroyBanner", adUnitId);
-            Debug.Log($"{TAG} Android destroyBanner method called");
+            MeticaAds.Log.LogDebug(() => $"{TAG} Android destroyBanner method called");
         }
         
         // Interstitial methods
@@ -115,9 +115,9 @@ namespace Metica.ADS.Android
             callback.AdLoadSuccess += (meticaAd) => InterstitialAdLoadSuccess?.Invoke(meticaAd);
             callback.AdLoadFailed += (error) => InterstitialAdLoadFailed?.Invoke(error);
 
-            Debug.Log($"{TAG} About to call Android loadInterstitial method");
+            MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android loadInterstitial method");
             _unityBridgeAndroidClass.CallStatic("loadInterstitial", callback);
-            Debug.Log($"{TAG} Android loadInterstitial method called");
+            MeticaAds.Log.LogDebug(() => $"{TAG} Android loadInterstitial method called");
         }
 
         public void ShowInterstitial()
@@ -131,9 +131,9 @@ namespace Metica.ADS.Android
             callback.AdClicked += (meticaAd) => InterstitialAdClicked?.Invoke(meticaAd);
             callback.AdRevenuePaid += (meticaAd) => InterstitialAdRevenuePaid?.Invoke(meticaAd);
 
-            Debug.Log($"{TAG} About to call Android showInterstitial method");
+            MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android showInterstitial method");
             _unityBridgeAndroidClass.CallStatic("showInterstitial", callback);
-            Debug.Log($"{TAG} Android showInterstitial method called");
+            MeticaAds.Log.LogDebug(() => $"{TAG} Android showInterstitial method called");
         }
 
         public bool IsInterstitialReady()
@@ -150,9 +150,9 @@ namespace Metica.ADS.Android
             callback.AdLoadSuccess += (meticaAd) => RewardedAdLoadSuccess?.Invoke(meticaAd);
             callback.AdLoadFailed += (error) => RewardedAdLoadFailed?.Invoke(error);
 
-            Debug.Log($"{TAG} About to call Android loadRewarded method");
+            MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android loadRewarded method");
             _unityBridgeAndroidClass.CallStatic("loadRewarded", callback);
-            Debug.Log($"{TAG} Android loadRewarded method called");
+            MeticaAds.Log.LogDebug(() => $"{TAG} Android loadRewarded method called");
         }
 
         public void ShowRewarded()
@@ -167,9 +167,9 @@ namespace Metica.ADS.Android
             callback.AdRewarded += (meticaAd) => RewardedAdRewarded?.Invoke(meticaAd);
             callback.AdRevenuePaid += (meticaAd) => RewardedAdRevenuePaid?.Invoke(meticaAd);
 
-            Debug.Log($"{TAG} About to call Android showRewarded method");
+            MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android showRewarded method");
             _unityBridgeAndroidClass.CallStatic("showRewarded", callback);
-            Debug.Log($"{TAG} Android showRewarded method called");
+            MeticaAds.Log.LogDebug(() => $"{TAG} Android showRewarded method called");
         }
 
         public bool IsRewardedReady()
