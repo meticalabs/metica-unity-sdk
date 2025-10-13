@@ -7,7 +7,7 @@ using UnityEngine.Assertions;
 // ReSharper disable once CheckNamespace
 namespace Metica.ADS
 {
-    internal static class MeticaAds
+    public static class MeticaAds
     {   
         public const string TAG = "MeticaUnityPlugin";
         private static readonly PlatformDelegate PlatformDelegate;
@@ -55,7 +55,7 @@ namespace Metica.ADS
             PlatformDelegate.RewardedAdRevenuePaid += MeticaAdsCallbacks.Rewarded.OnAdRevenuePaidInternal;
         }
 
-        internal static async Task<MeticaInitializationResult> InitializeAsync(MeticaConfiguration configuration)
+        public static async Task<MeticaInitializationResult> InitializeAsync(MeticaConfiguration configuration)
         {
             return await PlatformDelegate.InitializeAsync(
                 configuration.ApiKey,

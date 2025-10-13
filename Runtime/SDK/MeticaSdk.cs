@@ -77,7 +77,7 @@ namespace Metica.SDK
             Sdk = new MeticaSdk(config);
 
             // ADS
-            var result = await InitializeAsync(config);
+            var result = await MeticaAds.InitializeAsync(config);//InitializeAsync(config);
             IsMeticaAdsEnabled = result.IsMeticaAdsEnabled;
             return result;
         }
@@ -306,37 +306,37 @@ namespace Metica.SDK
         public static class Ads
         {
             public static void SetLogEnabled(bool logEnabled)
-                => SetLogEnabled(logEnabled);
+                => MeticaAds.SetLogEnabled(logEnabled);
 
             public static void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
-                => CreateBanner(bannerAdUnitId, position);
+                => MeticaAds.CreateBanner(bannerAdUnitId, position);
 
             public static void ShowBanner(string adUnitId)
-                => ShowBanner(adUnitId);
+                => MeticaAds.ShowBanner(adUnitId);
 
             public static void HideBanner(string adUnitId)
-                => HideBanner(adUnitId);
+                => MeticaAds.HideBanner(adUnitId);
 
             public static void DestroyBanner(string adUnitId)
-                => DestroyBanner(adUnitId);
+                => MeticaAds.DestroyBanner(adUnitId);
 
             public static void LoadInterstitial()
-                => LoadInterstitial();
+                => MeticaAds.LoadInterstitial();
 
             public static void ShowInterstitial()
-                => ShowInterstitial();
+                => MeticaAds.ShowInterstitial();
 
             public static bool IsInterstitialReady()
-                => IsInterstitialReady();
+                => MeticaAds.IsInterstitialReady();
 
             public static void LoadRewarded()
-                => LoadRewarded();
+                => MeticaAds.LoadRewarded();
 
             public static void ShowRewarded()
-                => ShowRewarded();
+                => MeticaAds.ShowRewarded();
 
             public static bool IsRewardedReady()
-                => IsRewardedReady();
+                => MeticaAds.IsRewardedReady();
 
             internal static void Dispose()
                 // TODO
