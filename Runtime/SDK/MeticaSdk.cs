@@ -12,9 +12,8 @@ namespace Metica.SDK
     {
         static MeticaSdk() 
         {
-            
             Registry.RegisterIfNull<IDeviceInfoProvider>(new DeviceInfoProvider());
-            Registry.RegisterIfNull<ILog>(new MeticaLogger(LogLevel));
+            Registry.RegisterIfNull<ILog>(new MeticaLogger(LogLevel.Error));
         }
 
         #region Fields
@@ -30,7 +29,6 @@ namespace Metica.SDK
         // TODO: remove apploving key from here in favour of
         // more configurability considering possible additions of other ad providers.
         public static string ApplovinKey { get; private set; }
-        public static LogLevel LogLevel { get; set; } = LogLevel.Info;
 
         private readonly IHttpService _http;
         private readonly OfferManager _offerManager;
@@ -43,6 +41,11 @@ namespace Metica.SDK
 
         #region Methods
 
+        public static void SetLogEnabled(bool logEnabled)
+        {
+            Registry.Register<ILog>(new MeticaLogger(LogLevel.Debug));
+            MeticaAds.SetLogEnabled(logEnabled);
+        }
         /// <summary>
         /// Utility, (Unity specific) method that should not be used directly.
         /// Resets static properties to null.
@@ -299,9 +302,6 @@ namespace Metica.SDK
         // ADS bridge
         public static class Ads
         {
-            public static void SetLogEnabled(bool logEnabled)
-                => MeticaAds.SetLogEnabled(logEnabled);
-
             public static void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
                 => MeticaAds.CreateBanner(bannerAdUnitId, position);
 

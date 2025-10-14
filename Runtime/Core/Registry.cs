@@ -90,10 +90,7 @@ namespace Metica.Core
             Assert.IsTrue(typeof(T).IsInterface);
 
             var serviceType = typeof(T);
-            if (!services.ContainsKey(serviceType))
-            {
-                services.Add(serviceType, implementation);
-            }
+            services[serviceType] = implementation;
         }
 
         private T ResolveType<T>()
