@@ -30,6 +30,5 @@ namespace Metica.ADS
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadFailed callback received, error={error}");
             AdLoadFailed?.Invoke(error);
         }
-
     }
 }

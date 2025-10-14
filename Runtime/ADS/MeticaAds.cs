@@ -11,8 +11,7 @@ namespace Metica.ADS
     {   
         public const string TAG = "MeticaUnityPlugin";
         private static readonly PlatformDelegate PlatformDelegate;
-
-        public static readonly ILog Log;
+        internal static readonly ILog Log;
 
         static MeticaAds()
         {
