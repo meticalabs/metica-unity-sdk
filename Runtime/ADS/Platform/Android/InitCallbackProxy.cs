@@ -23,10 +23,10 @@ public class InitCallbackProxy : AndroidJavaProxy
     public void onInit(AndroidJavaObject initResponseJavaObject)
         {
             //TODO: Use Metica Logger
-        Debug.Log($"{TAG} InitCallbackProxy onInit");
+            MeticaAds.Log.LogDebug(() => $"{TAG} InitCallbackProxy onInit");
         var smartFloorsJavaObject = initResponseJavaObject.Call<AndroidJavaObject>("getSmartFloors");
 
-        Debug.Log($"{TAG} InitCallbackProxy smartFloorsObj = {smartFloorsJavaObject.ToMeticaSmartFloors()}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} InitCallbackProxy smartFloorsObj = {smartFloorsJavaObject.ToMeticaSmartFloors()}");
         
         
             // TODO: currently we force trial user group

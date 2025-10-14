@@ -11,9 +11,9 @@ public class InitResponseProxy
 
     public InitResponseProxy(AndroidJavaObject javaObject)
     {
-        Debug.Log($"{TAG} InitResponseProxy created");
+        MeticaAds.Log.LogDebug(() => $"{TAG} InitResponseProxy created");
         var smartFloorsObj = javaObject.Get<AndroidJavaObject>("smartFloors");
-        Debug.Log($"{TAG} InitResponseProxy smartFloorsObj = {smartFloorsObj}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} InitResponseProxy smartFloorsObj = {smartFloorsObj}");
     }
 }
 }
