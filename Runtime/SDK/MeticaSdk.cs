@@ -10,6 +10,13 @@ namespace Metica.SDK
 {
     public class MeticaSdk
     {
+        static MeticaSdk() 
+        {
+            
+            Registry.RegisterIfNull<IDeviceInfoProvider>(new DeviceInfoProvider());
+            Registry.RegisterIfNull<ILog>(new MeticaLogger(LogLevel));
+        }
+
         #region Fields
 
         private static MeticaSdk Sdk { get; set; } = null;
@@ -68,7 +75,6 @@ namespace Metica.SDK
         /// </summary>
         public static async Task<MeticaInitializationResult> InitializeAsync(MeticaConfiguration config)
         {
-            RegisterServices();
             CheckConfig(config);
             if (Sdk != null)
             {
@@ -80,18 +86,6 @@ namespace Metica.SDK
             var result = await MeticaAds.InitializeAsync(config);//InitializeAsync(config);
             IsMeticaAdsEnabled = result.IsMeticaAdsEnabled;
             return result;
-        }
-
-        /// <summary>
-        /// Registration of implementation of services.
-        /// </summary>
-        /// <remarks>Call this <i>before</i> <see cref="InitializeAsync"/>
-        /// if and only if you want to use your own implementations of services known
-        /// to <see cref="MeticaSdk"/>, for example to mock them in unit testing.</remarks>
-        public static void RegisterServices()
-        {
-            Registry.RegisterIfNull<IDeviceInfoProvider>(new DeviceInfoProvider());
-            Registry.RegisterIfNull<ILog>(new MeticaLogger(LogLevel));
         }
 
         /// <summary>
