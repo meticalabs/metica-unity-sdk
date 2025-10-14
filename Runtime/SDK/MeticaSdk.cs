@@ -14,7 +14,7 @@ namespace Metica.SDK
 
         private static MeticaSdk Sdk { get; set; } = null;
 
-        public static string Version { get => "1.13.4"; }
+        public static string Version { get => "2.0.0-beta"; }
 
         public static string UserId { get; set; } // TODO: set should become private and require a reinitialization to cheange user id
         public static string ApiKey { get; private set; }
