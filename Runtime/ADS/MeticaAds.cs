@@ -80,7 +80,6 @@ namespace Metica.ADS
         // Banner ad methods
         public static void ShowBanner(string adUnitId)
         {
-            
             PlatformDelegate.ShowBanner(adUnitId);
         }
         public static void HideBanner(string adUnitId)
