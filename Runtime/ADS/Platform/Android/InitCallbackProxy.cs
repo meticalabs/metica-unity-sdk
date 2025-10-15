@@ -22,22 +22,13 @@ public class InitCallbackProxy : AndroidJavaProxy
     // Called from Android when initialization succeeds
     public void onInit(AndroidJavaObject initResponseJavaObject)
     {
-        //TODO: Use Metica Logger
         MeticaAds.Log.LogDebug(() => $"{TAG} InitCallbackProxy onInit");
         var smartFloorsJavaObject = initResponseJavaObject.Call<AndroidJavaObject>("getSmartFloors");
+        var smartFloors = smartFloorsJavaObject.ToMeticaSmartFloors();
 
-        MeticaAds.Log.LogDebug(() =>
-            $"{TAG} InitCallbackProxy smartFloorsObj = {smartFloorsJavaObject.ToMeticaSmartFloors()}");
+        MeticaAds.Log.LogDebug(() => $"{TAG} InitCallbackProxy smartFloorsObj = {smartFloors}");
 
-
-        // TODO: currently we force trial user group
-        _tcs.SetResult(
-            new MeticaInitializationResult(MeticaAdsAssignmentStatus.Normal)
-        );
-
-        /*
-        MeticaAds.Log.LogDebug(() => $"{TAG} onInitialized: {adsEnabled}");
-        if (adsEnabled)
+        if (smartFloors.userGroup == MeticaUserGroup.TRIAL)
         {
             _tcs.SetResult(
                 new MeticaInitializationResult(MeticaAdsAssignmentStatus.Normal)
@@ -46,10 +37,11 @@ public class InitCallbackProxy : AndroidJavaProxy
         else
         {
             _tcs.SetResult(
-                new MeticaInitializationResult(MeticaAdsAssignmentStatus.Holdout)
+                smartFloors.isSuccess
+                    ? new MeticaInitializationResult(MeticaAdsAssignmentStatus.Holdout)
+                    : new MeticaInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
             );
         }
-    */
     }
 }
 }
