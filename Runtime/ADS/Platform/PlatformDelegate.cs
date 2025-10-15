@@ -54,8 +54,8 @@ internal interface PlatformDelegate
     bool IsInterstitialReady(string interstitialAdUnitId);
             
     // Rewarded methods
-    void LoadRewarded();
-    void ShowRewarded();
-    bool IsRewardedReady();
+    void LoadRewarded(string rewardedAdUnitId);
+    void ShowRewarded(string rewardedAdUnitId);
+    bool IsRewardedReady(string rewardedAdUnitId);
 }
 }

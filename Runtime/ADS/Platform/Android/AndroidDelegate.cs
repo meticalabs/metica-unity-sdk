@@ -44,9 +44,6 @@ internal class AndroidDelegate : PlatformDelegate
     public event Action<MeticaAd> RewardedAdRewarded;
     public event Action<MeticaAd> RewardedAdRevenuePaid;
 
-    private const string RewardedAdUnitId = "0fdedfeb3c56e0c3";
-
-
     public void SetLogEnabled(bool logEnabled)
     {
         MeticaAds.Log.LogDebug(() => $"{TAG} SetLogEnabled called with: {logEnabled}");
@@ -152,7 +149,7 @@ internal class AndroidDelegate : PlatformDelegate
     }
 
     // Rewarded methods
-    public void LoadRewarded()
+    public void LoadRewarded(string rewardedAdUnitId)
     {
         var callback = new LoadCallbackProxy();
 
@@ -161,11 +158,11 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdLoadFailed += (error) => RewardedAdLoadFailed?.Invoke(error);
 
         MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android loadRewarded method");
-        _unityBridgeAndroidClass.CallStatic("loadRewarded", RewardedAdUnitId, callback);
+        _unityBridgeAndroidClass.CallStatic("loadRewarded", rewardedAdUnitId, callback);
         MeticaAds.Log.LogDebug(() => $"{TAG} Android loadRewarded method called");
     }
 
-    public void ShowRewarded()
+    public void ShowRewarded(string rewardedAdUnitId)
     {
         var callback = new ShowCallbackProxy();
 
@@ -178,13 +175,13 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdRevenuePaid += (meticaAd) => RewardedAdRevenuePaid?.Invoke(meticaAd);
 
         MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android showRewarded method");
-        _unityBridgeAndroidClass.CallStatic("showRewarded", RewardedAdUnitId, callback);
+        _unityBridgeAndroidClass.CallStatic("showRewarded", rewardedAdUnitId, callback);
         MeticaAds.Log.LogDebug(() => $"{TAG} Android showRewarded method called");
     }
 
-    public bool IsRewardedReady()
+    public bool IsRewardedReady(string rewardedAdUnitId)
     {
-        return _unityBridgeAndroidClass.CallStatic<bool>("isRewardedReady", RewardedAdUnitId);
+        return _unityBridgeAndroidClass.CallStatic<bool>("isRewardedReady", rewardedAdUnitId);
     }
 }
 }

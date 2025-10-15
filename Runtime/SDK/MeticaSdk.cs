@@ -323,14 +323,14 @@ namespace Metica.SDK
             public static bool IsInterstitialReady(string interstitialAdUnitId)
                 => MeticaAds.IsInterstitialReady(interstitialAdUnitId);
 
-            public static void LoadRewarded()
-                => MeticaAds.LoadRewarded();
+            public static void LoadRewarded(string rewardedAdUnitId)
+                => MeticaAds.LoadRewarded(rewardedAdUnitId);
 
-            public static void ShowRewarded()
-                => MeticaAds.ShowRewarded();
+            public static void ShowRewarded(string rewardedAdUnitId)
+                => MeticaAds.ShowRewarded(rewardedAdUnitId);
 
-            public static bool IsRewardedReady()
-                => MeticaAds.IsRewardedReady();
+            public static bool IsRewardedReady(string rewardedAdUnitId)
+                => MeticaAds.IsRewardedReady(rewardedAdUnitId);
 
             internal static void Dispose()
                 // TODO

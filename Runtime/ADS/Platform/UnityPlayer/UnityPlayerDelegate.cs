@@ -80,17 +80,17 @@ namespace Metica.ADS.UnityPlayer
             return false;
         }
 
-        public void LoadRewarded()
+        public void LoadRewarded(string rewardedAdUnitId)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock LoadRewarded called");
         }
 
-        public void ShowRewarded()
+        public void ShowRewarded(string rewardedAdUnitId)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock ShowRewarded called");
         }
 
-        public bool IsRewardedReady()
+        public bool IsRewardedReady(string rewardedAdUnitId)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock IsRewardedReady - always returns false");
             return false;

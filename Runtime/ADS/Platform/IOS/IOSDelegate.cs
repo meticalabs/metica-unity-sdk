@@ -81,17 +81,17 @@ internal class IOSDelegate : PlatformDelegate
     }
 
     // Rewarded methods
-    public void LoadRewarded()
+    public void LoadRewarded(string rewardedAdUnitId)
     {
      
     }
 
-    public void ShowRewarded()
+    public void ShowRewarded(string rewardedAdUnitId)
     {
     
     }
 
-    public bool IsRewardedReady()
+    public bool IsRewardedReady(string rewardedAdUnitId)
     {
         return false;
     }

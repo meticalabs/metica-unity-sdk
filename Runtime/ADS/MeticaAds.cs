@@ -108,17 +108,17 @@ namespace Metica.ADS
         }
         
         // Rewarded ad methods
-        public static void LoadRewarded()
+        public static void LoadRewarded(string rewardedAdUnitId)
         {
-            PlatformDelegate.LoadRewarded();
+            PlatformDelegate.LoadRewarded(rewardedAdUnitId);
         }
-        public static void ShowRewarded()
+        public static void ShowRewarded(string rewardedAdUnitId)
         {
-            PlatformDelegate.ShowRewarded();
+            PlatformDelegate.ShowRewarded(rewardedAdUnitId);
         }
-        public static bool IsRewardedReady()
+        public static bool IsRewardedReady(string rewardedAdUnitId)
         {
-            return PlatformDelegate.IsRewardedReady();
+            return PlatformDelegate.IsRewardedReady(rewardedAdUnitId);
         }
         
         private static UnityPlayer.UnityPlayerDelegate GetUnityPlayerDelegate()
