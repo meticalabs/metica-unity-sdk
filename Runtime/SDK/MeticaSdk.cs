@@ -314,14 +314,14 @@ namespace Metica.SDK
             public static void DestroyBanner(string adUnitId)
                 => MeticaAds.DestroyBanner(adUnitId);
 
-            public static void LoadInterstitial()
-                => MeticaAds.LoadInterstitial();
+            public static void LoadInterstitial(string interstitialAdUnitId)
+                => MeticaAds.LoadInterstitial(interstitialAdUnitId);
 
-            public static void ShowInterstitial()
-                => MeticaAds.ShowInterstitial();
+            public static void ShowInterstitial(string interstitialAdUnitId)
+                => MeticaAds.ShowInterstitial(interstitialAdUnitId);
 
-            public static bool IsInterstitialReady()
-                => MeticaAds.IsInterstitialReady();
+            public static bool IsInterstitialReady(string interstitialAdUnitId)
+                => MeticaAds.IsInterstitialReady(interstitialAdUnitId);
 
             public static void LoadRewarded()
                 => MeticaAds.LoadRewarded();

@@ -64,17 +64,17 @@ namespace Metica.ADS.UnityPlayer
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock DestroyBanner called");
         }
 
-        public void LoadInterstitial()
+        public void LoadInterstitial(string interstitialAdUnitId)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock LoadInterstitial called");
         }
 
-        public void ShowInterstitial()
+        public void ShowInterstitial(string interstitialAdUnitId)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock ShowInterstitial called");
         }
 
-        public bool IsInterstitialReady()
+        public bool IsInterstitialReady(string interstitialAdUnitId)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock IsInterstitialReady - always returns false");
             return false;

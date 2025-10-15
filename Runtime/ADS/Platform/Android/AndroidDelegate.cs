@@ -44,8 +44,6 @@ internal class AndroidDelegate : PlatformDelegate
     public event Action<MeticaAd> RewardedAdRewarded;
     public event Action<MeticaAd> RewardedAdRevenuePaid;
 
-    // TODO should be passed from consumer.
-    private const string InterstitialAdUnitId = "8c63ff91a4a47584";
     private const string RewardedAdUnitId = "0fdedfeb3c56e0c3";
 
 
@@ -119,7 +117,7 @@ internal class AndroidDelegate : PlatformDelegate
     }
 
     // Interstitial methods
-    public void LoadInterstitial()
+    public void LoadInterstitial(string interstitialAdUnitId)
     {
         var callback = new LoadCallbackProxy();
 
@@ -128,11 +126,11 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdLoadFailed += (error) => InterstitialAdLoadFailed?.Invoke(error);
 
         MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android loadInterstitial method");
-        _unityBridgeAndroidClass.CallStatic("loadInterstitial", InterstitialAdUnitId, callback);
+        _unityBridgeAndroidClass.CallStatic("loadInterstitial", interstitialAdUnitId, callback);
         MeticaAds.Log.LogDebug(() => $"{TAG} Android loadInterstitial method called");
     }
 
-    public void ShowInterstitial()
+    public void ShowInterstitial(string interstitialAdUnitId)
     {
         var callback = new ShowCallbackProxy();
 
@@ -144,13 +142,13 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdRevenuePaid += (meticaAd) => InterstitialAdRevenuePaid?.Invoke(meticaAd);
 
         MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android showInterstitial method");
-        _unityBridgeAndroidClass.CallStatic("showInterstitial", InterstitialAdUnitId, callback);
+        _unityBridgeAndroidClass.CallStatic("showInterstitial", interstitialAdUnitId, callback);
         MeticaAds.Log.LogDebug(() => $"{TAG} Android showInterstitial method called");
     }
 
-    public bool IsInterstitialReady()
+    public bool IsInterstitialReady(string interstitialAdUnitId)
     {
-        return _unityBridgeAndroidClass.CallStatic<bool>("isInterstitialReady", InterstitialAdUnitId);
+        return _unityBridgeAndroidClass.CallStatic<bool>("isInterstitialReady", interstitialAdUnitId);
     }
 
     // Rewarded methods

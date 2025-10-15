@@ -67,15 +67,15 @@ internal class IOSDelegate : PlatformDelegate
     }
 
     // Interstitial methods
-    public void LoadInterstitial()
+    public void LoadInterstitial(string interstitialAdUnitId)
     {
     }
 
-    public void ShowInterstitial()
+    public void ShowInterstitial(string interstitialAdUnitId)
     {
     }
 
-    public bool IsInterstitialReady()
+    public bool IsInterstitialReady(string interstitialAdUnitId)
     {
         return false;
     }

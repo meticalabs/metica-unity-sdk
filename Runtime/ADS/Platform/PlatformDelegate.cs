@@ -49,9 +49,9 @@ internal interface PlatformDelegate
     void DestroyBanner(string adUnitId);
 
     // Interstitial methods
-    void LoadInterstitial();
-    void ShowInterstitial();
-    bool IsInterstitialReady();
+    void LoadInterstitial(string interstitialAdUnitId);
+    void ShowInterstitial(string interstitialAdUnitId);
+    bool IsInterstitialReady(string interstitialAdUnitId);
             
     // Rewarded methods
     void LoadRewarded();

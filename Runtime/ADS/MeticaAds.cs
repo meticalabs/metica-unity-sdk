@@ -94,17 +94,17 @@ namespace Metica.ADS
         }
         
         // Interstitial ad methods
-        public static void LoadInterstitial()
+        public static void LoadInterstitial(string interstitialAdUnitId)
         {
-            PlatformDelegate.LoadInterstitial();
+            PlatformDelegate.LoadInterstitial(interstitialAdUnitId);
         }
-        public static void ShowInterstitial()
+        public static void ShowInterstitial(string interstitialAdUnitId)
         {
-            PlatformDelegate.ShowInterstitial();
+            PlatformDelegate.ShowInterstitial(interstitialAdUnitId);
         }
-        public static bool IsInterstitialReady()
+        public static bool IsInterstitialReady(string interstitialAdUnitId)
         {
-            return PlatformDelegate.IsInterstitialReady();
+            return PlatformDelegate.IsInterstitialReady(interstitialAdUnitId);
         }
         
         // Rewarded ad methods
