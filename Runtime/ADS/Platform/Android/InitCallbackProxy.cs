@@ -28,7 +28,7 @@ public class InitCallbackProxy : AndroidJavaProxy
 
         MeticaAds.Log.LogDebug(() => $"{TAG} InitCallbackProxy smartFloorsObj = {smartFloors}");
 
-        if (smartFloors.userGroup == MeticaUserGroup.TRIAL)
+        if (smartFloors.UserGroup == MeticaUserGroup.TRIAL)
         {
             _tcs.SetResult(
                 new MeticaInitializationResult(MeticaAdsAssignmentStatus.Normal)
@@ -37,7 +37,7 @@ public class InitCallbackProxy : AndroidJavaProxy
         else
         {
             _tcs.SetResult(
-                smartFloors.isSuccess
+                smartFloors.IsSuccess
                     ? new MeticaInitializationResult(MeticaAdsAssignmentStatus.Holdout)
                     : new MeticaInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
             );

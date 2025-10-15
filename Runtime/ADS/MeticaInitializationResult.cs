@@ -1,5 +1,6 @@
 namespace Metica.ADS
 {
+    [System.Obsolete("Use MeticaInitResponse instead.")]
     public class MeticaInitializationResult
     {
         public MeticaAdsAssignmentStatus Status { get; }
