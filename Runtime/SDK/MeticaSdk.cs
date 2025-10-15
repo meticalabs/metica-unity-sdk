@@ -76,7 +76,7 @@ namespace Metica.SDK
         /// <summary>
         /// Registers services and initializes all SDK components.
         /// </summary>
-        public static async Task<MeticaInitializationResult> InitializeAsync(MeticaConfiguration config)
+        public static async Task<MeticaInitResponse> InitializeAsync(MeticaConfiguration config)
         {
             CheckConfig(config);
             if (Sdk != null)
@@ -87,7 +87,7 @@ namespace Metica.SDK
 
             // ADS
             var result = await MeticaAds.InitializeAsync(config);//InitializeAsync(config);
-            IsMeticaAdsEnabled = result.IsMeticaAdsEnabled;
+            IsMeticaAdsEnabled = result.SmartFloors.UserGroup == MeticaUserGroup.TRIAL;
             return result;
         }
 

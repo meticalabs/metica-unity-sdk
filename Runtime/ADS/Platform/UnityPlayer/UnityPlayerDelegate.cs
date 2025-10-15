@@ -27,13 +27,14 @@ namespace Metica.ADS.UnityPlayer
         public event Action<MeticaAd> RewardedAdRewarded;
         public event Action<MeticaAd> RewardedAdRevenuePaid;
 
-        public Task<MeticaInitializationResult> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
+        public Task<MeticaInitResponse> InitializeAsync(string apiKey, string appId, string userId, string version,
+            string baseEndpoint,
             MeticaConfiguration meticaConfiguration)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock initialization - always returns HoldoutDueToError");
-            var tcs = new TaskCompletionSource<MeticaInitializationResult>();
+            var tcs = new TaskCompletionSource<MeticaInitResponse>();
             tcs.SetResult(
-                new MeticaInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
+                new MeticaInitResponse(new MeticaSmartFloors(MeticaUserGroup.HOLDOUT, false))
             );
             return tcs.Task;
         }

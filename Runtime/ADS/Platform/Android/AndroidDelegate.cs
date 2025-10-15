@@ -51,11 +51,11 @@ internal class AndroidDelegate : PlatformDelegate
         _unityBridgeAndroidClass.CallStatic("setLogEnabled", logEnabled);
     }
 
-    public Task<MeticaInitializationResult> InitializeAsync(string apiKey, string appId, string userId, string version,
+    public Task<MeticaInitResponse> InitializeAsync(string apiKey, string appId, string userId, string version,
         string baseEndpoint,
         MeticaConfiguration configuration)
     {
-        var tcs = new TaskCompletionSource<MeticaInitializationResult>();
+        var tcs = new TaskCompletionSource<MeticaInitResponse>();
 
         var callback = new InitCallbackProxy(tcs);
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Metica.ADS
 {
+[System.Obsolete]
 public static class MeticaAdExtensions
 {
     public static MaxSdkBase.AdInfo ToAdInfo(this MeticaAd meticaAd)
