@@ -35,8 +35,6 @@ namespace Metica.SDK
         private readonly ConfigManager _configManager;
         private readonly EventManager _eventManager;
 
-        public static bool IsMeticaAdsEnabled { get; private set; }
-
         #endregion Fields
 
         #region Methods
@@ -87,7 +85,6 @@ namespace Metica.SDK
 
             // ADS
             var result = await MeticaAds.InitializeAsync(config);//InitializeAsync(config);
-            IsMeticaAdsEnabled = result.SmartFloors.UserGroup == MeticaUserGroup.TRIAL;
             return result;
         }
 
