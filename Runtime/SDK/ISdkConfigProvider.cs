@@ -4,6 +4,6 @@ namespace Metica.SDK
 {
     public interface IMeticaConfigProvider
     {
-        public MeticaConfiguration Config { get; }
+        public MeticaInitConfig Config { get; }
     }
 }

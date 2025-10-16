@@ -17,23 +17,21 @@ namespace Metica.SDK
         }
 
         #region Fields
-
-        private static MeticaSdk Sdk { get; set; } = null;
+        
+        private static MeticaSdk Sdk { get; set; }
 
         public static string Version { get => "2.0.0-beta1"; }
 
-        public static string UserId { get; set; } // TODO: set should become private and require a reinitialization to cheange user id
+        internal static string UserId { get; set; } // TODO: set should become private and require a reinitialization to cheange user id
         public static string ApiKey { get; private set; }
         public static string AppId { get; private set; }
         public static string BaseEndpoint { get; private set; }
-        // TODO: remove apploving key from here in favour of
-        // more configurability considering possible additions of other ad providers.
-        public static string ApplovinKey { get; private set; }
 
         private readonly IHttpService _http;
         private readonly OfferManager _offerManager;
         private readonly ConfigManager _configManager;
         private readonly EventManager _eventManager;
+        private const string Endpoint = "https://api-gateway.dev.metica.com";
 
         #endregion Fields
 
@@ -56,25 +54,21 @@ namespace Metica.SDK
             BaseEndpoint = null;
         }
 
-        private static bool CheckConfig(MeticaConfiguration config)
+        private static bool CheckConfig(MeticaInitConfig config)
         {
-            if (string.IsNullOrEmpty(config.ApiKey) || string.IsNullOrEmpty(config.AppId) || string.IsNullOrEmpty(config.BaseEndpoint))
+            if (string.IsNullOrEmpty(config.ApiKey) || string.IsNullOrEmpty(config.AppId))
             {
                 Log.Error(() => "The given SDK configuration is not valid. Please make sure all fields are filled.");
                 return false;
             }
-            if (config.BaseEndpoint.EndsWith('/'))
-            {
-                Log.Error(() => "Please remove the '/' character at the end of the endpoint URL");
-                return false;
-            }
+          
             return true;
         }
 
         /// <summary>
         /// Registers services and initializes all SDK components.
         /// </summary>
-        public static async Task<MeticaInitResponse> InitializeAsync(MeticaConfiguration config)
+        public static async Task<MeticaInitResponse> InitializeAsync(MeticaInitConfig config)
         {
             CheckConfig(config);
             if (Sdk != null)
@@ -92,7 +86,7 @@ namespace Metica.SDK
         /// ORIGINAL SDK INITIALIZATION
         /// </summary>
         /// <param name="config">Metica SDK configuration object.</param>
-        private MeticaSdk(MeticaConfiguration config)
+        private MeticaSdk(MeticaInitConfig config)
         {
             _http = new HttpServiceDotnet(
                 requestTimeoutSeconds: 60,
@@ -100,11 +94,11 @@ namespace Metica.SDK
                 cacheTTLSeconds: 60
                 ).WithPersistentHeaders(new Dictionary<string, string> { { "X-API-Key", config.ApiKey } });
             // Initialize an OfferManager
-            _offerManager = new OfferManager(_http, $"{config.BaseEndpoint}/offers/v1/apps/{config.AppId}");
+            _offerManager = new OfferManager(_http, $"{Endpoint}/offers/v1/apps/{config.AppId}");
             // Initialize a ConfigManager
-            _configManager = new ConfigManager(_http, $"{config.BaseEndpoint}/configs/v1/apps/{config.AppId}");
+            _configManager = new ConfigManager(_http, $"{Endpoint}/configs/v1/apps/{config.AppId}");
             // Initialize an EventManager with _offerManager as IMeticaAttributesProvider
-            _eventManager = new EventManager(_http, $"{config.BaseEndpoint}/ingest/v1/events", _offerManager);
+            _eventManager = new EventManager(_http, $"{Endpoint}/ingest/v1/events", _offerManager);
             // Set the CurrentUserId with the initial value given in the configuration
 
             // - - - - - - - - - - -
@@ -112,7 +106,7 @@ namespace Metica.SDK
             UserId = config.UserId;
             ApiKey = config.ApiKey;
             AppId = config.AppId;
-            BaseEndpoint = config.BaseEndpoint;
+            BaseEndpoint = Endpoint;
         }
 
         public static async ValueTask DisposeAsync()

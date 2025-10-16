@@ -6,9 +6,9 @@ namespace Metica.SDK.Unity
     [CreateAssetMenu(fileName = "MeticaConfiguration", menuName = "Metica/SDK/New Metica Configuration")]
     public class MeticaConfigProvider: ScriptableObject, IMeticaConfigProvider
     {
-        [SerializeField] private MeticaConfiguration _config;
+        [SerializeField] private MeticaInitConfig _config;
 
-        public MeticaConfiguration Config => _config;
+        public MeticaInitConfig Config => _config;
 
     }
 }

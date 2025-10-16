@@ -55,15 +55,12 @@ namespace Metica.ADS
             PlatformDelegate.RewardedAdRevenuePaid += MeticaAdsCallbacks.Rewarded.OnAdRevenuePaidInternal;
         }
 
-        public static async Task<MeticaInitResponse> InitializeAsync(MeticaConfiguration configuration)
+        public static async Task<MeticaInitResponse> InitializeAsync(MeticaInitConfig initConfig)
         {
             return await PlatformDelegate.InitializeAsync(
-                configuration.ApiKey,
-                configuration.AppId,
-                configuration.UserId,
-                configuration.Version,
-                configuration.BaseEndpoint,
-                configuration
+                initConfig.ApiKey,
+                initConfig.AppId,
+                initConfig.UserId
             );
         }
 

@@ -34,10 +34,7 @@ internal interface PlatformDelegate
 
     Task<MeticaInitResponse> InitializeAsync(string apiKey,
         string appId,
-        string userId,
-        string version,
-        string baseEndpoint,
-        MeticaConfiguration configuration);
+        string userId);
     void SetLogEnabled(bool logEnabled);
             
     // Banner methods
