@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Metica.Network;
@@ -20,18 +21,18 @@ namespace Metica.SDK
         
         private static MeticaSdk Sdk { get; set; }
 
-        public static string Version { get => "2.0.0-beta1"; }
+        internal static string Version { get => "2.0.0-beta1"; }
 
         internal static string UserId { get; set; } // TODO: set should become private and require a reinitialization to cheange user id
         public static string ApiKey { get; private set; }
         public static string AppId { get; private set; }
-        public static string BaseEndpoint { get; private set; }
 
         private readonly IHttpService _http;
         private readonly OfferManager _offerManager;
         private readonly ConfigManager _configManager;
         private readonly EventManager _eventManager;
-        private const string Endpoint = "https://api-gateway.dev.metica.com";
+        private const string EndpointEnd = "https://api-gateway.dev.metica.com";
+        private const string EndpointProd = "https://api-gateway.prod-eu.metica.com";
 
         #endregion Fields
 
@@ -51,18 +52,30 @@ namespace Metica.SDK
             UserId = null;
             ApiKey = null;
             AppId = null;
-            BaseEndpoint = null;
         }
 
-        private static bool CheckConfig(MeticaInitConfig config)
+        private static void CheckConfig(MeticaInitConfig config)
         {
             if (string.IsNullOrEmpty(config.ApiKey) || string.IsNullOrEmpty(config.AppId))
             {
                 Log.Error(() => "The given SDK configuration is not valid. Please make sure all fields are filled.");
-                return false;
+                throw new InvalidOperationException("MeticaSDK cannot initialize with invalid configuration - ApiKey and AppId are required.");
             }
-          
-            return true;
+        }
+        
+        private static void CheckMediationInfo(MeticaMediationInfo mediationInfo)
+        {
+            if (mediationInfo == null)
+            {
+                Log.Error(() => "MeticaMediationInfo cannot be null.");
+                throw new ArgumentNullException(nameof(mediationInfo), "Mediation configuration is required for ad initialization.");
+            }
+
+            if (string.IsNullOrEmpty(mediationInfo.Key))
+            {
+                Log.Error(() => $"The {mediationInfo.MediationType} mediation key is not valid. Please provide a valid SDK key.");
+                throw new InvalidOperationException($"MeticaSDK cannot initialize {mediationInfo.MediationType} mediation without a valid key.");
+            }
         }
 
         /// <summary>
@@ -73,6 +86,10 @@ namespace Metica.SDK
             MeticaMediationInfo mediationInfo)
         {
             CheckConfig(config);
+            // Version 2.0.0 wil ship with MediationInfo parameter being required. 
+            // Perhaps in a later version this may be less strict
+            CheckMediationInfo(mediationInfo);
+            
             if (Sdk != null)
             {
                 Log.Warning(() => "Metica SDK reinitialized. This means a new initialization was done on top of a previous one.");
@@ -96,11 +113,11 @@ namespace Metica.SDK
                 cacheTTLSeconds: 60
                 ).WithPersistentHeaders(new Dictionary<string, string> { { "X-API-Key", config.ApiKey } });
             // Initialize an OfferManager
-            _offerManager = new OfferManager(_http, $"{Endpoint}/offers/v1/apps/{config.AppId}");
+            _offerManager = new OfferManager(_http, $"{EndpointProd}/offers/v1/apps/{config.AppId}");
             // Initialize a ConfigManager
-            _configManager = new ConfigManager(_http, $"{Endpoint}/configs/v1/apps/{config.AppId}");
+            _configManager = new ConfigManager(_http, $"{EndpointProd}/configs/v1/apps/{config.AppId}");
             // Initialize an EventManager with _offerManager as IMeticaAttributesProvider
-            _eventManager = new EventManager(_http, $"{Endpoint}/ingest/v1/events", _offerManager);
+            _eventManager = new EventManager(_http, $"{EndpointProd}/ingest/v1/events", _offerManager);
             // Set the CurrentUserId with the initial value given in the configuration
 
             // - - - - - - - - - - -
@@ -108,7 +125,6 @@ namespace Metica.SDK
             UserId = config.UserId;
             ApiKey = config.ApiKey;
             AppId = config.AppId;
-            BaseEndpoint = Endpoint;
         }
 
         public static async ValueTask DisposeAsync()
