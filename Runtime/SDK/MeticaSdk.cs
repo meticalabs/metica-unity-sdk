@@ -89,6 +89,7 @@ namespace Metica.SDK
             
             if (Sdk != null)
             {
+                // TODO: MET-4482 Allow multiple initialize calls
                 Log.Warning(() => "Metica SDK reinitialized. This means a new initialization was done on top of a previous one.");
             }
             Sdk = new MeticaSdk(config);

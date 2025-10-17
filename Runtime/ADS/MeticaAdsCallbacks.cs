@@ -9,7 +9,7 @@ public static class MeticaAdsCallbacks
     {
         // Public events for consumers to subscribe to
         public static event Action<MeticaAd> OnAdLoadSuccess;
-        public static event Action<string> OnAdLoadFailed;
+        public static event Action<MeticaAdError> OnAdLoadFailed;
         public static event Action<MeticaAd> OnAdClicked;
         public static event Action<MeticaAd> OnAdRevenuePaid;
 
@@ -21,7 +21,7 @@ public static class MeticaAdsCallbacks
 
         internal static void OnAdLoadFailedInternal(string error)
         {
-            OnAdLoadFailed?.Invoke(error);
+            OnAdLoadFailed?.Invoke(new MeticaAdError(error));
         }
 
         internal static void OnAdClickedInternal(MeticaAd meticaAd)
@@ -48,9 +48,9 @@ public static class MeticaAdsCallbacks
     {
         // Public events for consumers to subscribe to
         public static event Action<MeticaAd> OnAdLoadSuccess;
-        public static event Action<string> OnAdLoadFailed;
+        public static event Action<MeticaAdError> OnAdLoadFailed;
         public static event Action<MeticaAd> OnAdShowSuccess;
-        public static event Action<MeticaAd, string> OnAdShowFailed;
+        public static event Action<MeticaAd, MeticaAdError> OnAdShowFailed;
         public static event Action<MeticaAd> OnAdHidden;
         public static event Action<MeticaAd> OnAdClicked;
         public static event Action<MeticaAd> OnAdRevenuePaid;
@@ -63,7 +63,7 @@ public static class MeticaAdsCallbacks
 
         internal static void OnAdLoadFailedInternal(string error)
         {
-            OnAdLoadFailed?.Invoke(error);
+            OnAdLoadFailed?.Invoke(new MeticaAdError(error));
         }      
         internal static void OnAdShowSuccessInternal(MeticaAd meticaAd)
         {
@@ -72,7 +72,7 @@ public static class MeticaAdsCallbacks
 
         internal static void OnAdShowFailedInternal(MeticaAd meticaAd, string error)
         {
-            OnAdShowFailed?.Invoke(meticaAd, error);
+            OnAdShowFailed?.Invoke(meticaAd, new MeticaAdError(error));
         }
 
         internal static void OnAdHiddenInternal(MeticaAd meticaAd)
@@ -107,9 +107,9 @@ public static class MeticaAdsCallbacks
     {
         // Public events for consumers to subscribe to
         public static event Action<MeticaAd> OnAdLoadSuccess;
-        public static event Action<string> OnAdLoadFailed;
+        public static event Action<MeticaAdError> OnAdLoadFailed;
         public static event Action<MeticaAd> OnAdShowSuccess;
-        public static event Action<MeticaAd, string> OnAdShowFailed;
+        public static event Action<MeticaAd, MeticaAdError> OnAdShowFailed;
         public static event Action<MeticaAd> OnAdHidden;
         public static event Action<MeticaAd> OnAdClicked;
         public static event Action<MeticaAd> OnAdRewarded;
@@ -123,7 +123,7 @@ public static class MeticaAdsCallbacks
 
         internal static void OnAdLoadFailedInternal(string error)
         {
-            OnAdLoadFailed?.Invoke(error);
+            OnAdLoadFailed?.Invoke(new MeticaAdError(error));
         }      
         
         internal static void OnAdShowSuccessInternal(MeticaAd meticaAd)
@@ -133,7 +133,7 @@ public static class MeticaAdsCallbacks
 
         internal static void OnAdShowFailedInternal(MeticaAd meticaAd, string error)
         {
-            OnAdShowFailed?.Invoke(meticaAd, error);
+            OnAdShowFailed?.Invoke(meticaAd, new MeticaAdError(error));
         }
 
         internal static void OnAdHiddenInternal(MeticaAd meticaAd)
