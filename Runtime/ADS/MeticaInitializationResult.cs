@@ -1,8 +1,10 @@
 namespace Metica.ADS
 {
-    public class MeticaAdsInitializationResult
+    public class MeticaInitializationResult
     {
-        public MeticaAdsInitializationResult(MeticaAdsAssignmentStatus status)
+        public MeticaAdsAssignmentStatus Status { get; }
+     
+        public MeticaInitializationResult(MeticaAdsAssignmentStatus status)
         {
             Status = status;
         }
@@ -21,7 +23,5 @@ namespace Metica.ADS
                 return false;
             }
         }
-
-        public MeticaAdsAssignmentStatus Status { get; }
     }
 }

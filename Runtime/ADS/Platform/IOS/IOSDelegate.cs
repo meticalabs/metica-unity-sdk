@@ -56,64 +56,44 @@ internal class IOSDelegate : PlatformDelegate
     {
     }
 
-    public Task<MeticaAdsInitializationResult> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
+    public Task<MeticaInitializationResult> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
         MeticaConfiguration configuration)
     {
-        var tcs = new TaskCompletionSource<MeticaAdsInitializationResult>();
+        var tcs = new TaskCompletionSource<MeticaInitializationResult>();
         tcs.SetResult(
-            new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
+            new MeticaInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
         );
         return tcs.Task;
     }
 
     // Interstitial methods
-    public void LoadInterstitial()
+    public void LoadInterstitial(string interstitialAdUnitId)
     {
     }
 
-    public void ShowInterstitial()
+    public void ShowInterstitial(string interstitialAdUnitId)
     {
     }
 
-    public bool IsInterstitialReady()
+    public bool IsInterstitialReady(string interstitialAdUnitId)
     {
         return false;
     }
 
     // Rewarded methods
-    public void LoadRewarded()
+    public void LoadRewarded(string rewardedAdUnitId)
     {
      
     }
 
-    public void ShowRewarded()
+    public void ShowRewarded(string rewardedAdUnitId)
     {
     
     }
 
-    public bool IsRewardedReady()
+    public bool IsRewardedReady(string rewardedAdUnitId)
     {
         return false;
-    }
-    // Notification methods
-    public void NotifyAdLoadAttempt(string adUnitId)
-    {
-        // TODO: Implement iOS native call
-    }
-
-    public void NotifyAdLoadSuccess(MeticaAd meticaAd)
-    {
-        // TODO: Implement iOS native call
-    }
-
-    public void NotifyAdLoadFailed(string adUnitId, string error)
-    {
-        // TODO: Implement iOS native call
-    }
-
-    public void NotifyAdRevenue(MeticaAd meticaAd)
-    {
-        // TODO: Implement iOS native call
     }
 }
 }

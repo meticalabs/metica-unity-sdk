@@ -50,7 +50,7 @@ namespace Metica.SDK
         private readonly IMeticaAttributesProvider _meticaAttributesProvider;
         private readonly ITimeSource _timeSource = new SystemDateTimeSource();
 
-        public const uint DefaultEventQueueCountTrigger = 64; // Rename to DefaultQueueFlushCountTrigger
+        public const uint DefaultQueueFlushCountTrigger = 32;
         private const uint DefaultQueueFlushTimeoutSecondsTrigger = 10;
         private readonly uint _eventQueueCountTrigger;
         private long _lastEventDispatchUnixTime = 0;
@@ -61,7 +61,7 @@ namespace Metica.SDK
             IHttpService httpService,
             string endpoint,
             IMeticaAttributesProvider meticaAttributesProvider,
-            uint eventQueueCountTrigger = DefaultEventQueueCountTrigger
+            uint eventQueueCountTrigger = DefaultQueueFlushCountTrigger
             ) : base(httpService, endpoint)
         {
             _meticaAttributesProvider = meticaAttributesProvider;

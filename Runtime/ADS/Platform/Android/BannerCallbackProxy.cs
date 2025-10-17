@@ -11,7 +11,7 @@ namespace Metica.ADS
         public event Action<string> AdLoadFailed;
         public event Action<MeticaAd> AdClicked;
         public event Action<MeticaAd> AdRevenuePaid;
-
+        
         public BannerCallbackProxy() 
             : base("com.metica.ads.MeticaAdsBannerCallback")
         {

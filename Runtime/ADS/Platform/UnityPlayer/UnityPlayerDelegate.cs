@@ -27,13 +27,13 @@ namespace Metica.ADS.UnityPlayer
         public event Action<MeticaAd> RewardedAdRewarded;
         public event Action<MeticaAd> RewardedAdRevenuePaid;
 
-        public Task<MeticaAdsInitializationResult> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
+        public Task<MeticaInitializationResult> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
             MeticaConfiguration meticaConfiguration)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock initialization - always returns HoldoutDueToError");
-            var tcs = new TaskCompletionSource<MeticaAdsInitializationResult>();
+            var tcs = new TaskCompletionSource<MeticaInitializationResult>();
             tcs.SetResult(
-                new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
+                new MeticaInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
             );
             return tcs.Task;
         }
@@ -64,56 +64,36 @@ namespace Metica.ADS.UnityPlayer
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock DestroyBanner called");
         }
 
-        public void LoadInterstitial()
+        public void LoadInterstitial(string interstitialAdUnitId)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock LoadInterstitial called");
         }
 
-        public void ShowInterstitial()
+        public void ShowInterstitial(string interstitialAdUnitId)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock ShowInterstitial called");
         }
 
-        public bool IsInterstitialReady()
+        public bool IsInterstitialReady(string interstitialAdUnitId)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock IsInterstitialReady - always returns false");
             return false;
         }
 
-        public void LoadRewarded()
+        public void LoadRewarded(string rewardedAdUnitId)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock LoadRewarded called");
         }
 
-        public void ShowRewarded()
+        public void ShowRewarded(string rewardedAdUnitId)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock ShowRewarded called");
         }
 
-        public bool IsRewardedReady()
+        public bool IsRewardedReady(string rewardedAdUnitId)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock IsRewardedReady - always returns false");
             return false;
-        }
-        // Notification methods
-        public void NotifyAdLoadAttempt(string adUnitId)
-        {
-            MeticaAds.Log.LogDebug(() => $"[MeticaAds Unity] Mock NotifyAdLoadAttempt called for adUnitId: {adUnitId}");
-        }
-
-        public void NotifyAdLoadSuccess(MeticaAd meticaAd)
-        {
-            MeticaAds.Log.LogDebug(() => $"[MeticaAds Unity] Mock NotifyAdLoadSuccess called for adUnitId: {meticaAd.adUnitId}");
-        }
-
-        public void NotifyAdLoadFailed(string adUnitId, string error)
-        {
-            MeticaAds.Log.LogDebug(() => $"[MeticaAds Unity] Mock NotifyAdLoadFailed called for adUnitId: {adUnitId}, error: {error}");
-        }
-
-        public void NotifyAdRevenue(MeticaAd meticaAd)
-        {
-            MeticaAds.Log.LogDebug(() => $"[MeticaAds Unity] Mock NotifyAdShowSuccess called for adUnitId: {meticaAd.adUnitId}");
         }
     }
 }

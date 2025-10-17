@@ -70,7 +70,7 @@ namespace Metica.SDK
             if (_sessionPlacementStorage == null)
             {
                 // Lazy fetching of all placements into storage
-                var result = await GetAllOffersAsync(MeticaSdk.CurrentUserId);
+                var result = await GetAllOffersAsync(MeticaSdk.UserId);
                 _sessionPlacementStorage = result.placements;
             }
 
@@ -112,7 +112,7 @@ namespace Metica.SDK
             if (_sessionPlacementStorage == null)
             {
                 // Lazy fetching of all placements into storage
-                var result = await GetAllOffersAsync(MeticaSdk.CurrentUserId);
+                var result = await GetAllOffersAsync(MeticaSdk.UserId);
                 _sessionPlacementStorage = result.placements;
             }
 

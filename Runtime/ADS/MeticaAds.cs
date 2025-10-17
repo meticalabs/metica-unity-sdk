@@ -2,12 +2,12 @@
 
 using System.Threading.Tasks;
 using Metica.Core;
-using Metica.SDK;
 using UnityEngine.Assertions;
 
 // ReSharper disable once CheckNamespace
 namespace Metica.ADS
 {
+    // TODO: make the whole class internal
     public static class MeticaAds
     {   
         public const string TAG = "MeticaUnityPlugin";
@@ -23,7 +23,7 @@ namespace Metica.ADS
             // Check for Unity Editor first since the editor also responds to the currently selected platform.
             PlatformDelegate = GetUnityPlayerDelegate();
 #elif UNITY_ANDROID
-            PlatformDelegate = new Android.AndroidDelegate(AndroidUnityBridge.UnityBridgeClass, AndroidUnityBridge.MeticaAdsExternalTrackerClass);
+            PlatformDelegate = new Android.AndroidDelegate(AndroidUnityBridge.UnityBridgeClass);
 #elif UNITY_IPHONE || UNITY_IOS
             PlatformDelegate = new IOS.IOSDelegate();
 #else
@@ -55,20 +55,14 @@ namespace Metica.ADS
             PlatformDelegate.RewardedAdRevenuePaid += MeticaAdsCallbacks.Rewarded.OnAdRevenuePaidInternal;
         }
 
-        public static async Task<bool> InitializeAsync(MeticaConfiguration configuration)
-        {
-            var result = await InitializeWithResultAsync(configuration);
-            return result.IsMeticaAdsEnabled;
-        }
-
-        public static async Task<MeticaAdsInitializationResult> InitializeWithResultAsync(MeticaConfiguration configuration)
+        public static async Task<MeticaInitializationResult> InitializeAsync(MeticaConfiguration configuration)
         {
             return await PlatformDelegate.InitializeAsync(
-                MeticaSdk.ApiKey,
-                MeticaSdk.AppId,
-                MeticaSdk.CurrentUserId,
-                MeticaSdk.Version,
-                MeticaSdk.BaseEndpoint,
+                configuration.ApiKey,
+                configuration.AppId,
+                configuration.UserId,
+                configuration.Version,
+                configuration.BaseEndpoint,
                 configuration
             );
         }
@@ -86,7 +80,6 @@ namespace Metica.ADS
         // Banner ad methods
         public static void ShowBanner(string adUnitId)
         {
-            
             PlatformDelegate.ShowBanner(adUnitId);
         }
         public static void HideBanner(string adUnitId)
@@ -100,53 +93,31 @@ namespace Metica.ADS
         }
         
         // Interstitial ad methods
-        public static void LoadInterstitial()
+        public static void LoadInterstitial(string interstitialAdUnitId)
         {
-            PlatformDelegate.LoadInterstitial();
+            PlatformDelegate.LoadInterstitial(interstitialAdUnitId);
         }
-        public static void ShowInterstitial()
+        public static void ShowInterstitial(string interstitialAdUnitId)
         {
-            PlatformDelegate.ShowInterstitial();
+            PlatformDelegate.ShowInterstitial(interstitialAdUnitId);
         }
-        public static bool IsInterstitialReady()
+        public static bool IsInterstitialReady(string interstitialAdUnitId)
         {
-            return PlatformDelegate.IsInterstitialReady();
+            return PlatformDelegate.IsInterstitialReady(interstitialAdUnitId);
         }
         
         // Rewarded ad methods
-        public static void LoadRewarded()
+        public static void LoadRewarded(string rewardedAdUnitId)
         {
-            PlatformDelegate.LoadRewarded();
+            PlatformDelegate.LoadRewarded(rewardedAdUnitId);
         }
-        public static void ShowRewarded()
+        public static void ShowRewarded(string rewardedAdUnitId)
         {
-            PlatformDelegate.ShowRewarded();
+            PlatformDelegate.ShowRewarded(rewardedAdUnitId);
         }
-        public static bool IsRewardedReady()
+        public static bool IsRewardedReady(string rewardedAdUnitId)
         {
-            return PlatformDelegate.IsRewardedReady();
-        }
-
-        public static void NotifyAdLoadAttempt(string interstitialAdUnitId)
-        {
-            PlatformDelegate.NotifyAdLoadAttempt(interstitialAdUnitId);
-        }
-
-        public static void NotifyAdLoadSuccess(MeticaAd meticaAd)
-        {
-            PlatformDelegate.NotifyAdLoadSuccess(meticaAd);
-        }
-
-        public static void NotifyAdLoadFailed(string adUnitId, string error)
-        {
-            PlatformDelegate.NotifyAdLoadFailed(adUnitId, error);
-        }
-
-        public static void NotifyAdShowSuccess(MeticaAd meticaAd)
-        {
-            // Internally we use the NotifyAdRevenue call, but externally as to not
-            // break API we use NotifyAdShowSuccess. Which is similar as both will tel you ad was shown.
-            PlatformDelegate.NotifyAdRevenue(meticaAd);
+            return PlatformDelegate.IsRewardedReady(rewardedAdUnitId);
         }
         
         private static UnityPlayer.UnityPlayerDelegate GetUnityPlayerDelegate()

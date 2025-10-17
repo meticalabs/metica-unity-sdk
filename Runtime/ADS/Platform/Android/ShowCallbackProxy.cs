@@ -1,5 +1,3 @@
-// ShowCallbackProxy.cs
-
 using System;
 using UnityEngine;
 

@@ -5,10 +5,9 @@ using System.Text;
 
 using UnityEngine;
 
-using Metica.SDK;
 using Metica.SDK.Model;
 
-namespace Metica.Unity
+namespace Metica.SDK.Unity
 {
     /// <summary>
     /// Unity implementation of <see cref="IDeviceInfoProvider"/>.

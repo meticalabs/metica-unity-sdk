@@ -32,7 +32,7 @@ internal interface PlatformDelegate
     public event Action<MeticaAd> RewardedAdRewarded;
     public event Action<MeticaAd> RewardedAdRevenuePaid;
 
-    Task<MeticaAdsInitializationResult> InitializeAsync(
+    Task<MeticaInitializationResult> InitializeAsync(
         string apiKey,
         string appId,
         string userId,
@@ -49,19 +49,13 @@ internal interface PlatformDelegate
     void DestroyBanner(string adUnitId);
 
     // Interstitial methods
-    void LoadInterstitial();
-    void ShowInterstitial();
-    bool IsInterstitialReady();
+    void LoadInterstitial(string interstitialAdUnitId);
+    void ShowInterstitial(string interstitialAdUnitId);
+    bool IsInterstitialReady(string interstitialAdUnitId);
             
     // Rewarded methods
-    void LoadRewarded();
-    void ShowRewarded();
-    bool IsRewardedReady();
-    
-    // Notification methods  
-    void NotifyAdLoadAttempt(string adUnitId);
-    void NotifyAdLoadSuccess(MeticaAd meticaAd);
-    void NotifyAdLoadFailed(string adUnitId, string error);
-    void NotifyAdRevenue(MeticaAd meticaAd);
+    void LoadRewarded(string rewardedAdUnitId);
+    void ShowRewarded(string rewardedAdUnitId);
+    bool IsRewardedReady(string rewardedAdUnitId);
 }
 }
