@@ -36,6 +36,7 @@ internal interface PlatformDelegate
         string appId,
         string userId, string mediationKey);
     void SetLogEnabled(bool logEnabled);
+    
             
     // Banner methods
     void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position);

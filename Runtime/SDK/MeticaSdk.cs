@@ -86,9 +86,6 @@ namespace Metica.SDK
             MeticaMediationInfo mediationInfo)
         {
             CheckConfig(config);
-            // Version 2.0.0 wil ship with MediationInfo parameter being required. 
-            // Perhaps in a later version this may be less strict
-            CheckMediationInfo(mediationInfo);
             
             if (Sdk != null)
             {
@@ -97,6 +94,9 @@ namespace Metica.SDK
             Sdk = new MeticaSdk(config);
 
             // ADS
+            // Version 2.0.0 wil ship with MediationInfo parameter being enforced. 
+            // Perhaps in a later version this may be less strict, as we may allow only SmartContract without SmartFloors
+            CheckMediationInfo(mediationInfo);
             var result = await MeticaAds.InitializeAsync(config, mediationInfo);
             return result;
         }
