@@ -34,7 +34,7 @@ internal interface PlatformDelegate
 
     Task<MeticaInitResponse> InitializeAsync(string apiKey,
         string appId,
-        string userId);
+        string userId, string mediationKey);
     void SetLogEnabled(bool logEnabled);
             
     // Banner methods

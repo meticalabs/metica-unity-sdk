@@ -27,7 +27,8 @@ namespace Metica.ADS.UnityPlayer
         public event Action<MeticaAd> RewardedAdRewarded;
         public event Action<MeticaAd> RewardedAdRevenuePaid;
 
-        public Task<MeticaInitResponse> InitializeAsync(string apiKey, string appId, string userId)
+        public Task<MeticaInitResponse> InitializeAsync(string apiKey, string appId, string userId,
+            string mediationInfoKey)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock initialization - always returns HoldoutDueToError");
             var tcs = new TaskCompletionSource<MeticaInitResponse>();

@@ -56,7 +56,7 @@ internal class IOSDelegate : PlatformDelegate
     {
     }
 
-    public Task<MeticaInitResponse> InitializeAsync(string apiKey, string appId, string userId)
+    public Task<MeticaInitResponse> InitializeAsync(string apiKey, string appId, string userId, string mediationInfoKey)
     {
         var tcs = new TaskCompletionSource<MeticaInitResponse>();
         tcs.SetResult(

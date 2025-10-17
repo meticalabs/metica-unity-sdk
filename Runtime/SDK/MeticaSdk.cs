@@ -68,7 +68,9 @@ namespace Metica.SDK
         /// <summary>
         /// Registers services and initializes all SDK components.
         /// </summary>
-        public static async Task<MeticaInitResponse> InitializeAsync(MeticaInitConfig config)
+        public static async Task<MeticaInitResponse> InitializeAsync(
+            MeticaInitConfig config,
+            MeticaMediationInfo mediationInfo)
         {
             CheckConfig(config);
             if (Sdk != null)
@@ -78,7 +80,7 @@ namespace Metica.SDK
             Sdk = new MeticaSdk(config);
 
             // ADS
-            var result = await MeticaAds.InitializeAsync(config);//InitializeAsync(config);
+            var result = await MeticaAds.InitializeAsync(config, mediationInfo);
             return result;
         }
 
