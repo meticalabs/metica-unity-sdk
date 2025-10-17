@@ -31,7 +31,7 @@ namespace Metica.SDK
         private readonly OfferManager _offerManager;
         private readonly ConfigManager _configManager;
         private readonly EventManager _eventManager;
-        private const string EndpointEnd = "https://api-gateway.dev.metica.com";
+        private const string EndpointDev = "https://api-gateway.dev.metica.com";
         private const string EndpointProd = "https://api-gateway.prod-eu.metica.com";
 
         #endregion Fields
