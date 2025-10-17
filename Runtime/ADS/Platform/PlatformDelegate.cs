@@ -36,7 +36,8 @@ internal interface PlatformDelegate
         string appId,
         string userId, string mediationKey);
     void SetLogEnabled(bool logEnabled);
-    
+    void SetHasUserConsent(bool hasUserConsent);
+    void SetDoNotSell(bool doNotSell);
             
     // Banner methods
     void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position);

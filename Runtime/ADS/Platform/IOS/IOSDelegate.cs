@@ -40,6 +40,16 @@ internal class IOSDelegate : PlatformDelegate
     {
     }
 
+    public void SetHasUserConsent(bool value)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void SetDoNotSell(bool value)
+    {
+        throw new NotImplementedException();
+    }
+
     public void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
     {
     }

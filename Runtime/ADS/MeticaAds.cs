@@ -70,7 +70,15 @@ namespace Metica.ADS
         {
             PlatformDelegate.SetLogEnabled(logEnabled);
         }
-        
+        public static void SetHasUserConsent(bool hasUserConsent)
+        {
+            PlatformDelegate.SetHasUserConsent(hasUserConsent);
+        }
+
+        public static void SetDoNotSell(bool doNotSell)
+        {
+            PlatformDelegate.SetDoNotSell(doNotSell);
+        }
         public static void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
         {
             PlatformDelegate.CreateBanner(bannerAdUnitId, position);

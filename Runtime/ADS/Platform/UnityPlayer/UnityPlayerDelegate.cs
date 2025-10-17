@@ -43,6 +43,16 @@ namespace Metica.ADS.UnityPlayer
             MeticaAds.Log.LogDebug(() => $"[MeticaAds Unity] Mock SetLogEnabled: {logEnabled}");
         }
 
+        public void SetHasUserConsent(bool value)
+        {
+            MeticaAds.Log.LogDebug(() => $"[MeticaAds Unity] Mock SetHasUserConsent: {value}");
+        }
+
+        public void SetDoNotSell(bool value)
+        {
+            MeticaAds.Log.LogDebug(() => $"[MeticaAds Unity] Mock SetDoNotSell: {value}");
+        }
+
         public void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock CreateBanner called");

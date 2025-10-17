@@ -311,6 +311,12 @@ namespace Metica.SDK
         // ADS bridge
         public static class Ads
         {
+            public static void SetHasUserConsent(bool userConsent)
+                => MeticaAds.SetHasUserConsent(userConsent);
+
+            public static void SetDoNotSell(bool doNotSell)
+                => MeticaAds.SetDoNotSell(doNotSell);
+
             public static void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
                 => MeticaAds.CreateBanner(bannerAdUnitId, position);
 

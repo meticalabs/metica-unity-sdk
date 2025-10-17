@@ -51,6 +51,20 @@ internal class AndroidDelegate : PlatformDelegate
         _unityBridgeAndroidClass.CallStatic("setLogEnabled", logEnabled);
     }
 
+    public void SetHasUserConsent(bool hasUserConsent)
+    {
+        MeticaAds.Log.LogDebug(() => $"{TAG} SetHasUserConsent called with: {hasUserConsent}");
+
+        _unityBridgeAndroidClass.CallStatic("setHasUserConsent", hasUserConsent);
+    }
+
+    public void SetDoNotSell(bool doNotSell)
+    {
+        MeticaAds.Log.LogDebug(() => $"{TAG} SetDoNotSell called with: {doNotSell}");
+
+        _unityBridgeAndroidClass.CallStatic("setDoNotSell", doNotSell);
+    }
+
     public Task<MeticaInitResponse> InitializeAsync(string apiKey, string appId, string userId, string mediationKey)
     {
         var tcs = new TaskCompletionSource<MeticaInitResponse>();
