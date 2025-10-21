@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 using Metica.Core;
 using Metica.Network;
-using Metica.SDK.Model;
+using Metica.Model;
 
-namespace Metica.SDK
+namespace Metica
 {
     [Serializable]
     public class EventDispatchResult : IMeticaHttpResult

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Metica.SDK.Unity
+namespace Metica.Unity
 {
     public static class MeticaUnityHandlers
     {

@@ -1,4 +1,4 @@
-namespace Metica.SDK
+namespace Metica
 {
 public class MeticaSmartFloors
 {

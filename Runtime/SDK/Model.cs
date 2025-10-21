@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Metica.SDK.Model
+namespace Metica.Model
 {
     internal static class EventTypes
     {

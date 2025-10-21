@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using Metica.SDK;
+using Metica;
 
 namespace Metica.ADS.UnityPlayer
 {

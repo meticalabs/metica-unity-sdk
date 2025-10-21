@@ -2,7 +2,7 @@
 
 using System.Threading.Tasks;
 using Metica.Core;
-using Metica.SDK;
+using Metica;
 using UnityEngine.Assertions;
 
 // ReSharper disable once CheckNamespace

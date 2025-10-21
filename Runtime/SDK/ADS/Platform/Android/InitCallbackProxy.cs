@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Metica.SDK;
+using Metica;
 using UnityEngine;
 // ReSharper disable InconsistentNaming
 

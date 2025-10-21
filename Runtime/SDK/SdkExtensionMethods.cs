@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Metica.SDK
+namespace Metica
 {
     public static class SdkExtensionMethods
     {

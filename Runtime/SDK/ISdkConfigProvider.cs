@@ -1,6 +1,6 @@
 using Metica.ADS;
 
-namespace Metica.SDK
+namespace Metica
 {
     public interface IMeticaConfigProvider
     {

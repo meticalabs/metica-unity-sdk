@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
-namespace Metica.SDK.Storage
+namespace Metica.Storage
 {
     /// <summary>
     /// File-based storage strategy.

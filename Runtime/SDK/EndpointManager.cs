@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
-namespace Metica.SDK
+namespace Metica
 {
     public interface IMeticaHttpResult
     {

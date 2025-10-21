@@ -11,7 +11,7 @@ using Metica.Core;
 /// using MeticaLogger = Log;
 /// </code>
 /// </summary>
-namespace Metica.SDK
+namespace Metica
 {
 public static class Log
 {

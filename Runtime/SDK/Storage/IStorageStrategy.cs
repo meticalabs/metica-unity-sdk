@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Metica.SDK.Storage
+namespace Metica.Storage
 {
     /// <summary>
     /// Defines the contract for a storage strategy.

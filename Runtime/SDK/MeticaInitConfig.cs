@@ -1,4 +1,4 @@
-namespace Metica.SDK
+namespace Metica
 {
 /// <summary>
 /// Configuration data required for initializing the Metica SDK.

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Metica.Core;
 using Metica.Network;
-using Metica.SDK.Model;
+using Metica.Model;
 using Newtonsoft.Json;
 
-namespace Metica.SDK
+namespace Metica
 {
     [Serializable]
     public class OfferResult : IMeticaHttpResult

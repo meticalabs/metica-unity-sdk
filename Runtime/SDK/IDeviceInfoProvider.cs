@@ -1,6 +1,6 @@
-using Metica.SDK.Model;
+using Metica.Model;
 
-namespace Metica.SDK
+namespace Metica
 {
     /// <summary>
     /// Provider of <see cref="DeviceInfo"/> structure as defined in Metica API schema

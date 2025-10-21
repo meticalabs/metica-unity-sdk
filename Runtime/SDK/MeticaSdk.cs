@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Metica.Network;
 using Metica.Core;
-using Metica.SDK.Model;
-using Metica.SDK.Unity;
+using Metica.Model;
+using Metica.Unity;
 using Metica.ADS;
 
-namespace Metica.SDK
+namespace Metica
 {
     public class MeticaSdk
     {

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-namespace Metica.SDK.Unity
+namespace Metica.Unity
 {
     public class MeticaUnitySdk : MonoBehaviour
     {

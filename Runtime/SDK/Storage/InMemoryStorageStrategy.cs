@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Metica.SDK.Storage
+namespace Metica.Storage
 {
     /// <summary>
     /// In-memory storage strategy, useful for testing or temporary storage.

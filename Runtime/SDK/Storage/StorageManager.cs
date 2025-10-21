@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Metica.SDK.Storage
+namespace Metica.Storage
 {
     /// <summary>
     /// Facade for storage operations. Delegates work to a chosen storage strategy.

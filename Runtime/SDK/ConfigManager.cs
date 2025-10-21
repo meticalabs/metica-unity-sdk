@@ -4,9 +4,9 @@ using Newtonsoft.Json;
 
 using Metica.Core;
 using Metica.Network;
-using Metica.SDK.Model;
+using Metica.Model;
 
-namespace Metica.SDK
+namespace Metica
 {
     [System.Serializable]
     public class ConfigResult : IMeticaHttpResult
