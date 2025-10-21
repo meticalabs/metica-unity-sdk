@@ -51,19 +51,27 @@ internal class AndroidDelegate : PlatformDelegate
         _unityBridgeAndroidClass.CallStatic("setLogEnabled", logEnabled);
     }
 
-    public Task<MeticaInitializationResult> InitializeAsync(string apiKey, string appId, string userId, string version,
-        string baseEndpoint,
-        MeticaConfiguration configuration)
+    public void SetHasUserConsent(bool hasUserConsent)
     {
-        var tcs = new TaskCompletionSource<MeticaInitializationResult>();
+        MeticaAds.Log.LogDebug(() => $"{TAG} SetHasUserConsent called with: {hasUserConsent}");
+
+        _unityBridgeAndroidClass.CallStatic("setHasUserConsent", hasUserConsent);
+    }
+
+    public void SetDoNotSell(bool doNotSell)
+    {
+        MeticaAds.Log.LogDebug(() => $"{TAG} SetDoNotSell called with: {doNotSell}");
+
+        _unityBridgeAndroidClass.CallStatic("setDoNotSell", doNotSell);
+    }
+
+    public Task<MeticaInitResponse> InitializeAsync(string apiKey, string appId, string userId, string mediationKey)
+    {
+        var tcs = new TaskCompletionSource<MeticaInitResponse>();
 
         var callback = new InitCallbackProxy(tcs);
 
-        // TODO: pass it in the function
-        const string applovinSdkKey =
-            "CZ_XxS0v1pDXVdV2yDXaxO4dOV8849QwTq7iDFlGLsJZngU95AEyaq2z8lF0GRlSvdknWDpTDp1GmprFC1FiJ1";
-
-        _unityBridgeAndroidClass.CallStatic("initialize", apiKey, appId, applovinSdkKey, userId, callback);
+        _unityBridgeAndroidClass.CallStatic("initialize", apiKey, appId, mediationKey, userId, callback);
         return tcs.Task;
     }
 

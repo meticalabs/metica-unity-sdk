@@ -40,6 +40,16 @@ internal class IOSDelegate : PlatformDelegate
     {
     }
 
+    public void SetHasUserConsent(bool value)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void SetDoNotSell(bool value)
+    {
+        throw new NotImplementedException();
+    }
+
     public void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
     {
     }
@@ -56,12 +66,11 @@ internal class IOSDelegate : PlatformDelegate
     {
     }
 
-    public Task<MeticaInitializationResult> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
-        MeticaConfiguration configuration)
+    public Task<MeticaInitResponse> InitializeAsync(string apiKey, string appId, string userId, string mediationInfoKey)
     {
-        var tcs = new TaskCompletionSource<MeticaInitializationResult>();
+        var tcs = new TaskCompletionSource<MeticaInitResponse>();
         tcs.SetResult(
-            new MeticaInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
+            new MeticaInitResponse(new MeticaSmartFloors(MeticaUserGroup.HOLDOUT, false))
         );
         return tcs.Task;
     }

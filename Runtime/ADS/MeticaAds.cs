@@ -55,15 +55,14 @@ namespace Metica.ADS
             PlatformDelegate.RewardedAdRevenuePaid += MeticaAdsCallbacks.Rewarded.OnAdRevenuePaidInternal;
         }
 
-        public static async Task<MeticaInitializationResult> InitializeAsync(MeticaConfiguration configuration)
+        public static async Task<MeticaInitResponse> InitializeAsync(MeticaInitConfig initConfig,
+            MeticaMediationInfo mediationInfo)
         {
             return await PlatformDelegate.InitializeAsync(
-                configuration.ApiKey,
-                configuration.AppId,
-                configuration.UserId,
-                configuration.Version,
-                configuration.BaseEndpoint,
-                configuration
+                initConfig.ApiKey,
+                initConfig.AppId,
+                initConfig.UserId,
+                mediationInfo.Key
             );
         }
 
@@ -71,7 +70,15 @@ namespace Metica.ADS
         {
             PlatformDelegate.SetLogEnabled(logEnabled);
         }
-        
+        public static void SetHasUserConsent(bool hasUserConsent)
+        {
+            PlatformDelegate.SetHasUserConsent(hasUserConsent);
+        }
+
+        public static void SetDoNotSell(bool doNotSell)
+        {
+            PlatformDelegate.SetDoNotSell(doNotSell);
+        }
         public static void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
         {
             PlatformDelegate.CreateBanner(bannerAdUnitId, position);

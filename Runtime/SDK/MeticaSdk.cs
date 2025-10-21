@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Metica.Network;
@@ -17,25 +18,21 @@ namespace Metica.SDK
         }
 
         #region Fields
+        
+        private static MeticaSdk Sdk { get; set; }
 
-        private static MeticaSdk Sdk { get; set; } = null;
+        internal static string Version { get => "2.0.0-beta1"; }
 
-        public static string Version { get => "2.0.0-beta1"; }
-
-        public static string UserId { get; set; } // TODO: set should become private and require a reinitialization to cheange user id
+        internal static string UserId { get; set; } // TODO: set should become private and require a reinitialization to cheange user id
         public static string ApiKey { get; private set; }
         public static string AppId { get; private set; }
-        public static string BaseEndpoint { get; private set; }
-        // TODO: remove apploving key from here in favour of
-        // more configurability considering possible additions of other ad providers.
-        public static string ApplovinKey { get; private set; }
 
         private readonly IHttpService _http;
         private readonly OfferManager _offerManager;
         private readonly ConfigManager _configManager;
         private readonly EventManager _eventManager;
-
-        public static bool IsMeticaAdsEnabled { get; private set; }
+        private const string EndpointDev = "https://api-gateway.dev.metica.com";
+        private const string EndpointProd = "https://api-gateway.prod-eu.metica.com";
 
         #endregion Fields
 
@@ -55,30 +52,41 @@ namespace Metica.SDK
             UserId = null;
             ApiKey = null;
             AppId = null;
-            BaseEndpoint = null;
         }
 
-        private static bool CheckConfig(MeticaConfiguration config)
+        private static void CheckConfig(MeticaInitConfig config)
         {
-            if (string.IsNullOrEmpty(config.ApiKey) || string.IsNullOrEmpty(config.AppId) || string.IsNullOrEmpty(config.BaseEndpoint))
+            if (string.IsNullOrEmpty(config.ApiKey) || string.IsNullOrEmpty(config.AppId))
             {
                 Log.Error(() => "The given SDK configuration is not valid. Please make sure all fields are filled.");
-                return false;
+                throw new InvalidOperationException("MeticaSDK cannot initialize with invalid configuration - ApiKey and AppId are required.");
             }
-            if (config.BaseEndpoint.EndsWith('/'))
+        }
+        
+        private static void CheckMediationInfo(MeticaMediationInfo mediationInfo)
+        {
+            if (mediationInfo == null)
             {
-                Log.Error(() => "Please remove the '/' character at the end of the endpoint URL");
-                return false;
+                Log.Error(() => "MeticaMediationInfo cannot be null.");
+                throw new ArgumentNullException(nameof(mediationInfo), "Mediation configuration is required for ad initialization.");
             }
-            return true;
+
+            if (string.IsNullOrEmpty(mediationInfo.Key))
+            {
+                Log.Error(() => $"The {mediationInfo.MediationType} mediation key is not valid. Please provide a valid SDK key.");
+                throw new InvalidOperationException($"MeticaSDK cannot initialize {mediationInfo.MediationType} mediation without a valid key.");
+            }
         }
 
         /// <summary>
         /// Registers services and initializes all SDK components.
         /// </summary>
-        public static async Task<MeticaInitializationResult> InitializeAsync(MeticaConfiguration config)
+        public static async Task<MeticaInitResponse> InitializeAsync(
+            MeticaInitConfig config,
+            MeticaMediationInfo mediationInfo)
         {
             CheckConfig(config);
+            
             if (Sdk != null)
             {
                 Log.Warning(() => "Metica SDK reinitialized. This means a new initialization was done on top of a previous one.");
@@ -86,8 +94,10 @@ namespace Metica.SDK
             Sdk = new MeticaSdk(config);
 
             // ADS
-            var result = await MeticaAds.InitializeAsync(config);//InitializeAsync(config);
-            IsMeticaAdsEnabled = result.IsMeticaAdsEnabled;
+            // Version 2.0.0 wil ship with MediationInfo parameter being enforced. 
+            // Perhaps in a later version this may be less strict, as we may allow only SmartContract without SmartFloors
+            CheckMediationInfo(mediationInfo);
+            var result = await MeticaAds.InitializeAsync(config, mediationInfo);
             return result;
         }
 
@@ -95,7 +105,7 @@ namespace Metica.SDK
         /// ORIGINAL SDK INITIALIZATION
         /// </summary>
         /// <param name="config">Metica SDK configuration object.</param>
-        private MeticaSdk(MeticaConfiguration config)
+        private MeticaSdk(MeticaInitConfig config)
         {
             _http = new HttpServiceDotnet(
                 requestTimeoutSeconds: 60,
@@ -103,11 +113,11 @@ namespace Metica.SDK
                 cacheTTLSeconds: 60
                 ).WithPersistentHeaders(new Dictionary<string, string> { { "X-API-Key", config.ApiKey } });
             // Initialize an OfferManager
-            _offerManager = new OfferManager(_http, $"{config.BaseEndpoint}/offers/v1/apps/{config.AppId}");
+            _offerManager = new OfferManager(_http, $"{EndpointProd}/offers/v1/apps/{config.AppId}");
             // Initialize a ConfigManager
-            _configManager = new ConfigManager(_http, $"{config.BaseEndpoint}/configs/v1/apps/{config.AppId}");
+            _configManager = new ConfigManager(_http, $"{EndpointProd}/configs/v1/apps/{config.AppId}");
             // Initialize an EventManager with _offerManager as IMeticaAttributesProvider
-            _eventManager = new EventManager(_http, $"{config.BaseEndpoint}/ingest/v1/events", _offerManager);
+            _eventManager = new EventManager(_http, $"{EndpointProd}/ingest/v1/events", _offerManager);
             // Set the CurrentUserId with the initial value given in the configuration
 
             // - - - - - - - - - - -
@@ -115,7 +125,6 @@ namespace Metica.SDK
             UserId = config.UserId;
             ApiKey = config.ApiKey;
             AppId = config.AppId;
-            BaseEndpoint = config.BaseEndpoint;
         }
 
         public static async ValueTask DisposeAsync()
@@ -302,6 +311,12 @@ namespace Metica.SDK
         // ADS bridge
         public static class Ads
         {
+            public static void SetHasUserConsent(bool userConsent)
+                => MeticaAds.SetHasUserConsent(userConsent);
+
+            public static void SetDoNotSell(bool doNotSell)
+                => MeticaAds.SetDoNotSell(doNotSell);
+
             public static void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
                 => MeticaAds.CreateBanner(bannerAdUnitId, position);
 

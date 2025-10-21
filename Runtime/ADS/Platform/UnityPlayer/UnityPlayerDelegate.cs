@@ -27,13 +27,13 @@ namespace Metica.ADS.UnityPlayer
         public event Action<MeticaAd> RewardedAdRewarded;
         public event Action<MeticaAd> RewardedAdRevenuePaid;
 
-        public Task<MeticaInitializationResult> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
-            MeticaConfiguration meticaConfiguration)
+        public Task<MeticaInitResponse> InitializeAsync(string apiKey, string appId, string userId,
+            string mediationInfoKey)
         {
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock initialization - always returns HoldoutDueToError");
-            var tcs = new TaskCompletionSource<MeticaInitializationResult>();
+            var tcs = new TaskCompletionSource<MeticaInitResponse>();
             tcs.SetResult(
-                new MeticaInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
+                new MeticaInitResponse(new MeticaSmartFloors(MeticaUserGroup.HOLDOUT, false))
             );
             return tcs.Task;
         }
@@ -41,6 +41,16 @@ namespace Metica.ADS.UnityPlayer
         public void SetLogEnabled(bool logEnabled)
         {
             MeticaAds.Log.LogDebug(() => $"[MeticaAds Unity] Mock SetLogEnabled: {logEnabled}");
+        }
+
+        public void SetHasUserConsent(bool value)
+        {
+            MeticaAds.Log.LogDebug(() => $"[MeticaAds Unity] Mock SetHasUserConsent: {value}");
+        }
+
+        public void SetDoNotSell(bool value)
+        {
+            MeticaAds.Log.LogDebug(() => $"[MeticaAds Unity] Mock SetDoNotSell: {value}");
         }
 
         public void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)

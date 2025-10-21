@@ -15,7 +15,8 @@ namespace Metica.SDK.Unity
         private void Awake()
         {
             // Initialize Metica SDK.
-            var result = MeticaSdk.InitializeAsync(_sdkConfigProvider.Config);
+            // PREFAB IS NOT USED
+            // var result = MeticaSdk.InitializeAsync(_sdkConfigProvider.Config);
 
             DontDestroyOnLoad(this);
         }

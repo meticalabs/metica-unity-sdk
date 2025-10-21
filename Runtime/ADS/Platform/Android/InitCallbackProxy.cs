@@ -1,18 +1,15 @@
-// InitializeCallbackProxy.cs
-
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using UnityEngine;
+// ReSharper disable InconsistentNaming
 
 namespace Metica.ADS
 {
-[SuppressMessage("ReSharper", "InconsistentNaming")]
 public class InitCallbackProxy : AndroidJavaProxy
 {
     private const string TAG = MeticaAds.TAG;
-    private readonly TaskCompletionSource<MeticaInitializationResult> _tcs;
+    private readonly TaskCompletionSource<MeticaInitResponse> _tcs;
 
-    public InitCallbackProxy(TaskCompletionSource<MeticaInitializationResult> tcs)
+    public InitCallbackProxy(TaskCompletionSource<MeticaInitResponse> tcs)
         : base("com.metica.MeticaInitCallback")
     {
         MeticaAds.Log.LogDebug(() => $"{TAG} MeticaAdsInitCallback created");
@@ -27,21 +24,7 @@ public class InitCallbackProxy : AndroidJavaProxy
         var smartFloors = smartFloorsJavaObject.ToMeticaSmartFloors();
 
         MeticaAds.Log.LogDebug(() => $"{TAG} InitCallbackProxy smartFloorsObj = {smartFloors}");
-
-        if (smartFloors.userGroup == MeticaUserGroup.TRIAL)
-        {
-            _tcs.SetResult(
-                new MeticaInitializationResult(MeticaAdsAssignmentStatus.Normal)
-            );
-        }
-        else
-        {
-            _tcs.SetResult(
-                smartFloors.isSuccess
-                    ? new MeticaInitializationResult(MeticaAdsAssignmentStatus.Holdout)
-                    : new MeticaInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
-            );
-        }
+        _tcs.SetResult(new MeticaInitResponse(smartFloors));
     }
 }
 }
