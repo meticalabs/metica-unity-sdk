@@ -1,3 +1,4 @@
+using Metica.SDK;
 using UnityEngine;
 
 namespace Metica.ADS
