@@ -1,4 +1,4 @@
-namespace Metica.ADS
+namespace Metica.Ads
 {
 public enum MeticaBannerPosition
 {

@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Metica;
 
-namespace Metica.ADS.UnityPlayer
+namespace Metica.Ads.UnityPlayer
 {
     internal class UnityPlayerDelegate : PlatformDelegate
     {

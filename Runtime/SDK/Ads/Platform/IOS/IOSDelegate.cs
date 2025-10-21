@@ -6,7 +6,7 @@ using System;
 using System.Threading.Tasks;
 using Metica;
 
-namespace Metica.ADS.IOS
+namespace Metica.Ads.IOS
 {
 internal class IOSDelegate : PlatformDelegate
 {

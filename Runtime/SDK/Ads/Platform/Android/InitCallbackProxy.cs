@@ -3,7 +3,7 @@ using Metica;
 using UnityEngine;
 // ReSharper disable InconsistentNaming
 
-namespace Metica.ADS
+namespace Metica.Ads
 {
 public class InitCallbackProxy : AndroidJavaProxy
 {

@@ -5,7 +5,7 @@ using Metica.Network;
 using Metica.Core;
 using Metica.Model;
 using Metica.Unity;
-using Metica.ADS;
+using Metica.Ads;
 
 namespace Metica
 {

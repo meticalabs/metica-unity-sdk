@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Metica;
 using UnityEngine;
 
-namespace Metica.ADS.Android
+namespace Metica.Ads.Android
 {
 internal class AndroidDelegate : PlatformDelegate
 {

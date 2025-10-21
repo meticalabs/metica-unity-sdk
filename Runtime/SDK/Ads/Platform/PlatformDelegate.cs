@@ -4,7 +4,7 @@ using System;
 using System.Threading.Tasks;
 using Metica;
 
-namespace Metica.ADS
+namespace Metica.Ads
 {
 internal interface PlatformDelegate
 {

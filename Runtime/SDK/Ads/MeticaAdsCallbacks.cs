@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Metica.ADS
+namespace Metica.Ads
 {
 public static class MeticaAdsCallbacks
 {

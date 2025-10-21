@@ -1,4 +1,4 @@
-using Metica.ADS;
+using Metica.Ads;
 
 namespace Metica
 {

@@ -6,7 +6,7 @@ using Metica;
 using UnityEngine.Assertions;
 
 // ReSharper disable once CheckNamespace
-namespace Metica.ADS
+namespace Metica.Ads
 {
     internal static class MeticaAds
     {   

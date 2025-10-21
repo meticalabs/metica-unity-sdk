@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Metica.ADS
+namespace Metica.Ads
 {
 /// <summary>
 /// Configuration info for ad mediation services.

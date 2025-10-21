@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Metica.ADS
+namespace Metica.Ads
 {
 [Serializable]
 public class MeticaAdError

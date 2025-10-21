@@ -1,7 +1,7 @@
 using Metica;
 using UnityEngine;
 
-namespace Metica.ADS
+namespace Metica.Ads
 {
     /// <summary>
     /// Extension methods for converting AndroidJavaObject instances to C# objects.
