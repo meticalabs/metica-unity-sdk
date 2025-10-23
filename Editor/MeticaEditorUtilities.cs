@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
-using Metica.SDK.Unity;
+using Metica.Unity;
 
 namespace Metica.UnityEd
 {
