@@ -1,13 +1,15 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 namespace Metica.Ads
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class LoadCallbackProxy : AndroidJavaProxy
     {
         private const string TAG = MeticaAds.TAG;
         public event Action<MeticaAd> AdLoadSuccess;
-        public event Action<string> AdLoadFailed;
+        public event Action<MeticaAdError> AdLoadFailed;
 
         public LoadCallbackProxy()
             : base("com.metica.ads.MeticaAdsLoadCallback")
@@ -29,7 +31,7 @@ namespace Metica.Ads
         {
             var meticaAdError = meticaAdErrorObject.ToMeticaAdError(); 
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadFailed callback received, error={meticaAdError}");
-            AdLoadFailed?.Invoke(meticaAdError.message);
+            AdLoadFailed?.Invoke(meticaAdError);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Metica.Ads
         private const string TAG = MeticaAds.TAG;
         
         public event Action<MeticaAd> AdShowSuccess;
-        public event Action<MeticaAd, string> AdShowFailed;
+        public event Action<MeticaAd, MeticaAdError> AdShowFailed;
         public event Action<MeticaAd> AdHidden;
         public event Action<MeticaAd> AdClicked;
         public event Action<MeticaAd> AdRewarded;
@@ -29,11 +29,12 @@ namespace Metica.Ads
         }
         
         // Called when ad fails to show - now receives MeticaAd object
-        public void onAdShowFailed(AndroidJavaObject meticaAdObject, string error)
+        public void onAdShowFailed(AndroidJavaObject meticaAdObject, AndroidJavaObject meticaAdErrorObject)
         {
             var meticaAd = meticaAdObject.ToMeticaAd();
-            MeticaAds.Log.LogDebug(() => $"{TAG} onAdShowFailed callback received for adUnitId={meticaAd.adUnitId}, error={error}");
-            AdShowFailed?.Invoke(meticaAd, error);
+            var meticaAdError = meticaAdErrorObject.ToMeticaAdError();
+            MeticaAds.Log.LogDebug(() => $"{TAG} onAdShowFailed callback received for adUnitId={meticaAd.adUnitId}, error={meticaAdError}");
+            AdShowFailed?.Invoke(meticaAd, meticaAdError);
         }
         
         // Called when ad is hidden (closed) - now receives MeticaAd object
