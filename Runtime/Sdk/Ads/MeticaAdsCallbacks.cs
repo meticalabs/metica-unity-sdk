@@ -19,9 +19,9 @@ public static class MeticaAdsCallbacks
             OnAdLoadSuccess?.Invoke(meticaAd);
         }
 
-        internal static void OnAdLoadFailedInternal(string error)
+        internal static void OnAdLoadFailedInternal(MeticaAdError meticaAdError)
         {
-            OnAdLoadFailed?.Invoke(new MeticaAdError(error));
+            OnAdLoadFailed?.Invoke(meticaAdError);
         }
 
         internal static void OnAdClickedInternal(MeticaAd meticaAd)
@@ -61,18 +61,18 @@ public static class MeticaAdsCallbacks
             OnAdLoadSuccess?.Invoke(meticaAd);
         }
 
-        internal static void OnAdLoadFailedInternal(string error)
+        internal static void OnAdLoadFailedInternal(MeticaAdError meticaAdError)
         {
-            OnAdLoadFailed?.Invoke(new MeticaAdError(error));
+            OnAdLoadFailed?.Invoke(meticaAdError);
         }      
         internal static void OnAdShowSuccessInternal(MeticaAd meticaAd)
         {
             OnAdShowSuccess?.Invoke(meticaAd);
         }
 
-        internal static void OnAdShowFailedInternal(MeticaAd meticaAd, string error)
+        internal static void OnAdShowFailedInternal(MeticaAd meticaAd, MeticaAdError meticaAdError)
         {
-            OnAdShowFailed?.Invoke(meticaAd, new MeticaAdError(error));
+            OnAdShowFailed?.Invoke(meticaAd, meticaAdError);
         }
 
         internal static void OnAdHiddenInternal(MeticaAd meticaAd)
@@ -121,9 +121,9 @@ public static class MeticaAdsCallbacks
             OnAdLoadSuccess?.Invoke(meticaAd);
         }
 
-        internal static void OnAdLoadFailedInternal(string error)
+        internal static void OnAdLoadFailedInternal(MeticaAdError meticaAdError)
         {
-            OnAdLoadFailed?.Invoke(new MeticaAdError(error));
+            OnAdLoadFailed?.Invoke(meticaAdError);
         }      
         
         internal static void OnAdShowSuccessInternal(MeticaAd meticaAd)
@@ -131,9 +131,9 @@ public static class MeticaAdsCallbacks
             OnAdShowSuccess?.Invoke(meticaAd);
         }
 
-        internal static void OnAdShowFailedInternal(MeticaAd meticaAd, string error)
+        internal static void OnAdShowFailedInternal(MeticaAd meticaAd, MeticaAdError meticaAdError)
         {
-            OnAdShowFailed?.Invoke(meticaAd, new MeticaAdError(error));
+            OnAdShowFailed?.Invoke(meticaAd, meticaAdError);
         }
 
         internal static void OnAdHiddenInternal(MeticaAd meticaAd)

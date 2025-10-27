@@ -22,24 +22,24 @@ internal class AndroidDelegate : PlatformDelegate
 
     // Events for banner ad lifecycle callbacks
     public event Action<MeticaAd> BannerAdLoadSuccess;
-    public event Action<string> BannerAdLoadFailed;
+    public event Action<MeticaAdError> BannerAdLoadFailed;
     public event Action<MeticaAd> BannerAdClicked;
     public event Action<MeticaAd> BannerAdRevenuePaid;
 
     // Events for interstitial ad lifecycle callbacks
     public event Action<MeticaAd> InterstitialAdLoadSuccess;
-    public event Action<string> InterstitialAdLoadFailed;
+    public event Action<MeticaAdError> InterstitialAdLoadFailed;
     public event Action<MeticaAd> InterstitialAdShowSuccess;
-    public event Action<MeticaAd, string> InterstitialAdShowFailed;
+    public event Action<MeticaAd, MeticaAdError> InterstitialAdShowFailed;
     public event Action<MeticaAd> InterstitialAdHidden;
     public event Action<MeticaAd> InterstitialAdClicked;
     public event Action<MeticaAd> InterstitialAdRevenuePaid;
 
     // Events for rewarded ad lifecycle callbacks
     public event Action<MeticaAd> RewardedAdLoadSuccess;
-    public event Action<string> RewardedAdLoadFailed;
+    public event Action<MeticaAdError> RewardedAdLoadFailed;
     public event Action<MeticaAd> RewardedAdShowSuccess;
-    public event Action<MeticaAd, string> RewardedAdShowFailed;
+    public event Action<MeticaAd, MeticaAdError> RewardedAdShowFailed;
     public event Action<MeticaAd> RewardedAdHidden;
     public event Action<MeticaAd> RewardedAdClicked;
     public event Action<MeticaAd> RewardedAdRewarded;
@@ -80,8 +80,8 @@ internal class AndroidDelegate : PlatformDelegate
     public void CreateBanner(string adUnitId, MeticaBannerPosition position)
     {
         var callback = new BannerCallbackProxy();
-        callback.AdLoadSuccess += (meticaAd) => BannerAdLoadSuccess?.Invoke(meticaAd);
-        callback.AdLoadFailed += (error) => BannerAdLoadFailed?.Invoke(error);
+        callback.AdLoadSuccess += BannerAdLoadSuccess;
+        callback.AdLoadFailed += BannerAdLoadFailed;
         callback.AdClicked += (meticaAd) => BannerAdClicked?.Invoke(meticaAd);
         callback.AdRevenuePaid += (meticaAd) => BannerAdRevenuePaid?.Invoke(meticaAd);
 
@@ -128,8 +128,8 @@ internal class AndroidDelegate : PlatformDelegate
         var callback = new LoadCallbackProxy();
 
         // Wire up all events
-        callback.AdLoadSuccess += (meticaAd) => InterstitialAdLoadSuccess?.Invoke(meticaAd);
-        callback.AdLoadFailed += (error) => InterstitialAdLoadFailed?.Invoke(error);
+        callback.AdLoadSuccess += InterstitialAdLoadSuccess;
+        callback.AdLoadFailed += InterstitialAdLoadFailed;
 
         MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android loadInterstitial method");
         _unityBridgeAndroidClass.CallStatic("loadInterstitial", interstitialAdUnitId, callback);

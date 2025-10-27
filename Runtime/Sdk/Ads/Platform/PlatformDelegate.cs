@@ -10,24 +10,24 @@ internal interface PlatformDelegate
 {
     // Events for banner ad lifecycle callbacks
     public event Action<MeticaAd> BannerAdLoadSuccess;
-    public event Action<string> BannerAdLoadFailed;
+    public event Action<MeticaAdError> BannerAdLoadFailed;
     public event Action<MeticaAd> BannerAdClicked;
     public event Action<MeticaAd> BannerAdRevenuePaid;
     
     // Events for interstitial ad lifecycle callbacks
     public event Action<MeticaAd> InterstitialAdLoadSuccess;
-    public event Action<string> InterstitialAdLoadFailed;
+    public event Action<MeticaAdError> InterstitialAdLoadFailed;
     public event Action<MeticaAd> InterstitialAdShowSuccess;
-    public event Action<MeticaAd, string> InterstitialAdShowFailed;
+    public event Action<MeticaAd, MeticaAdError> InterstitialAdShowFailed;
     public event Action<MeticaAd> InterstitialAdHidden;
     public event Action<MeticaAd> InterstitialAdClicked;
     public event Action<MeticaAd> InterstitialAdRevenuePaid;
             
     // Events for rewarded ad lifecycle callbacks
     public event Action<MeticaAd> RewardedAdLoadSuccess;
-    public event Action<string> RewardedAdLoadFailed;
+    public event Action<MeticaAdError> RewardedAdLoadFailed;
     public event Action<MeticaAd> RewardedAdShowSuccess;
-    public event Action<MeticaAd, string> RewardedAdShowFailed;
+    public event Action<MeticaAd, MeticaAdError> RewardedAdShowFailed;
     public event Action<MeticaAd> RewardedAdHidden;
     public event Action<MeticaAd> RewardedAdClicked;
     public event Action<MeticaAd> RewardedAdRewarded;

@@ -8,7 +8,7 @@ namespace Metica.Ads
         private const string TAG = MeticaAds.TAG;
 
         public event Action<MeticaAd> AdLoadSuccess;
-        public event Action<string> AdLoadFailed;
+        public event Action<MeticaAdError> AdLoadFailed;
         public event Action<MeticaAd> AdClicked;
         public event Action<MeticaAd> AdRevenuePaid;
         
@@ -28,10 +28,11 @@ namespace Metica.Ads
         }
 
         // Called from Android when ad load fails - now only receives error string
-        public void onAdLoadFailed(string error)
+        public void onAdLoadFailed(AndroidJavaObject meticaAdErrorObject)
         {
-            MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadFailed callback received, error={error}");
-            AdLoadFailed?.Invoke(error);
+            var meticaAdError = meticaAdErrorObject.ToMeticaAdError();
+            MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadFailed callback received, error={meticaAdError}");
+            AdLoadFailed?.Invoke(meticaAdError);
         }
         
         // Called when ad is clicked - now receives MeticaAd object

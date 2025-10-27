@@ -37,6 +37,11 @@ namespace Metica.Ads
 
             return new MeticaAd(adUnitId, revenue, networkName, placementTag, adFormat, creativeId, latency);
         }
+        public static MeticaAdError ToMeticaAdError(this AndroidJavaObject javaObject)
+        {
+            var message = javaObject.Get<string>("message");
+            return new MeticaAdError(message);
+        }
         
     public static MeticaSmartFloors ToMeticaSmartFloors(this AndroidJavaObject javaObject)
         {
