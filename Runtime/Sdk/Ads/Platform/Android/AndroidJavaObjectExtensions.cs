@@ -39,7 +39,7 @@ namespace Metica.Ads
         }
         public static MeticaAdError ToMeticaAdError(this AndroidJavaObject javaObject)
         {
-            var message = javaObject.Get<string>("message");
+            var message = javaObject.Call<string>("getMessage");
             return new MeticaAdError(message);
         }
         
