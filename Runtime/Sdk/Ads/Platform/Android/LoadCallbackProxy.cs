@@ -20,7 +20,6 @@ namespace Metica.Ads
         // Called from Android when ad loads successfully - now receives MeticaAd object
         public void onAdLoadSuccess(AndroidJavaObject meticaAdObject)
         {
-            // Convert AndroidJavaObject to C# MeticaAd object
             var meticaAd = meticaAdObject.ToMeticaAd();
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadSuccess callback received for adUnitId={meticaAd.adUnitId}");
             AdLoadSuccess?.Invoke(meticaAd);
