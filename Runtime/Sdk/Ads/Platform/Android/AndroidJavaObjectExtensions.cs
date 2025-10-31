@@ -27,13 +27,13 @@ namespace Metica.Ads
         /// </exception>
         public static MeticaAd ToMeticaAd(this AndroidJavaObject javaObject)
         {
-            string adUnitId = javaObject.Get<string>("adUnitId");
-            double revenue = javaObject.Get<double>("revenue");
-            string networkName = javaObject.Get<string>("networkName");
-            string placementTag = javaObject.Get<string>("placementTag");
-            string adFormat = javaObject.Get<string>("adFormat");
-            string creativeId = javaObject.Get<string>("creativeId");
-            long latency = javaObject.Get<long>("latency");
+            string adUnitId = javaObject.Call<string>("getAdUnitId");
+            double revenue = javaObject.Call<double>("getRevenue");
+            string networkName = javaObject.Call<string>("getNetworkName");
+            string placementTag = javaObject.Call<string>("getPlacementTag");
+            string adFormat = javaObject.Call<string>("getAdFormat");
+            string creativeId = javaObject.Call<string>("getCreativeId");
+            long latency = javaObject.Call<long>("getLatency");
 
             return new MeticaAd(adUnitId, revenue, networkName, placementTag, adFormat, creativeId, latency);
         }
