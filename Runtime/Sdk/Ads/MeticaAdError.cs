@@ -4,12 +4,11 @@ using System;
 
 namespace Metica.Ads
 {
-[Serializable]
 public class MeticaAdError
 {
     public string message;
 
-    public MeticaAdError(String message)
+    public MeticaAdError(string message)
     {
         this.message = message;
     }

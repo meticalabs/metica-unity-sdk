@@ -1,3 +1,4 @@
+using System;
 using Metica;
 using UnityEngine;
 
@@ -9,6 +10,20 @@ namespace Metica.Ads
     public static class AndroidJavaObjectExtensions
     {
         /// <summary>
+        /// Converts a Java Double object (AndroidJavaObject) to a nullable C# double.
+        /// </summary>
+        /// <param name="javaObject">The AndroidJavaObject representing a Java Double, or null</param>
+        /// <returns>A nullable double value, or null if the javaObject is null</returns>
+        public static double? ToNullableDouble(this AndroidJavaObject javaObject)
+        {
+            if (javaObject == null)
+            {
+                return null;
+            }
+            return javaObject.Call<double>("doubleValue");
+        }
+
+        /// <summary>
         /// Converts an AndroidJavaObject representing a MeticaAd to a C# MeticaAd object.
         /// </summary>
         /// <param name="javaObject">The AndroidJavaObject containing MeticaAd data from the Android side</param>
@@ -16,7 +31,7 @@ namespace Metica.Ads
         /// <remarks>
         /// This method extracts the following properties from the AndroidJavaObject:
         /// - adUnitId: The unique identifier for the ad unit
-        /// - revenue: The revenue value (non-nullable)
+        /// - revenue: The revenue value (nullable)
         /// - networkName: The name of the ad network (nullable)
         /// - placementTag: The placement tag for the ad (nullable)
         /// - adFormat: The format type of the ad (nullable)
@@ -27,13 +42,13 @@ namespace Metica.Ads
         /// </exception>
         public static MeticaAd ToMeticaAd(this AndroidJavaObject javaObject)
         {
-            string adUnitId = javaObject.Call<string>("getAdUnitId");
-            double revenue = javaObject.Call<double>("getRevenue");
-            string networkName = javaObject.Call<string>("getNetworkName");
-            string placementTag = javaObject.Call<string>("getPlacementTag");
-            string adFormat = javaObject.Call<string>("getAdFormat");
-            string creativeId = javaObject.Call<string>("getCreativeId");
-            long latency = javaObject.Call<long>("getLatency");
+            var adUnitId = javaObject.Call<string>("getAdUnitId");
+            var revenue = javaObject.Call<AndroidJavaObject>("getRevenue").ToNullableDouble();
+            var networkName = javaObject.Call<string>("getNetworkName");
+            var placementTag = javaObject.Call<string>("getPlacementTag");
+            var adFormat = javaObject.Call<string>("getAdFormat");
+            var creativeId = javaObject.Call<string>("getCreativeId");
+            var latency = javaObject.Call<long>("getLatency");
 
             return new MeticaAd(adUnitId, revenue, networkName, placementTag, adFormat, creativeId, latency);
         }
