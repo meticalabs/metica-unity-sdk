@@ -16,11 +16,17 @@ namespace Metica.Ads
         /// <returns>A nullable double value, or null if the javaObject is null</returns>
         public static double? ToNullableDouble(this AndroidJavaObject javaObject)
         {
-            if (javaObject == null)
-            {
-                return null;
-            }
-            return javaObject.Call<double>("doubleValue");
+            return javaObject?.Call<double>("doubleValue");
+        }
+
+        /// <summary>
+        /// Converts a Java Long object (AndroidJavaObject) to a nullable C# long.
+        /// </summary>
+        /// <param name="javaObject">The AndroidJavaObject representing a Java Long, or null</param>
+        /// <returns>A nullable long value, or null if the javaObject is null</returns>
+        public static long? ToNullableLong(this AndroidJavaObject javaObject)
+        {
+            return javaObject?.Call<long>("longValue");
         }
 
         /// <summary>
@@ -48,7 +54,7 @@ namespace Metica.Ads
             var placementTag = javaObject.Call<string>("getPlacementTag");
             var adFormat = javaObject.Call<string>("getAdFormat");
             var creativeId = javaObject.Call<string>("getCreativeId");
-            var latency = javaObject.Call<long>("getLatency");
+            var latency = javaObject.Call<AndroidJavaObject>("getLatency").ToNullableLong();
 
             return new MeticaAd(adUnitId, revenue, networkName, placementTag, adFormat, creativeId, latency);
         }
