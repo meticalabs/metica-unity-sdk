@@ -104,23 +104,23 @@ namespace Metica.Ads
         {
             PlatformDelegate.LoadInterstitial(interstitialAdUnitId);
         }
-        public static void ShowInterstitial(string interstitialAdUnitId)
+        public static void ShowInterstitial(string interstitialAdUnitId, string? placementId)
         {
-            PlatformDelegate.ShowInterstitial(interstitialAdUnitId);
+            PlatformDelegate.ShowInterstitial(interstitialAdUnitId, placementId);
         }
         public static bool IsInterstitialReady(string interstitialAdUnitId)
         {
             return PlatformDelegate.IsInterstitialReady(interstitialAdUnitId);
         }
-        
+
         // Rewarded ad methods
         public static void LoadRewarded(string rewardedAdUnitId)
         {
             PlatformDelegate.LoadRewarded(rewardedAdUnitId);
         }
-        public static void ShowRewarded(string rewardedAdUnitId)
+        public static void ShowRewarded(string rewardedAdUnitId, string? placementId)
         {
-            PlatformDelegate.ShowRewarded(rewardedAdUnitId);
+            PlatformDelegate.ShowRewarded(rewardedAdUnitId, placementId);
         }
         public static bool IsRewardedReady(string rewardedAdUnitId)
         {
