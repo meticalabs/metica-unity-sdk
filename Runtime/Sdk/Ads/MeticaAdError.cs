@@ -16,5 +16,10 @@ public class MeticaAdError
         this.message = message;
         this.adUnitId = adUnitId;
     }
+
+    public override string ToString()
+    {
+        return $"MeticaAdError[Message={message}, AdUnitId={adUnitId}]";
+    }
 }
 }

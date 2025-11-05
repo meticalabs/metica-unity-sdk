@@ -25,5 +25,10 @@ public class MeticaAd
         this.creativeId = creativeId;
         this.latency = latency;
     }
+
+    public override string ToString()
+    {
+        return $"MeticaAd[AdUnitId={adUnitId}, Revenue={revenue}, Network={networkName}, Placement={placementTag}, Format={adFormat}, CreativeId={creativeId}, Latency={latency}ms]";
+    }
 }
 }
