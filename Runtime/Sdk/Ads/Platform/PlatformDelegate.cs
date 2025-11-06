@@ -48,12 +48,12 @@ internal interface PlatformDelegate
 
     // Interstitial methods
     void LoadInterstitial(string interstitialAdUnitId);
-    void ShowInterstitial(string interstitialAdUnitId, string? placementId);
+    void ShowInterstitial(string interstitialAdUnitId, string? placementId, string? customData);
     bool IsInterstitialReady(string interstitialAdUnitId);
 
     // Rewarded methods
     void LoadRewarded(string rewardedAdUnitId);
-    void ShowRewarded(string rewardedAdUnitId, string? placementId);
+    void ShowRewarded(string rewardedAdUnitId, string? placementId, string? customData);
     bool IsRewardedReady(string rewardedAdUnitId);
 }
 }

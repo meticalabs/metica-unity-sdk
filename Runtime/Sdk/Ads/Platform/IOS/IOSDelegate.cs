@@ -81,7 +81,7 @@ internal class IOSDelegate : PlatformDelegate
     {
     }
 
-    public void ShowInterstitial(string interstitialAdUnitId, string? placementId)
+    public void ShowInterstitial(string interstitialAdUnitId, string? placementId, string? customData)
     {
     }
 
@@ -96,7 +96,7 @@ internal class IOSDelegate : PlatformDelegate
 
     }
 
-    public void ShowRewarded(string rewardedAdUnitId, string? placementId)
+    public void ShowRewarded(string rewardedAdUnitId, string? placementId, string? customData)
     {
 
     }

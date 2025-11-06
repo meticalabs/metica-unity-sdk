@@ -335,8 +335,8 @@ namespace Metica
             public static void LoadInterstitial(string interstitialAdUnitId)
                 => MeticaAds.LoadInterstitial(interstitialAdUnitId);
 
-            public static void ShowInterstitial(string interstitialAdUnitId, string? placementId = null)
-                => MeticaAds.ShowInterstitial(interstitialAdUnitId, placementId);
+            public static void ShowInterstitial(string interstitialAdUnitId, string? placementId = null, string? customData = null)
+                => MeticaAds.ShowInterstitial(interstitialAdUnitId, placementId, customData);
 
             public static bool IsInterstitialReady(string interstitialAdUnitId)
                 => MeticaAds.IsInterstitialReady(interstitialAdUnitId);
@@ -344,8 +344,8 @@ namespace Metica
             public static void LoadRewarded(string rewardedAdUnitId)
                 => MeticaAds.LoadRewarded(rewardedAdUnitId);
 
-            public static void ShowRewarded(string rewardedAdUnitId, string? placementId = null)
-                => MeticaAds.ShowRewarded(rewardedAdUnitId, placementId);
+            public static void ShowRewarded(string rewardedAdUnitId, string? placementId = null, string? customData = null)
+                => MeticaAds.ShowRewarded(rewardedAdUnitId, placementId, customData);
 
             public static bool IsRewardedReady(string rewardedAdUnitId)
                 => MeticaAds.IsRewardedReady(rewardedAdUnitId);
