@@ -1,3 +1,5 @@
+#nullable enable
+
 using UnityEngine;
 
 namespace Metica.Ads
@@ -40,7 +42,8 @@ public static class AndroidJavaObjectExtensions
     public static MeticaAdError ToMeticaAdError(this AndroidJavaObject javaObject)
     {
         var message = javaObject.Call<string>("getMessage");
-        return new MeticaAdError(message);
+        var adUnitId = javaObject.Call<string>("getAdUnitId");
+        return new MeticaAdError(message, adUnitId);
     }
 
     public static MeticaSmartFloors ToMeticaSmartFloors(this AndroidJavaObject javaObject)

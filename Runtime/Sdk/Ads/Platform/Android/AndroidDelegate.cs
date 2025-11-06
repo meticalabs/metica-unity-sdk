@@ -136,7 +136,7 @@ internal class AndroidDelegate : PlatformDelegate
         MeticaAds.Log.LogDebug(() => $"{TAG} Android loadInterstitial method called");
     }
 
-    public void ShowInterstitial(string interstitialAdUnitId)
+    public void ShowInterstitial(string interstitialAdUnitId, string? placementId, string? customData)
     {
         var callback = new ShowCallbackProxy();
 
@@ -147,8 +147,8 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdClicked += (meticaAd) => InterstitialAdClicked?.Invoke(meticaAd);
         callback.AdRevenuePaid += (meticaAd) => InterstitialAdRevenuePaid?.Invoke(meticaAd);
 
-        MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android showInterstitial method");
-        _unityBridgeAndroidClass.CallStatic("showInterstitial", interstitialAdUnitId, callback);
+        MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android showInterstitial method with placementId={placementId}, customData={customData}");
+        _unityBridgeAndroidClass.CallStatic("showInterstitial", interstitialAdUnitId, placementId, customData, callback);
         MeticaAds.Log.LogDebug(() => $"{TAG} Android showInterstitial method called");
     }
 
@@ -171,7 +171,7 @@ internal class AndroidDelegate : PlatformDelegate
         MeticaAds.Log.LogDebug(() => $"{TAG} Android loadRewarded method called");
     }
 
-    public void ShowRewarded(string rewardedAdUnitId)
+    public void ShowRewarded(string rewardedAdUnitId, string? placementId, string? customData)
     {
         var callback = new ShowCallbackProxy();
 
@@ -183,8 +183,8 @@ internal class AndroidDelegate : PlatformDelegate
         callback.AdRewarded += (meticaAd) => RewardedAdRewarded?.Invoke(meticaAd);
         callback.AdRevenuePaid += (meticaAd) => RewardedAdRevenuePaid?.Invoke(meticaAd);
 
-        MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android showRewarded method");
-        _unityBridgeAndroidClass.CallStatic("showRewarded", rewardedAdUnitId, callback);
+        MeticaAds.Log.LogDebug(() => $"{TAG} About to call Android showRewarded method with placementId={placementId}, customData={customData}");
+        _unityBridgeAndroidClass.CallStatic("showRewarded", rewardedAdUnitId, placementId, customData, callback);
         MeticaAds.Log.LogDebug(() => $"{TAG} Android showRewarded method called");
     }
 
