@@ -14,11 +14,17 @@ internal class AndroidDelegate : PlatformDelegate
     public AndroidDelegate(AndroidJavaClass unityBridgeClass)
     {
         _unityBridgeAndroidClass = unityBridgeClass;
+        var mediationClass = unityBridgeClass.GetStatic<AndroidJavaObject>("Mediation");
+        var maxObject = mediationClass.GetStatic<AndroidJavaObject>("Max");
+        Max = new AndroidApplovinFunctions(maxObject);
     }
 
     private const string TAG = MeticaAds.TAG;
 
     private readonly AndroidJavaClass _unityBridgeAndroidClass;
+
+    // AppLovin-specific functionality
+    public MeticaApplovinFunctions Max { get; }
 
     // Events for banner ad lifecycle callbacks
     public event Action<MeticaAd> BannerAdLoadSuccess;
