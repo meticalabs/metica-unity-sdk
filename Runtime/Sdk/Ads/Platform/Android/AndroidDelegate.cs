@@ -14,8 +14,8 @@ internal class AndroidDelegate : PlatformDelegate
     public AndroidDelegate(AndroidJavaClass unityBridgeClass)
     {
         _unityBridgeAndroidClass = unityBridgeClass;
-        var mediationClass = unityBridgeClass.GetStatic<AndroidJavaObject>("Mediation");
-        var maxObject = mediationClass.GetStatic<AndroidJavaObject>("Max");
+        var mediationClass = new AndroidJavaClass("com.metica.unity_bridge.UnityBridge$Mediation");
+        var maxObject = mediationClass.CallStatic<AndroidJavaObject>("getMax");
         Max = new AndroidApplovinFunctions(maxObject);
     }
 
