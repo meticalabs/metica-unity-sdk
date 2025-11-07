@@ -9,10 +9,12 @@ using UnityEngine.Assertions;
 namespace Metica.Ads
 {
     internal static class MeticaAds
-    {   
+    {
         public const string TAG = "MeticaUnityPlugin";
         private static readonly PlatformDelegate PlatformDelegate;
         internal static readonly ILog Log;
+
+        public static MeticaApplovinFunctions Max => PlatformDelegate.Max;
 
         static MeticaAds()
         {

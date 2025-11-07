@@ -12,6 +12,9 @@ internal class IOSDelegate : PlatformDelegate
 {
     private const string TAG = MeticaAds.TAG;
 
+    // AppLovin-specific functionality
+    public MeticaApplovinFunctions Max { get; } = new IOSApplovinFunctions();
+
     // Events for banner ad lifecycle callbacks
     public event Action<MeticaAd> BannerAdLoadSuccess;
     public event Action<MeticaAdError> BannerAdLoadFailed;

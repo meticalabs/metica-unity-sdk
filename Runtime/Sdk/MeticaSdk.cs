@@ -314,6 +314,8 @@ namespace Metica
         // ADS bridge
         public static class Ads
         {
+            public static MeticaApplovinFunctions Max => MeticaAds.Max;
+
             public static void SetHasUserConsent(bool userConsent)
                 => MeticaAds.SetHasUserConsent(userConsent);
 

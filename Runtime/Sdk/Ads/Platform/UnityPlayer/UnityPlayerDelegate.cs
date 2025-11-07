@@ -8,6 +8,9 @@ namespace Metica.Ads.UnityPlayer
 {
     internal class UnityPlayerDelegate : PlatformDelegate
     {
+        // AppLovin-specific functionality
+        public MeticaApplovinFunctions Max { get; } = new UnityPlayerApplovinFunctions();
+
         // Mock events - these won't actually fire in editor
         public event Action<MeticaAd> BannerAdLoadSuccess;
         public event Action<MeticaAdError> BannerAdLoadFailed;

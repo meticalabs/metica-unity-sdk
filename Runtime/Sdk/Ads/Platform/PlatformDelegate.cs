@@ -8,6 +8,9 @@ namespace Metica.Ads
 {
 internal interface PlatformDelegate
 {
+    // AppLovin-specific functionality
+    MeticaApplovinFunctions Max { get; }
+
     // Events for banner ad lifecycle callbacks
     public event Action<MeticaAd> BannerAdLoadSuccess;
     public event Action<MeticaAdError> BannerAdLoadFailed;
