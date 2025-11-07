@@ -14,9 +14,6 @@ internal class AndroidDelegate : PlatformDelegate
     public AndroidDelegate(AndroidJavaClass unityBridgeClass)
     {
         _unityBridgeAndroidClass = unityBridgeClass;
-        var mediationClass = new AndroidJavaClass("com.metica.unity_bridge.UnityBridge$Mediation");
-        var maxObject = mediationClass.CallStatic<AndroidJavaObject>("getMax");
-        Max = new AndroidApplovinFunctions(maxObject);
     }
 
     private const string TAG = MeticaAds.TAG;
@@ -24,7 +21,22 @@ internal class AndroidDelegate : PlatformDelegate
     private readonly AndroidJavaClass _unityBridgeAndroidClass;
 
     // AppLovin-specific functionality
-    public MeticaApplovinFunctions Max { get; }
+    //
+    // IMPORTANT: Max is lazily initialized to avoid accessing the native MeticaSdk.Ads before initialization.
+    // If we eagerly initialize Max in the constructor, it will call UnityBridge.Mediation.getMax(),
+    // which internally accesses MeticaSdk.Ads. This throws IllegalStateException if MeticaSdk.initialize()
+    // hasn't been called yet on the native side.
+    //
+    // Lazy initialization ensures Max is only created when first accessed, which happens after
+    // MeticaSdk.InitializeAsync() completes successfully.
+    private readonly Lazy<MeticaApplovinFunctions> _max = new Lazy<MeticaApplovinFunctions>(() =>
+    {
+        var mediationClass = new AndroidJavaClass("com.metica.unity_bridge.UnityBridge$Mediation");
+        var maxObject = mediationClass.CallStatic<AndroidJavaObject>("getMax");
+        return new AndroidApplovinFunctions(maxObject);
+    });
+
+    public MeticaApplovinFunctions Max => _max.Value;
 
     // Events for banner ad lifecycle callbacks
     public event Action<MeticaAd> BannerAdLoadSuccess;
