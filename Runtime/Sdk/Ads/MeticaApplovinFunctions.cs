@@ -4,6 +4,7 @@ namespace Metica.Ads
     /// Interface for AppLovin-specific functionality in the Metica SDK.
     /// Provides access to privacy settings and consent flow information.
     /// </summary>
+    // ReSharper disable once InconsistentNaming
     public interface MeticaApplovinFunctions
     {
         /// <summary>
@@ -22,6 +23,6 @@ namespace Metica.Ads
         /// Gets the geographical location category of the user for consent flow purposes.
         /// </summary>
         /// <returns>The user's geographical category as determined by AppLovin's consent flow</returns>
-        MaxSdk.ConsentFlowUserGeography GetConsentFlowUserGeography();
+        MaxSdkBase.ConsentFlowUserGeography GetConsentFlowUserGeography();
     }
 }

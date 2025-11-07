@@ -36,7 +36,7 @@ namespace Metica.Ads.Android
             var geographyObject = _maxObject.Call<AndroidJavaObject>("getConsentFlowUserGeography");
             var ordinal = geographyObject.Call<int>("ordinal");
             MeticaAds.Log.LogDebug(() => $"{TAG} Android Max.getConsentFlowUserGeography returned ordinal: {ordinal}");
-            return (MaxSdk.ConsentFlowUserGeography)ordinal;
+            return (MaxSdkBase.ConsentFlowUserGeography)ordinal;
         }
     }
 }
