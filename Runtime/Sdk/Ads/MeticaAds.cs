@@ -10,17 +10,14 @@ namespace Metica.Ads
 {
     internal static class MeticaAds
     {
-        public const string TAG = "MeticaUnityPlugin";
+        public const string TAG = "[MeticaUnityPlugin]";
         private static readonly PlatformDelegate PlatformDelegate;
-        internal static readonly ILog Log;
+        internal static ILog Log => Registry.Resolve<ILog>();
 
         public static MeticaApplovinFunctions Max => PlatformDelegate.Max;
 
         static MeticaAds()
         {
-            Log = Registry.Resolve<ILog>();
-            Assert.IsNotNull(Log, $"No implementations of {nameof(ILog)} were found in the {nameof(Registry)}. Make sure that an implementation of {nameof(ILog)} has been registered first.");
-
 #if UNITY_EDITOR
             // Check for Unity Editor first since the editor also responds to the currently selected platform.
             PlatformDelegate = GetUnityPlayerDelegate();
