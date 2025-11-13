@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using Metica.Ads;
 
 namespace Metica.Ads.IOS
 {
@@ -52,7 +53,7 @@ namespace Metica.Ads.IOS
 
         [DllImport("__Internal")]
         private static extern void ios_showRewarded(
-            string interstitialAdUnitId,
+            string rewardedAdUnitId,
             OnAdShowSuccessDelegate onShowSuccess,
             OnAdShowFailedDelegate onShowFailed,
             OnAdHiddenDelegate onAdHidden,
@@ -73,10 +74,10 @@ namespace Metica.Ads.IOS
             );
         }
 
-        public void ShowRewarded(string interstitialAdUnitId)
+        public void ShowRewarded(string rewardedAdUnitId)
         {
             ios_showRewarded(
-                interstitialAdUnitId,
+                rewardedAdUnitId,
                 OnAdShowSuccess,
                 OnAdShowFailed,
                 OnAdHidden,

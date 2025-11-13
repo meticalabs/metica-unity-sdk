@@ -6,6 +6,7 @@ using System;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using Metica;
+using Metica.Ads;
 
 namespace Metica.Ads.IOS
 {

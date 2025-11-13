@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using Metica;
+using Metica.Ads;
 
 namespace Metica.Ads.IOS
 {
