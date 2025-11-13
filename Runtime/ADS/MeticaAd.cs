@@ -1,6 +1,7 @@
 // MeticaAd.cs
 
 using System;
+using UnityEngine;
 
 namespace Metica.ADS
 {

@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -7,12 +8,12 @@ namespace Metica.ADS.IOS
     public class IOSInitializeCallback
     {
         private const string TAG = MeticaAds.TAG;
-        private readonly TaskCompletionSource<MeticaAdsInitializationResult> _tcs;
+        private static TaskCompletionSource<MeticaAdsInitializationResult> _currentTcs;
 
         public IOSInitializeCallback(TaskCompletionSource<MeticaAdsInitializationResult> tcs)
         {
             MeticaAds.Log.LogDebug(() => $"{TAG} MeticaAdsInitCallback created");
-            _tcs = tcs;
+            _currentTcs = tcs;
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -31,36 +32,46 @@ namespace Metica.ADS.IOS
                 userId,
                 version,
                 baseEndpoint,
-                onInitialized,
-                onFailed
+                OnInitialized,
+                OnFailed
             );
         }
 
-        public void
-
-        public void onInitialized(bool adsEnabled)
+        [AOT.MonoPInvokeCallback(typeof(OnInitializeSuccessDelegate))]
+        private static void OnInitialized(bool adsEnabled)
         {
             MeticaAds.Log.LogDebug(() => $"{TAG} onInitialized: {adsEnabled}");
-            if (adsEnabled)
+            var tcs = _currentTcs;
+            if (tcs != null)
             {
-                _tcs.SetResult(
-                    new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.Normal)
-                );
-            }
-            else
-            {
-                _tcs.SetResult(
-                    new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.Holdout)
-                );
+                if (adsEnabled)
+                {
+                    tcs.SetResult(
+                        new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.Normal)
+                    );
+                }
+                else
+                {
+                    tcs.SetResult(
+                        new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.Holdout)
+                    );
+                }
+                _currentTcs = null;
             }
         }
 
-        public void onFailed(string reason)
+        [AOT.MonoPInvokeCallback(typeof(OnInitializeFailedDelegate))]
+        private static void OnFailed(string reason)
         {
             MeticaAds.Log.LogDebug(() => $"{TAG} onFailed: {reason}");
-            _tcs.SetResult(
-                new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
-            );
+            var tcs = _currentTcs;
+            if (tcs != null)
+            {
+                tcs.SetResult(
+                    new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
+                );
+                _currentTcs = null;
+            }
         }
     }
 }

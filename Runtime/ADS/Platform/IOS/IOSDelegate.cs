@@ -111,8 +111,8 @@ internal class IOSDelegate : PlatformDelegate
     public void LoadRewarded()
     {
             var callback = new IOSLoadCallback();
-            callback.AdLoadSuccess += (meticaAd) => InterstitialAdLoadSuccess?.Invoke(meticaAd);
-            callback.AdLoadFailed += (error) => InterstitialAdLoadFailed?.Invoke(error);
+            callback.AdLoadSuccess += (meticaAd) => RewardedAdLoadSuccess?.Invoke(meticaAd);
+            callback.AdLoadFailed += (error) => RewardedAdLoadFailed?.Invoke(error);
      
             MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS loadRewarded method");
             callback.LoadRewarded();

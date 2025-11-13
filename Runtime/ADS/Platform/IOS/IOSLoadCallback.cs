@@ -7,12 +7,14 @@ namespace Metica.ADS.IOS
     public class IOSLoadCallback
     {
         private const string TAG = MeticaAds.TAG;
+        private static IOSLoadCallback _currentInstance;
         public event Action<MeticaAd> AdLoadSuccess;
         public event Action<string> AdLoadFailed;
 
         public IOSLoadCallback()
         {
             MeticaAds.Log.LogDebug(() => $"{TAG} LoadCallbackProxy created");
+            _currentInstance = this;
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -28,30 +30,32 @@ namespace Metica.ADS.IOS
         public void LoadInterstitial()
         {
             ios_loadInterstitial(
-                onAdLoadSuccess,
-                onAdLoadFailed
+                OnAdLoadSuccess,
+                OnAdLoadFailed
             );
         }
 
         public void LoadRewarded()
         {
             ios_loadRewarded(
-                onAdLoadSuccess,
-                onAdLoadFailed
+                OnAdLoadSuccess,
+                OnAdLoadFailed
             );
         }
 
-        public void onAdLoadSuccess(string meticaAdJson)
+        [AOT.MonoPInvokeCallback(typeof(OnAdLoadSuccessDelegate))]
+        private static void OnAdLoadSuccess(string meticaAdJson)
         {
             var meticaAd = MeticaAd.FromJson(meticaAdJson);
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadSuccess callback received for adUnitId={meticaAd.adUnitId}");
-            AdLoadSuccess?.Invoke(meticaAd);
+            _currentInstance?.AdLoadSuccess?.Invoke(meticaAd);
         }
 
-        public void onAdLoadFailed(string error)
+        [AOT.MonoPInvokeCallback(typeof(OnAdLoadFailedDelegate))]
+        private static void OnAdLoadFailed(string error)
         {
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadFailed callback received, error={error}");
-            AdLoadFailed?.Invoke(error);
+            _currentInstance?.AdLoadFailed?.Invoke(error);
         }
     }
 }
