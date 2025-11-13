@@ -26,7 +26,7 @@ namespace Metica.ADS.IOS
         public delegate void OnAdShowSuccessDelegate(string meticaAdJson);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void OnAdShowFailedDelegate(string meticaAdJson, string error);
+        public delegate void OnAdShowFailedDelegate(string meticaAdJson, string meticaAdErrorJson);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void OnAdHiddenDelegate(string meticaAdJson);
@@ -42,6 +42,7 @@ namespace Metica.ADS.IOS
 
         [DllImport("__Internal")]
         private static extern void ios_showInterstitial(
+            string interstitialAdUnitId,
             OnAdShowSuccessDelegate onShowSuccess,
             OnAdShowFailedDelegate onShowFailed,
             OnAdHiddenDelegate onAdHidden,
@@ -51,6 +52,7 @@ namespace Metica.ADS.IOS
 
         [DllImport("__Internal")]
         private static extern void ios_showRewarded(
+            string interstitialAdUnitId,
             OnAdShowSuccessDelegate onShowSuccess,
             OnAdShowFailedDelegate onShowFailed,
             OnAdHiddenDelegate onAdHidden,
@@ -59,9 +61,10 @@ namespace Metica.ADS.IOS
             OnAdRevenuePaidDelegate onAdRevenuePaid
         );
 
-        public void ShowInterstitial()
+        public void ShowInterstitial(string interstitialAdUnitId)
         {
             ios_showInterstitial(
+                interstitialAdUnitId,
                 OnAdShowSuccess,
                 OnAdShowFailed,
                 OnAdHidden,
@@ -70,9 +73,10 @@ namespace Metica.ADS.IOS
             );
         }
 
-        public void ShowRewarded()
+        public void ShowRewarded(string interstitialAdUnitId)
         {
             ios_showRewarded(
+                interstitialAdUnitId,
                 OnAdShowSuccess,
                 OnAdShowFailed,
                 OnAdHidden,
@@ -91,11 +95,13 @@ namespace Metica.ADS.IOS
         }
 
         [AOT.MonoPInvokeCallback(typeof(OnAdShowFailedDelegate))]
-        private static void OnAdShowFailed(string meticaAdJson, string error)
+        private static void OnAdShowFailed(string meticaAdJson, string meticaAdErrorJson)
         {
             var ad = MeticaAd.FromJson(meticaAdJson);
-            MeticaAds.Log.LogDebug(() => $"{TAG} onAdShowFailed for adUnitId={ad.adUnitId}, error={error}");
-            _currentInstance?.AdShowFailed?.Invoke(ad, error);
+            var meticaAdError = MeticaAdError.FromJson(errorJson);
+
+            MeticaAds.Log.LogDebug(() => $"{TAG} onAdShowFailed for adUnitId={ad.adUnitId}, error={meticaAdError.message}");
+            _currentInstance?.AdShowFailed?.Invoke(ad, meticaAdError);
         }
 
         [AOT.MonoPInvokeCallback(typeof(OnAdHiddenDelegate))]

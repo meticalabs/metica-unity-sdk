@@ -4,11 +4,8 @@
 
 using System;
 using System.Threading.Tasks;
-<<<<<<< HEAD:Runtime/ADS/Platform/IOS/IOSDelegate.cs
 using System.Runtime.InteropServices;
-=======
 using Metica;
->>>>>>> develop:Runtime/Sdk/Ads/Platform/IOS/IOSDelegate.cs
 
 namespace Metica.Ads.IOS
 {
@@ -41,17 +38,17 @@ internal class IOSDelegate : PlatformDelegate
     public event Action<MeticaAd> RewardedAdRewarded;
     public event Action<MeticaAd> RewardedAdRevenuePaid;
 
-        [DllImport("__Internal")]
-        private static extern void ios_setLogEnabled(bool value);
-        [DllImport("__Internal")]
-        private static extern bool ios_isRewardedReady();
-        [DllImport("__Internal")]
-        private static extern bool ios_isInterstitialReady();
+    [DllImport("__Internal")]
+    private static extern void ios_setLogEnabled(bool value);
+    [DllImport("__Internal")]
+    private static extern bool ios_isRewardedReady(string adUnitId);
+    [DllImport("__Internal")]
+    private static extern bool ios_isInterstitialReady(string adUnitId);
         
     public void SetLogEnabled(bool logEnabled)
     {
-            MeticaAds.Log.LogDebug(() => $"{TAG} SetLogEnabled called with: {logEnabled}");
-            ios_setLogEnabled(logEnabled);
+        MeticaAds.Log.LogDebug(() => $"{TAG} SetLogEnabled called with: {logEnabled}");
+        ios_setLogEnabled(logEnabled);
     }
 
     public void SetHasUserConsent(bool value)
@@ -80,90 +77,77 @@ internal class IOSDelegate : PlatformDelegate
     {
     }
 
-<<<<<<< HEAD:Runtime/ADS/Platform/IOS/IOSDelegate.cs
-        public Task<MeticaAdsInitializationResult> InitializeAsync(string apiKey, string appId, string userId, string version, string baseEndpoint,
-            MeticaConfiguration configuration)
-        {
-            var tcs = new TaskCompletionSource<MeticaAdsInitializationResult>();
-            var callback = new IOSInitializeCallback(tcs);
-            callback.InitializeSDK(apiKey, appId, userId, version, baseEndpoint);
-            return tcs.Task;
-        }
-=======
     public Task<MeticaInitResponse> InitializeAsync(string apiKey, string appId, string userId, string mediationInfoKey)
     {
         var tcs = new TaskCompletionSource<MeticaInitResponse>();
-        tcs.SetResult(
-            new MeticaInitResponse(new MeticaSmartFloors(MeticaUserGroup.HOLDOUT, false))
-        );
+        var callback = new IOSInitializeCallback(tcs);
+        callback.InitializeSDK(apiKey, appId, userId, mediationInfoKey);
         return tcs.Task;
     }
->>>>>>> develop:Runtime/Sdk/Ads/Platform/IOS/IOSDelegate.cs
 
     // Interstitial methods
     public void LoadInterstitial(string interstitialAdUnitId)
     {
-            var callback = new IOSLoadCallback();
-            callback.AdLoadSuccess += (meticaAd) => InterstitialAdLoadSuccess?.Invoke(meticaAd);
-            callback.AdLoadFailed += (error) => InterstitialAdLoadFailed?.Invoke(error);
+        var callback = new IOSLoadCallback();
+        callback.AdLoadSuccess += (meticaAd) => InterstitialAdLoadSuccess?.Invoke(meticaAd);
+        callback.AdLoadFailed += (error) => InterstitialAdLoadFailed?.Invoke(error);
             
-            MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS loadInterstitial method");
-            callback.LoadInterstitial();
-            MeticaAds.Log.LogDebug(() => $"{TAG} iOS loadInterstitial method called");
+        MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS loadInterstitial method");
+        callback.LoadInterstitial(interstitialAdUnitId);
+        MeticaAds.Log.LogDebug(() => $"{TAG} iOS loadInterstitial method called");
     }
 
     public void ShowInterstitial(string interstitialAdUnitId)
     {
-            var callback = new IOSShowCallbackProxy();
+        var callback = new IOSShowCallbackProxy();
 
-            callback.AdShowSuccess += (ad) => InterstitialAdShowSuccess?.Invoke(ad);
-            callback.AdShowFailed += (ad, error) => InterstitialAdShowFailed?.Invoke(ad, error);
-            callback.AdHidden += (ad) => InterstitialAdHidden?.Invoke(ad);
-            callback.AdClicked += (ad) => InterstitialAdClicked?.Invoke(ad);
-            callback.AdRevenuePaid += (ad) => InterstitialAdRevenuePaid?.Invoke(ad);
+        callback.AdShowSuccess += (ad) => InterstitialAdShowSuccess?.Invoke(ad);
+        callback.AdShowFailed += (ad, error) => InterstitialAdShowFailed?.Invoke(ad, error);
+        callback.AdHidden += (ad) => InterstitialAdHidden?.Invoke(ad);
+        callback.AdClicked += (ad) => InterstitialAdClicked?.Invoke(ad);
+        callback.AdRevenuePaid += (ad) => InterstitialAdRevenuePaid?.Invoke(ad);
 
-            MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS showInterstitial method");
-            callback.ShowInterstitial();
-            MeticaAds.Log.LogDebug(() => $"{TAG} iOS showInterstitial method called");
+        MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS showInterstitial method");
+        callback.ShowInterstitial(interstitialAdUnitId);
+        MeticaAds.Log.LogDebug(() => $"{TAG} iOS showInterstitial method called");
     }
 
     public bool IsInterstitialReady(string interstitialAdUnitId)
     {
-        return false;
+        return ios_isInterstitialReady(interstitialAdUnitId);
     }
 
     // Rewarded methods
     public void LoadRewarded(string rewardedAdUnitId)
     {
-            var callback = new IOSLoadCallback();
-            callback.AdLoadSuccess += (meticaAd) => RewardedAdLoadSuccess?.Invoke(meticaAd);
-            callback.AdLoadFailed += (error) => RewardedAdLoadFailed?.Invoke(error);
+        var callback = new IOSLoadCallback();
+        callback.AdLoadSuccess += (meticaAd) => RewardedAdLoadSuccess?.Invoke(meticaAd);
+        callback.AdLoadFailed += (error) => RewardedAdLoadFailed?.Invoke(error);
      
-            MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS loadRewarded method");
-            callback.LoadRewarded();
-            MeticaAds.Log.LogDebug(() => $"{TAG} iOS loadRewarded method called");
+        MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS loadRewarded method");
+        callback.LoadRewarded(rewardedAdUnitId);
+        MeticaAds.Log.LogDebug(() => $"{TAG} iOS loadRewarded method called");
     }
 
     public void ShowRewarded(string rewardedAdUnitId)
     {
-            var callback = new IOSShowCallbackProxy();
-            callback.AdShowSuccess += (ad) => RewardedAdShowSuccess?.Invoke(ad);
-            callback.AdShowFailed += (ad, error) => RewardedAdShowFailed?.Invoke(ad, error);
-            callback.AdHidden += (ad) => RewardedAdHidden?.Invoke(ad);
-            callback.AdClicked += (ad) => RewardedAdClicked?.Invoke(ad);
-            callback.AdRewarded += (ad) => RewardedAdRewarded?.Invoke(ad);
-            callback.AdRevenuePaid += (ad) => RewardedAdRevenuePaid?.Invoke(ad);
+        var callback = new IOSShowCallbackProxy();
+        callback.AdShowSuccess += (ad) => RewardedAdShowSuccess?.Invoke(ad);
+        callback.AdShowFailed += (ad, error) => RewardedAdShowFailed?.Invoke(ad, error);
+        callback.AdHidden += (ad) => RewardedAdHidden?.Invoke(ad);
+        callback.AdClicked += (ad) => RewardedAdClicked?.Invoke(ad);
+        callback.AdRewarded += (ad) => RewardedAdRewarded?.Invoke(ad);
+        callback.AdRevenuePaid += (ad) => RewardedAdRevenuePaid?.Invoke(ad);
     
-            MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS showRewarded method");
-            callback.ShowRewarded();
-            MeticaAds.Log.LogDebug(() => $"{TAG} iOS showRewarded method called");
+        MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS showRewarded method");
+        callback.ShowRewarded(rewardedAdUnitId);
+        MeticaAds.Log.LogDebug(() => $"{TAG} iOS showRewarded method called");
     }
 
     public bool IsRewardedReady(string rewardedAdUnitId)
     {
-        return false;
+        return ios_isRewardedReady(rewardedAdUnitId);
     }
-<<<<<<< HEAD:Runtime/ADS/Platform/IOS/IOSDelegate.cs
 
     // Notification methods
     public void NotifyAdLoadAttempt(string adUnitId)
@@ -185,7 +169,5 @@ internal class IOSDelegate : PlatformDelegate
     {
         // TODO: Implement iOS native call
     }
-=======
->>>>>>> develop:Runtime/Sdk/Ads/Platform/IOS/IOSDelegate.cs
 }
 }

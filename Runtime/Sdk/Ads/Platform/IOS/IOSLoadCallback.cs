@@ -20,24 +20,26 @@ namespace Metica.ADS.IOS
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void OnAdLoadSuccessDelegate(string meticaAdJson);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void OnAdLoadFailedDelegate(string error);
+        public delegate void OnAdLoadFailedDelegate(string errorJson);
 
         [DllImport("__Internal")]
-        private static extern void ios_loadInterstitial(OnAdLoadSuccessDelegate onSuccess, OnAdLoadFailedDelegate onFailure);
+        private static extern void ios_loadInterstitial(string adUnitId, OnAdLoadSuccessDelegate onSuccess, OnAdLoadFailedDelegate onFailure);
         [DllImport("__Internal")]
-        private static extern void ios_loadRewarded(OnAdLoadSuccessDelegate onSuccess, OnAdLoadFailedDelegate onFail);
+        private static extern void ios_loadRewarded(string adUnitId, OnAdLoadSuccessDelegate onSuccess, OnAdLoadFailedDelegate onFail);
 
-        public void LoadInterstitial()
+        public void LoadInterstitial(string adUnitId)
         {
             ios_loadInterstitial(
+                adUnitId,
                 OnAdLoadSuccess,
                 OnAdLoadFailed
             );
         }
 
-        public void LoadRewarded()
+        public void LoadRewarded(string adUnitId)
         {
             ios_loadRewarded(
+                adUnitId,
                 OnAdLoadSuccess,
                 OnAdLoadFailed
             );
@@ -52,10 +54,11 @@ namespace Metica.ADS.IOS
         }
 
         [AOT.MonoPInvokeCallback(typeof(OnAdLoadFailedDelegate))]
-        private static void OnAdLoadFailed(string error)
+        private static void OnAdLoadFailed(string errorJson)
         {
+            var meticaAdError = MeticaAdError.FromJson(errorJson);
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadFailed callback received, error={error}");
-            _currentInstance?.AdLoadFailed?.Invoke(error);
+            _currentInstance?.AdLoadFailed?.Invoke(meticaAdError);
         }
     }
 }

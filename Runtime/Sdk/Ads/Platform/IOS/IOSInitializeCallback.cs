@@ -17,59 +17,33 @@ namespace Metica.ADS.IOS
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void OnInitializeSuccessDelegate(bool enabled);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void OnInitializeFailedDelegate(string error);
+        public delegate void OnInitializeSuccessDelegate(string meticaAdsInitializationResponseJson);
 
         [DllImport("__Internal")]
-        private static extern void ios_sdkInitialize(string apiKey, string appId, string userId, string version, string baseEndpoint, OnInitializeSuccessDelegate onSuccess, OnInitializeFailedDelegate onFail);
+        private static extern void ios_sdkInitialize(string apiKey, string appId, string userId, string mediationInfoKey, OnInitializeSuccessDelegate result);
 
-        public void InitializeSDK(string apiKey, string appId, string userId, string version, string baseEndpoint)
+        public void InitializeSDK(string apiKey, string appId, string userId, string mediationInfoKey)
         {
             ios_sdkInitialize(
                 apiKey,
                 appId,
                 userId,
-                version,
-                baseEndpoint,
-                OnInitialized,
-                OnFailed
+                mediationInfoKey,
+                OnInitialized
             );
         }
 
         [AOT.MonoPInvokeCallback(typeof(OnInitializeSuccessDelegate))]
-        private static void OnInitialized(bool adsEnabled)
+        private static void OnInitialized(string meticaAdsInitializationResponseJson)
         {
-            MeticaAds.Log.LogDebug(() => $"{TAG} onInitialized: {adsEnabled}");
+            var meticaInitResponse = MeticaInitResponse.FromJson(meticaAdsInitializationResponseJson);
             var tcs = _currentTcs;
             if (tcs != null)
             {
-                if (adsEnabled)
-                {
-                    tcs.SetResult(
-                        new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.Normal)
-                    );
-                }
-                else
-                {
-                    tcs.SetResult(
-                        new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.Holdout)
-                    );
-                }
-                _currentTcs = null;
-            }
-        }
-
-        [AOT.MonoPInvokeCallback(typeof(OnInitializeFailedDelegate))]
-        private static void OnFailed(string reason)
-        {
-            MeticaAds.Log.LogDebug(() => $"{TAG} onFailed: {reason}");
-            var tcs = _currentTcs;
-            if (tcs != null)
-            {
-                tcs.SetResult(
-                    new MeticaAdsInitializationResult(MeticaAdsAssignmentStatus.HoldoutDueToError)
-                );
+                MeticaAds.Log.LogDebug(() => $"{TAG} IOSInitializeCallback onInit");
+                var smartFloors = meticaInitResponse.SmartFloors;
+                MeticaAds.Log.LogDebug(() => $"{TAG} IOSInitializeCallback smartFloorsObj = {smartFloors}");
+                tcs.SetResult(meticaInitResponse);
                 _currentTcs = null;
             }
         }

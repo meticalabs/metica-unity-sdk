@@ -1,6 +1,7 @@
 // MeticaAd.cs
 
 using System;
+using UnityEngine;
 
 namespace Metica.Ads
 {
@@ -12,6 +13,11 @@ public class MeticaAdError
     public MeticaAdError(String message)
     {
         this.message = message;
+    }
+
+    public static MeticaAdError FromJson(string json)
+    {
+        return JsonUtility.FromJson<MeticaAdError>(json);
     }
 }
 }
