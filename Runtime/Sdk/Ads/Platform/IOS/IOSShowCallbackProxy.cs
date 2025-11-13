@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-namespace Metica.ADS.IOS
+namespace Metica.Ads.IOS
 {
     internal class IOSShowCallbackProxy
     {
@@ -10,7 +10,7 @@ namespace Metica.ADS.IOS
         private static IOSShowCallbackProxy _currentInstance;
         
         public event Action<MeticaAd> AdShowSuccess;
-        public event Action<MeticaAd, string> AdShowFailed;
+        public event Action<MeticaAd, MeticaAdError> AdShowFailed;
         public event Action<MeticaAd> AdHidden;
         public event Action<MeticaAd> AdClicked;
         public event Action<MeticaAd> AdRewarded;
@@ -98,7 +98,7 @@ namespace Metica.ADS.IOS
         private static void OnAdShowFailed(string meticaAdJson, string meticaAdErrorJson)
         {
             var ad = MeticaAd.FromJson(meticaAdJson);
-            var meticaAdError = MeticaAdError.FromJson(errorJson);
+            var meticaAdError = MeticaAdError.FromJson(meticaAdErrorJson);
 
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdShowFailed for adUnitId={ad.adUnitId}, error={meticaAdError.message}");
             _currentInstance?.AdShowFailed?.Invoke(ad, meticaAdError);

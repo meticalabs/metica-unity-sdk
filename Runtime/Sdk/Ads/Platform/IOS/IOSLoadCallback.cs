@@ -2,14 +2,14 @@ using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-namespace Metica.ADS.IOS
+namespace Metica.Ads.IOS
 {
     public class IOSLoadCallback
     {
         private const string TAG = MeticaAds.TAG;
         private static IOSLoadCallback _currentInstance;
         public event Action<MeticaAd> AdLoadSuccess;
-        public event Action<string> AdLoadFailed;
+        public event Action<MeticaAdError> AdLoadFailed;
 
         public IOSLoadCallback()
         {
@@ -57,7 +57,7 @@ namespace Metica.ADS.IOS
         private static void OnAdLoadFailed(string errorJson)
         {
             var meticaAdError = MeticaAdError.FromJson(errorJson);
-            MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadFailed callback received, error={error}");
+            MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadFailed callback received, error={meticaAdError.message}");
             _currentInstance?.AdLoadFailed?.Invoke(meticaAdError);
         }
     }

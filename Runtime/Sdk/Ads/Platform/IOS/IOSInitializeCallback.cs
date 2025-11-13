@@ -2,15 +2,16 @@ using System;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using Metica;
 
-namespace Metica.ADS.IOS
+namespace Metica.Ads.IOS
 {
     public class IOSInitializeCallback
     {
         private const string TAG = MeticaAds.TAG;
-        private static TaskCompletionSource<MeticaAdsInitializationResult> _currentTcs;
+        private static TaskCompletionSource<MeticaInitResponse> _currentTcs;
 
-        public IOSInitializeCallback(TaskCompletionSource<MeticaAdsInitializationResult> tcs)
+        public IOSInitializeCallback(TaskCompletionSource<MeticaInitResponse> tcs)
         {
             MeticaAds.Log.LogDebug(() => $"{TAG} MeticaAdsInitCallback created");
             _currentTcs = tcs;
