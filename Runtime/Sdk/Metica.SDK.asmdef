@@ -1,12 +1,11 @@
 {
-    "name": "Metica.UnityEd",
+    "name": "Metica.SDK",
     "rootNamespace": "",
     "references": [
-        "GUID:201bb3ee2b9a58648b8158bc0b3694a5"
+        "GUID:338a946abe1644d408adf5afa3f9bf49",
+        "GUID:cae81f611ee505e4a805f6867af6cf27"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
