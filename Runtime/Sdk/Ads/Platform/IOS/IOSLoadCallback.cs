@@ -57,7 +57,7 @@ namespace Metica.Ads.IOS
         [AOT.MonoPInvokeCallback(typeof(OnAdLoadFailedDelegate))]
         private static void OnAdLoadFailed(string errorJson)
         {
-            var meticaAdError = MeticaAdError.FromJson(errorJson);
+            var meticaAdError = MeticaAdErrorJson.FromJson(errorJson);
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadFailed callback received, error={meticaAdError.message}");
             _currentInstance?.AdLoadFailed?.Invoke(meticaAdError);
         }

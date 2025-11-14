@@ -99,7 +99,7 @@ namespace Metica.Ads.IOS
         private static void OnAdShowFailed(string meticaAdJson, string meticaAdErrorJson)
         {
             var ad = MeticaAdJson.FromJson(meticaAdJson);
-            var meticaAdError = MeticaAdError.FromJson(meticaAdErrorJson);
+            var meticaAdError = MeticaAdErrorJson.FromJson(meticaAdErrorJson);
 
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdShowFailed for adUnitId={ad.adUnitId}, error={meticaAdError.message}");
             _currentInstance?.AdShowFailed?.Invoke(ad, meticaAdError);
