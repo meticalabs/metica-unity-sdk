@@ -4,7 +4,9 @@
 
 using System;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 using Metica;
+using Metica.Ads;
 
 namespace Metica.Ads.IOS
 {
@@ -40,18 +42,33 @@ internal class IOSDelegate : PlatformDelegate
     public event Action<MeticaAd> RewardedAdRewarded;
     public event Action<MeticaAd> RewardedAdRevenuePaid;
 
+    [DllImport("__Internal")]
+    private static extern void ios_setLogEnabled(bool value);
+    [DllImport("__Internal")]
+    private static extern bool ios_isRewardedReady(string adUnitId);
+    [DllImport("__Internal")]
+    private static extern bool ios_isInterstitialReady(string adUnitId);
+    [DllImport("__Internal")]
+    private static extern void ios_setHasUserConsent(bool value);
+    [DllImport("__Internal")]
+    private static extern void ios_setDoNotSell(bool value);
+        
     public void SetLogEnabled(bool logEnabled)
     {
+        MeticaAds.Log.LogDebug(() => $"{TAG} SetLogEnabled called with: {logEnabled}");
+        ios_setLogEnabled(logEnabled);
     }
 
-    public void SetHasUserConsent(bool value)
+    public void SetHasUserConsent(bool hasUserConsent)
     {
-        throw new NotImplementedException();
+        MeticaAds.Log.LogDebug(() => $"{TAG} SetHasUserConsent called with: {hasUserConsent}");
+        ios_setHasUserConsent(hasUserConsent);
     }
 
-    public void SetDoNotSell(bool value)
+    public void SetDoNotSell(bool doNotSell)
     {
-        throw new NotImplementedException();
+        MeticaAds.Log.LogDebug(() => $"{TAG} SetDoNotSell called with: {doNotSell}");
+        ios_setDoNotSell(doNotSell);
     }
 
     public void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
@@ -73,40 +90,94 @@ internal class IOSDelegate : PlatformDelegate
     public Task<MeticaInitResponse> InitializeAsync(string apiKey, string appId, string userId, string mediationInfoKey)
     {
         var tcs = new TaskCompletionSource<MeticaInitResponse>();
-        tcs.SetResult(
-            new MeticaInitResponse(new MeticaSmartFloors(MeticaUserGroup.HOLDOUT, false))
-        );
+        var callback = new IOSInitializeCallback(tcs);
+        callback.InitializeSDK(apiKey, appId, userId, mediationInfoKey);
         return tcs.Task;
     }
 
     // Interstitial methods
     public void LoadInterstitial(string interstitialAdUnitId)
     {
+        var callback = new IOSLoadCallback();
+        callback.AdLoadSuccess += (meticaAd) => InterstitialAdLoadSuccess?.Invoke(meticaAd);
+        callback.AdLoadFailed += (error) => InterstitialAdLoadFailed?.Invoke(error);
+            
+        MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS loadInterstitial method");
+        callback.LoadInterstitial(interstitialAdUnitId);
+        MeticaAds.Log.LogDebug(() => $"{TAG} iOS loadInterstitial method called");
     }
 
     public void ShowInterstitial(string interstitialAdUnitId, string? placementId, string? customData)
     {
+        var callback = new IOSShowCallbackProxy();
+
+        callback.AdShowSuccess += (ad) => InterstitialAdShowSuccess?.Invoke(ad);
+        callback.AdShowFailed += (ad, error) => InterstitialAdShowFailed?.Invoke(ad, error);
+        callback.AdHidden += (ad) => InterstitialAdHidden?.Invoke(ad);
+        callback.AdClicked += (ad) => InterstitialAdClicked?.Invoke(ad);
+        callback.AdRevenuePaid += (ad) => InterstitialAdRevenuePaid?.Invoke(ad);
+
+        MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS showInterstitial method");
+        callback.ShowInterstitial(interstitialAdUnitId);
+        MeticaAds.Log.LogDebug(() => $"{TAG} iOS showInterstitial method called");
     }
 
     public bool IsInterstitialReady(string interstitialAdUnitId)
     {
-        return false;
+        return ios_isInterstitialReady(interstitialAdUnitId);
     }
 
     // Rewarded methods
     public void LoadRewarded(string rewardedAdUnitId)
     {
-
+        var callback = new IOSLoadCallback();
+        callback.AdLoadSuccess += (meticaAd) => RewardedAdLoadSuccess?.Invoke(meticaAd);
+        callback.AdLoadFailed += (error) => RewardedAdLoadFailed?.Invoke(error);
+     
+        MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS loadRewarded method");
+        callback.LoadRewarded(rewardedAdUnitId);
+        MeticaAds.Log.LogDebug(() => $"{TAG} iOS loadRewarded method called");
     }
 
     public void ShowRewarded(string rewardedAdUnitId, string? placementId, string? customData)
     {
-
+        var callback = new IOSShowCallbackProxy();
+        callback.AdShowSuccess += (ad) => RewardedAdShowSuccess?.Invoke(ad);
+        callback.AdShowFailed += (ad, error) => RewardedAdShowFailed?.Invoke(ad, error);
+        callback.AdHidden += (ad) => RewardedAdHidden?.Invoke(ad);
+        callback.AdClicked += (ad) => RewardedAdClicked?.Invoke(ad);
+        callback.AdRewarded += (ad) => RewardedAdRewarded?.Invoke(ad);
+        callback.AdRevenuePaid += (ad) => RewardedAdRevenuePaid?.Invoke(ad);
+    
+        MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS showRewarded method");
+        callback.ShowRewarded(rewardedAdUnitId);
+        MeticaAds.Log.LogDebug(() => $"{TAG} iOS showRewarded method called");
     }
 
     public bool IsRewardedReady(string rewardedAdUnitId)
     {
-        return false;
+        return ios_isRewardedReady(rewardedAdUnitId);
+    }
+
+    // Notification methods
+    public void NotifyAdLoadAttempt(string adUnitId)
+    {
+        // TODO: Implement iOS native call
+    }
+
+    public void NotifyAdLoadSuccess(MeticaAd meticaAd)
+    {
+        // TODO: Implement iOS native call
+    }
+
+    public void NotifyAdLoadFailed(string adUnitId, string error)
+    {
+        // TODO: Implement iOS native call
+    }
+
+    public void NotifyAdRevenue(MeticaAd meticaAd)
+    {
+        // TODO: Implement iOS native call
     }
 }
 }

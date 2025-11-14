@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace Metica
 {
 public class MeticaInitResponse
@@ -7,6 +9,11 @@ public class MeticaInitResponse
     public MeticaInitResponse(MeticaSmartFloors smartFloors)
     {
         SmartFloors = smartFloors;
+    }
+
+    public static MeticaInitResponse FromJson(string json)
+    {
+        return JsonUtility.FromJson<MeticaInitResponse>(json);
     }
 }
 }
