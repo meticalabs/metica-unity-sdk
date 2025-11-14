@@ -49,7 +49,7 @@ namespace Metica.Ads.IOS
         [AOT.MonoPInvokeCallback(typeof(OnAdLoadSuccessDelegate))]
         private static void OnAdLoadSuccess(string meticaAdJson)
         {
-            var meticaAd = MeticaAd.FromJson(meticaAdJson);
+            var meticaAd = MeticaAdJson.FromJson(meticaAdJson);
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadSuccess callback received for adUnitId={meticaAd.adUnitId}");
             _currentInstance?.AdLoadSuccess?.Invoke(meticaAd);
         }

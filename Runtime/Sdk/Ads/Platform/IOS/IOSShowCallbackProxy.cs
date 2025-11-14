@@ -90,7 +90,7 @@ namespace Metica.Ads.IOS
         [AOT.MonoPInvokeCallback(typeof(OnAdShowSuccessDelegate))]
         private static void OnAdShowSuccess(string meticaAdJson)
         {
-            var ad = MeticaAd.FromJson(meticaAdJson);
+            var ad = MeticaAdJson.FromJson(meticaAdJson);
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdShowSuccess for adUnitId={ad.adUnitId}");
             _currentInstance?.AdShowSuccess?.Invoke(ad);
         }
@@ -98,7 +98,7 @@ namespace Metica.Ads.IOS
         [AOT.MonoPInvokeCallback(typeof(OnAdShowFailedDelegate))]
         private static void OnAdShowFailed(string meticaAdJson, string meticaAdErrorJson)
         {
-            var ad = MeticaAd.FromJson(meticaAdJson);
+            var ad = MeticaAdJson.FromJson(meticaAdJson);
             var meticaAdError = MeticaAdError.FromJson(meticaAdErrorJson);
 
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdShowFailed for adUnitId={ad.adUnitId}, error={meticaAdError.message}");
@@ -108,7 +108,7 @@ namespace Metica.Ads.IOS
         [AOT.MonoPInvokeCallback(typeof(OnAdHiddenDelegate))]
         private static void OnAdHidden(string meticaAdJson)
         {
-            var ad = MeticaAd.FromJson(meticaAdJson);
+            var ad = MeticaAdJson.FromJson(meticaAdJson);
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdHidden for adUnitId={ad.adUnitId}");
             _currentInstance?.AdHidden?.Invoke(ad);
         }
@@ -116,7 +116,7 @@ namespace Metica.Ads.IOS
         [AOT.MonoPInvokeCallback(typeof(OnAdClickedDelegate))]
         private static void OnAdClicked(string meticaAdJson)
         {
-            var ad = MeticaAd.FromJson(meticaAdJson);
+            var ad = MeticaAdJson.FromJson(meticaAdJson);
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdClicked for adUnitId={ad.adUnitId}");
             _currentInstance?.AdClicked?.Invoke(ad);
         }
@@ -124,7 +124,7 @@ namespace Metica.Ads.IOS
         [AOT.MonoPInvokeCallback(typeof(OnAdRewardedDelegate))]
         private static void OnAdRewarded(string meticaAdJson)
         {
-            var ad = MeticaAd.FromJson(meticaAdJson);
+            var ad = MeticaAdJson.FromJson(meticaAdJson);
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdRewarded for adUnitId={ad.adUnitId}");
             _currentInstance?.AdRewarded?.Invoke(ad);
         }
@@ -132,7 +132,7 @@ namespace Metica.Ads.IOS
         [AOT.MonoPInvokeCallback(typeof(OnAdRevenuePaidDelegate))]
         private static void OnAdRevenuePaid(string meticaAdJson)
         {
-            var ad = MeticaAd.FromJson(meticaAdJson);
+            var ad = MeticaAdJson.FromJson(meticaAdJson);
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdRevenuePaid for adUnitId={ad.adUnitId}");
             _currentInstance?.AdRevenuePaid?.Invoke(ad);
         }
