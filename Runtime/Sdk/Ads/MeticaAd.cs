@@ -1,36 +1,23 @@
 // MeticaAd.cs
 
 using System;
-using UnityEngine;
+using Newtonsoft.Json;
 
 namespace Metica.Ads
 {
-    [Serializable]
-    public class MeticaAd
+    public record MeticaAd(
+        string adUnitId,
+        double? revenue,
+        string? networkName,
+        string? placementTag,
+        string? adFormat,
+        string? creativeId,
+        long? latency
+    );
+  
+    public static class MeticaAdJson
     {
-        public string adUnitId;
-        public double revenue;
-        public string networkName;
-        public string placementTag;
-        public string adFormat;
-        public string creativeId;
-        public long latency;
-
-        public MeticaAd(string adUnitId, double revenue, string networkName,
-            string placementTag, string adFormat, string creativeId, long latency)
-        {
-            this.adUnitId = adUnitId;
-            this.revenue = revenue;
-            this.networkName = networkName;
-            this.placementTag = placementTag;
-            this.adFormat = adFormat;
-            this.creativeId = creativeId;
-            this.latency = latency;
-        }
-
-        public static MeticaAd FromJson(string json)
-        {
-            return JsonUtility.FromJson<MeticaAd>(json);
-        }
+        public static MeticaAd FromJson(string json) =>
+            JsonConvert.DeserializeObject<MeticaAd>(json)!;
     }
 }
