@@ -1,5 +1,7 @@
 // MeticaAd.cs
 
+#nullable enable
+
 using System;
 using Newtonsoft.Json;
 
@@ -20,4 +22,5 @@ namespace Metica.Ads
         public static MeticaAd FromJson(string json) =>
             JsonConvert.DeserializeObject<MeticaAd>(json)!;
     }
+
 }

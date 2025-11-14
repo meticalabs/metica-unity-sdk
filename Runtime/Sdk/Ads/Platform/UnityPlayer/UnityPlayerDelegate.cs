@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Threading.Tasks;
 using Metica;
@@ -6,6 +8,9 @@ namespace Metica.Ads.UnityPlayer
 {
     internal class UnityPlayerDelegate : PlatformDelegate
     {
+        // AppLovin-specific functionality
+        public MeticaApplovinFunctions Max { get; } = new UnityPlayerApplovinFunctions();
+
         // Mock events - these won't actually fire in editor
         public event Action<MeticaAd> BannerAdLoadSuccess;
         public event Action<MeticaAdError> BannerAdLoadFailed;
@@ -80,9 +85,9 @@ namespace Metica.Ads.UnityPlayer
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock LoadInterstitial called");
         }
 
-        public void ShowInterstitial(string interstitialAdUnitId)
+        public void ShowInterstitial(string interstitialAdUnitId, string? placementId, string? customData)
         {
-            MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock ShowInterstitial called");
+            MeticaAds.Log.LogDebug(() => $"[MeticaAds Unity] Mock ShowInterstitial called with placementId={placementId}, customData={customData}");
         }
 
         public bool IsInterstitialReady(string interstitialAdUnitId)
@@ -96,9 +101,9 @@ namespace Metica.Ads.UnityPlayer
             MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock LoadRewarded called");
         }
 
-        public void ShowRewarded(string rewardedAdUnitId)
+        public void ShowRewarded(string rewardedAdUnitId, string? placementId, string? customData)
         {
-            MeticaAds.Log.LogDebug(() => "[MeticaAds Unity] Mock ShowRewarded called");
+            MeticaAds.Log.LogDebug(() => $"[MeticaAds Unity] Mock ShowRewarded called with placementId={placementId}, customData={customData}");
         }
 
         public bool IsRewardedReady(string rewardedAdUnitId)

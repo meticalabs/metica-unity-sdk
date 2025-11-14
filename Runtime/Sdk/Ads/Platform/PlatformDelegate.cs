@@ -8,6 +8,9 @@ namespace Metica.Ads
 {
 internal interface PlatformDelegate
 {
+    // AppLovin-specific functionality
+    MeticaApplovinFunctions Max { get; }
+
     // Events for banner ad lifecycle callbacks
     public event Action<MeticaAd> BannerAdLoadSuccess;
     public event Action<MeticaAdError> BannerAdLoadFailed;
@@ -48,12 +51,12 @@ internal interface PlatformDelegate
 
     // Interstitial methods
     void LoadInterstitial(string interstitialAdUnitId);
-    void ShowInterstitial(string interstitialAdUnitId);
+    void ShowInterstitial(string interstitialAdUnitId, string? placementId, string? customData);
     bool IsInterstitialReady(string interstitialAdUnitId);
-            
+
     // Rewarded methods
     void LoadRewarded(string rewardedAdUnitId);
-    void ShowRewarded(string rewardedAdUnitId);
+    void ShowRewarded(string rewardedAdUnitId, string? placementId, string? customData);
     bool IsRewardedReady(string rewardedAdUnitId);
 }
 }

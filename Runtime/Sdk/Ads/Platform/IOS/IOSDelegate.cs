@@ -14,6 +14,9 @@ internal class IOSDelegate : PlatformDelegate
 {
     private const string TAG = MeticaAds.TAG;
 
+    // AppLovin-specific functionality
+    public MeticaApplovinFunctions Max { get; } = new IOSApplovinFunctions();
+
     // Events for banner ad lifecycle callbacks
     public event Action<MeticaAd> BannerAdLoadSuccess;
     public event Action<MeticaAdError> BannerAdLoadFailed;
@@ -104,7 +107,7 @@ internal class IOSDelegate : PlatformDelegate
         MeticaAds.Log.LogDebug(() => $"{TAG} iOS loadInterstitial method called");
     }
 
-    public void ShowInterstitial(string interstitialAdUnitId)
+    public void ShowInterstitial(string interstitialAdUnitId, string? placementId, string? customData)
     {
         var callback = new IOSShowCallbackProxy();
 
@@ -136,7 +139,7 @@ internal class IOSDelegate : PlatformDelegate
         MeticaAds.Log.LogDebug(() => $"{TAG} iOS loadRewarded method called");
     }
 
-    public void ShowRewarded(string rewardedAdUnitId)
+    public void ShowRewarded(string rewardedAdUnitId, string? placementId, string? customData)
     {
         var callback = new IOSShowCallbackProxy();
         callback.AdShowSuccess += (ad) => RewardedAdShowSuccess?.Invoke(ad);

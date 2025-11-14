@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -21,7 +23,7 @@ namespace Metica
         
         private static MeticaSdk Sdk { get; set; }
 
-        internal static string Version { get => "2.0.0-beta1"; }
+        internal static string Version { get => "2.0.0-beta5"; }
 
         internal static string UserId { get; set; } // TODO: set should become private and require a reinitialization to cheange user id
         public static string ApiKey { get; private set; }
@@ -312,6 +314,8 @@ namespace Metica
         // ADS bridge
         public static class Ads
         {
+            public static MeticaApplovinFunctions Max => MeticaAds.Max;
+
             public static void SetHasUserConsent(bool userConsent)
                 => MeticaAds.SetHasUserConsent(userConsent);
 
@@ -333,8 +337,8 @@ namespace Metica
             public static void LoadInterstitial(string interstitialAdUnitId)
                 => MeticaAds.LoadInterstitial(interstitialAdUnitId);
 
-            public static void ShowInterstitial(string interstitialAdUnitId)
-                => MeticaAds.ShowInterstitial(interstitialAdUnitId);
+            public static void ShowInterstitial(string interstitialAdUnitId, string? placementId = null, string? customData = null)
+                => MeticaAds.ShowInterstitial(interstitialAdUnitId, placementId, customData);
 
             public static bool IsInterstitialReady(string interstitialAdUnitId)
                 => MeticaAds.IsInterstitialReady(interstitialAdUnitId);
@@ -342,8 +346,8 @@ namespace Metica
             public static void LoadRewarded(string rewardedAdUnitId)
                 => MeticaAds.LoadRewarded(rewardedAdUnitId);
 
-            public static void ShowRewarded(string rewardedAdUnitId)
-                => MeticaAds.ShowRewarded(rewardedAdUnitId);
+            public static void ShowRewarded(string rewardedAdUnitId, string? placementId = null, string? customData = null)
+                => MeticaAds.ShowRewarded(rewardedAdUnitId, placementId, customData);
 
             public static bool IsRewardedReady(string rewardedAdUnitId)
                 => MeticaAds.IsRewardedReady(rewardedAdUnitId);

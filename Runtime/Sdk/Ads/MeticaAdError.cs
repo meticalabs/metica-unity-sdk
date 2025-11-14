@@ -1,23 +1,20 @@
-// MeticaAd.cs
+// MeticaAdError.cs
+
+#nullable enable
 
 using System;
-using UnityEngine;
+using Newtonsoft.Json;
 
 namespace Metica.Ads
 {
-[Serializable]
-public class MeticaAdError
-{
-    public string message;
-
-    public MeticaAdError(String message)
+    public record MeticaAdError(
+      string message,
+      string? adUnitId
+    );
+  
+    public static class MeticaAdErrorJson
     {
-        this.message = message;
+        public static MeticaAdError FromJson(string json) =>
+            JsonConvert.DeserializeObject<MeticaAdError>(json)!;
     }
-
-    public static MeticaAdError FromJson(string json)
-    {
-        return JsonUtility.FromJson<MeticaAdError>(json);
-    }
-}
 }

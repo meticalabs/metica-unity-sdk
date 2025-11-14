@@ -9,16 +9,15 @@ using UnityEngine.Assertions;
 namespace Metica.Ads
 {
     internal static class MeticaAds
-    {   
-        public const string TAG = "MeticaUnityPlugin";
+    {
+        public const string TAG = "[MeticaUnityPlugin]";
         private static readonly PlatformDelegate PlatformDelegate;
-        internal static readonly ILog Log;
+        internal static ILog Log => Registry.Resolve<ILog>();
+
+        public static MeticaApplovinFunctions Max => PlatformDelegate.Max;
 
         static MeticaAds()
         {
-            Log = Registry.Resolve<ILog>();
-            Assert.IsNotNull(Log, $"No implementations of {nameof(ILog)} were found in the {nameof(Registry)}. Make sure that an implementation of {nameof(ILog)} has been registered first.");
-
 #if UNITY_EDITOR
             // Check for Unity Editor first since the editor also responds to the currently selected platform.
             PlatformDelegate = GetUnityPlayerDelegate();
@@ -104,23 +103,23 @@ namespace Metica.Ads
         {
             PlatformDelegate.LoadInterstitial(interstitialAdUnitId);
         }
-        public static void ShowInterstitial(string interstitialAdUnitId)
+        public static void ShowInterstitial(string interstitialAdUnitId, string? placementId = null, string? customData = null)
         {
-            PlatformDelegate.ShowInterstitial(interstitialAdUnitId);
+            PlatformDelegate.ShowInterstitial(interstitialAdUnitId, placementId, customData);
         }
         public static bool IsInterstitialReady(string interstitialAdUnitId)
         {
             return PlatformDelegate.IsInterstitialReady(interstitialAdUnitId);
         }
-        
+
         // Rewarded ad methods
         public static void LoadRewarded(string rewardedAdUnitId)
         {
             PlatformDelegate.LoadRewarded(rewardedAdUnitId);
         }
-        public static void ShowRewarded(string rewardedAdUnitId)
+        public static void ShowRewarded(string rewardedAdUnitId, string? placementId = null, string? customData = null)
         {
-            PlatformDelegate.ShowRewarded(rewardedAdUnitId);
+            PlatformDelegate.ShowRewarded(rewardedAdUnitId, placementId, customData);
         }
         public static bool IsRewardedReady(string rewardedAdUnitId)
         {
