@@ -45,6 +45,10 @@ internal class IOSDelegate : PlatformDelegate
     private static extern bool ios_isRewardedReady(string adUnitId);
     [DllImport("__Internal")]
     private static extern bool ios_isInterstitialReady(string adUnitId);
+    [DllImport("__Internal")]
+    private static extern void ios_setHasUserConsent(bool value);
+    [DllImport("__Internal")]
+    private static extern void ios_setDoNotSell(bool value);
         
     public void SetLogEnabled(bool logEnabled)
     {
@@ -52,14 +56,16 @@ internal class IOSDelegate : PlatformDelegate
         ios_setLogEnabled(logEnabled);
     }
 
-    public void SetHasUserConsent(bool value)
+    public void SetHasUserConsent(bool hasUserConsent)
     {
-        throw new NotImplementedException();
+        MeticaAds.Log.LogDebug(() => $"{TAG} SetHasUserConsent called with: {hasUserConsent}");
+        ios_setHasUserConsent(hasUserConsent);
     }
 
-    public void SetDoNotSell(bool value)
+    public void SetDoNotSell(bool doNotSell)
     {
-        throw new NotImplementedException();
+        MeticaAds.Log.LogDebug(() => $"{TAG} SetDoNotSell called with: {doNotSell}");
+        ios_setDoNotSell(doNotSell);
     }
 
     public void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
