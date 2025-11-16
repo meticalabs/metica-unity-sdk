@@ -2,6 +2,7 @@
     "name": "Metica.SDK",
     "rootNamespace": "",
     "references": [
+        "GUID:d681d85e7e353c043b47fcbc61583d28",
         "GUID:338a946abe1644d408adf5afa3f9bf49",
         "GUID:cae81f611ee505e4a805f6867af6cf27",
         "GUID:a4cfc1a18fa3a469b96d885db522f42e"
@@ -16,3 +17,4 @@
     "versionDefines": [],
     "noEngineReferences": false
 }
+
