@@ -19,9 +19,9 @@ namespace Metica.Ads.IOS
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void OnAdLoadSuccessDelegate(string meticaAdJson);
+        public delegate void OnAdLoadSuccessDelegate(string adUnitId, double revenue, string networkName, string placementTag, string adFormat, string creativeId, long latency);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void OnAdLoadFailedDelegate(string errorJson);
+        public delegate void OnAdLoadFailedDelegate(string error, string adUnitId);
 
         [DllImport("__Internal")]
         private static extern void ios_loadInterstitial(string adUnitId, OnAdLoadSuccessDelegate onSuccess, OnAdLoadFailedDelegate onFailure);
@@ -47,17 +47,17 @@ namespace Metica.Ads.IOS
         }
 
         [AOT.MonoPInvokeCallback(typeof(OnAdLoadSuccessDelegate))]
-        private static void OnAdLoadSuccess(string meticaAdJson)
+        private static void OnAdLoadSuccess(string adUnitId, double revenue, string networkName, string placementTag, string adFormat, string creativeId, long latency)
         {
-            var meticaAd = MeticaAdJson.FromJson(meticaAdJson);
+            var meticaAd = new MeticaAd(adUnitId, revenue, networkName, placementTag, adFormat, creativeId, latency);
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadSuccess callback received for adUnitId={meticaAd.adUnitId}");
             _currentInstance?.AdLoadSuccess?.Invoke(meticaAd);
         }
 
         [AOT.MonoPInvokeCallback(typeof(OnAdLoadFailedDelegate))]
-        private static void OnAdLoadFailed(string errorJson)
+        private static void OnAdLoadFailed(string error, string adUnitId)
         {
-            var meticaAdError = MeticaAdErrorJson.FromJson(errorJson);
+            var meticaAdError = new MeticaAdError(error, adUnitId);
             MeticaAds.Log.LogDebug(() => $"{TAG} onAdLoadFailed callback received, error={meticaAdError.message}");
             _currentInstance?.AdLoadFailed?.Invoke(meticaAdError);
         }
