@@ -23,7 +23,7 @@ namespace Metica
         
         private static MeticaSdk Sdk { get; set; }
 
-        internal static string Version { get => "2.0.0-beta5"; }
+        internal static string Version { get => "2.0.0-beta6"; }
 
         internal static string UserId { get; set; } // TODO: set should become private and require a reinitialization to cheange user id
         public static string ApiKey { get; private set; }
