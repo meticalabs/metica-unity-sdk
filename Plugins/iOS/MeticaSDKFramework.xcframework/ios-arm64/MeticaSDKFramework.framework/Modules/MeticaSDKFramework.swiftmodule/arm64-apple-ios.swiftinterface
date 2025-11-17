@@ -1,0 +1,335 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.2.1 effective-5.10 (swiftlang-6.2.1.4.8 clang-1700.4.4.1)
+// swift-module-flags: -target arm64-apple-ios18.4 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -module-name MeticaSDKFramework
+// swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.2.1
+import AppLovinSDK
+import Combine
+import CommonCrypto
+import CryptoKit
+import Foundation
+import Swift
+import UIKit
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+import os.log
+import os
+public protocol MeticaAd {
+  var adUnitId: Swift.String { get }
+  var revenue: Swift.Double { get }
+  #if compiler(>=5.3) && $NonescapableTypes
+  var networkName: Swift.String? { get }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  var placementTag: Swift.String? { get }
+  #endif
+  var adFormat: Swift.String { get }
+  #if compiler(>=5.3) && $NonescapableTypes
+  var creativeId: Swift.String? { get }
+  #endif
+  var latency: Swift.Int64 { get }
+}
+public struct MeticaAdError : Swift.Codable, Swift.Equatable, Swift.Hashable {
+  public let message: Swift.String
+  public let adUnitId: Swift.String?
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(message: Swift.String, adUnitId: Swift.String?)
+  #endif
+  public static func == (a: MeticaSDKFramework.MeticaAdError, b: MeticaSDKFramework.MeticaAdError) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+  public init(from decoder: any Swift.Decoder) throws
+}
+extension MeticaSDKFramework.MeticaAdError {
+  public func encode(to encoder: any Swift.Encoder) throws
+}
+public enum MeticaAdFormatType : Swift.Equatable {
+  case INTER
+  case REWARDED
+  public static func == (a: MeticaSDKFramework.MeticaAdFormatType, b: MeticaSDKFramework.MeticaAdFormatType) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public protocol MeticaAds {
+  func loadInterstitial(adUnitId: Swift.String, callback: any MeticaSDKFramework.MeticaAdsLoadCallback)
+  func showInterstitial(adUnitId: Swift.String, callback: any MeticaSDKFramework.MeticaAdsShowCallback)
+  func isInterstitialReady(adUnitId: Swift.String) -> Swift.Bool
+  func loadRewarded(adUnitId: Swift.String, callback: any MeticaSDKFramework.MeticaAdsLoadCallback)
+  func showRewarded(adUnitId: Swift.String, callback: any MeticaSDKFramework.MeticaAdsShowCallback)
+  func isRewardedReady(adUnitId: Swift.String) -> Swift.Bool
+}
+extension MeticaSDKFramework.MeticaAds {
+  public static var privacySettings: any MeticaSDKFramework.MeticaPrivacySettings {
+    get
+  }
+}
+public protocol MeticaAdsLoadCallback {
+  func onAdLoadSuccess(meticaAd: any MeticaSDKFramework.MeticaAd)
+  func onAdLoadFailed(meticaAdError: MeticaSDKFramework.MeticaAdError)
+}
+public protocol MeticaAdsShowCallback {
+  func onAdShowSuccess(meticaAd: any MeticaSDKFramework.MeticaAd)
+  func onAdShowFailed(meticaAd: any MeticaSDKFramework.MeticaAd, meticaAdError: MeticaSDKFramework.MeticaAdError)
+  func onAdHidden(meticaAd: any MeticaSDKFramework.MeticaAd)
+  func onAdClicked(meticaAd: any MeticaSDKFramework.MeticaAd)
+  func onAdRevenuePaid(meticaAd: any MeticaSDKFramework.MeticaAd)
+  func onAdRewarded(meticaAd: any MeticaSDKFramework.MeticaAd)
+}
+public struct MeticaMediationInfo : Swift.Equatable, Swift.Hashable {
+  public let mediationType: MeticaSDKFramework.MeticaMediationType
+  public let key: Swift.String
+  public let extraInformation: [Swift.String : Swift.String]
+  public init(mediationType: MeticaSDKFramework.MeticaMediationType, key: Swift.String, extraInformation: [Swift.String : Swift.String] = [:])
+  public static func == (a: MeticaSDKFramework.MeticaMediationInfo, b: MeticaSDKFramework.MeticaMediationInfo) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum MeticaMediationType : Swift.String, Swift.Equatable, Swift.Hashable {
+  case max
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public protocol MeticaPrivacySettings {
+  func setHasUserConsent(isConsent: Swift.Bool)
+  func setDoNotSell(isDoNotSell: Swift.Bool)
+}
+public protocol KeychainWrapperProtocol {
+  func saveToKeychain(key: Swift.String, value: Swift.String)
+  #if compiler(>=5.3) && $NonescapableTypes
+  func loadFromKeychain(key: Swift.String) -> Swift.String?
+  #endif
+}
+final public class KeychainWrapper : MeticaSDKFramework.KeychainWrapperProtocol {
+  public init()
+  final public func saveToKeychain(key: Swift.String, value: Swift.String)
+  #if compiler(>=5.3) && $NonescapableTypes
+  final public func loadFromKeychain(key: Swift.String) -> Swift.String?
+  #endif
+  @objc deinit
+}
+public enum MeticaLogger {
+  public enum LogLevel : Swift.String {
+    case debug
+    case info
+    case warn
+    case error
+    case special
+    #if compiler(>=5.3) && $NonescapableTypes
+    public init?(rawValue: Swift.String)
+    #endif
+    public typealias RawValue = Swift.String
+    public var rawValue: Swift.String {
+      get
+    }
+  }
+  public static var enableLogs: Swift.Bool
+  public static var isLoggingEnabled: Swift.Bool {
+    get
+  }
+  public static func addListener(_ listener: any MeticaSDKFramework.MeticaLoggerListener)
+  public static func removeListener(_ listener: any MeticaSDKFramework.MeticaLoggerListener)
+  #if compiler(>=5.3) && $NonescapableTypes
+  public static func debug(_ message: @autoclosure () -> Swift.String, tag: Swift.String? = nil, forceLogging: Swift.Bool = false, function: Swift.String = #function, file: Swift.String = #file, line: Swift.UInt = #line)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public static func info(_ message: @autoclosure () -> Swift.String, tag: Swift.String? = nil, forceLogging: Swift.Bool = false, function: Swift.String = #function, file: Swift.String = #file, line: Swift.UInt = #line)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public static func warn(_ message: @autoclosure () -> Swift.String, tag: Swift.String? = nil, error: (any Swift.Error)? = nil, forceLogging: Swift.Bool = false, function: Swift.String = #function, file: Swift.String = #file, line: Swift.UInt = #line)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public static func error(_ message: @autoclosure () -> Swift.String, tag: Swift.String? = nil, error: (any Swift.Error)? = nil, forceLogging: Swift.Bool = false, function: Swift.String = #function, file: Swift.String = #file, line: Swift.UInt = #line)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public static func tlog(_ message: @autoclosure () -> Swift.String, error: (any Swift.Error)? = nil, function: Swift.String = #function, file: Swift.String = #file, line: Swift.UInt = #line)
+  #endif
+}
+public protocol MeticaLoggerListener : AnyObject {
+  func onLog(tag: Swift.String, message: Swift.String, level: MeticaSDKFramework.MeticaLogger.LogLevel)
+}
+public enum UserIdGenerationError : Swift.Error {
+  case emptyAppId
+  public static func == (a: MeticaSDKFramework.UserIdGenerationError, b: MeticaSDKFramework.UserIdGenerationError) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+final public class UserIdManager {
+  public enum Keys : Swift.String {
+    case userId
+    #if compiler(>=5.3) && $NonescapableTypes
+    public init?(rawValue: Swift.String)
+    #endif
+    public typealias RawValue = Swift.String
+    public var rawValue: Swift.String {
+      get
+    }
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(appId: Swift.String?, keychain: any MeticaSDKFramework.KeychainWrapperProtocol = KeychainWrapper())
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  final public func getStableUserId() -> Swift.Result<Swift.String, MeticaSDKFramework.UserIdGenerationError>
+  #endif
+  @objc deinit
+}
+public protocol MeticaInitCallback {
+  func onInit(initResponse: MeticaSDKFramework.MeticaInitResponse)
+}
+public struct MeticaInitConfig {
+  public let apiKey: Swift.String
+  public let appId: Swift.String
+  public init(apiKey: Swift.String, appId: Swift.String, userId: Swift.String)
+}
+extension MeticaSDKFramework.MeticaInitConfig : Swift.Equatable {
+  public static func == (lhs: MeticaSDKFramework.MeticaInitConfig, rhs: MeticaSDKFramework.MeticaInitConfig) -> Swift.Bool
+}
+extension MeticaSDKFramework.MeticaInitConfig : Swift.Hashable {
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public struct MeticaInitResponse : Swift.Codable, Swift.Equatable, Swift.Hashable {
+  public let smartFloors: MeticaSDKFramework.MeticaSmartFloors
+  public init(smartFloors: MeticaSDKFramework.MeticaSmartFloors)
+  public static func == (a: MeticaSDKFramework.MeticaInitResponse, b: MeticaSDKFramework.MeticaInitResponse) -> Swift.Bool
+  public func encode(to encoder: any Swift.Encoder) throws
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+  public init(from decoder: any Swift.Decoder) throws
+}
+@_hasMissingDesignatedInitializers public class MeticaSdk {
+  public static var Ads: any MeticaSDKFramework.MeticaAds {
+    get
+  }
+  public static var privacySettings: any MeticaSDKFramework.MeticaPrivacySettings {
+    get
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  @_Concurrency.MainActor public static func initialize(initConfig: MeticaSDKFramework.MeticaInitConfig, mediationInfo: MeticaSDKFramework.MeticaMediationInfo, callback: (any MeticaSDKFramework.MeticaInitCallback)?)
+  #endif
+  @objc deinit
+}
+public struct MeticaSmartFloors : Swift.Codable, Swift.Equatable, Swift.Hashable {
+  public let userGroup: MeticaSDKFramework.MeticaUserGroup
+  public let isSuccess: Swift.Bool
+  public init(userGroup: MeticaSDKFramework.MeticaUserGroup, isSuccess: Swift.Bool)
+  public static func == (a: MeticaSDKFramework.MeticaSmartFloors, b: MeticaSDKFramework.MeticaSmartFloors) -> Swift.Bool
+  public func encode(to encoder: any Swift.Encoder) throws
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+  public init(from decoder: any Swift.Decoder) throws
+}
+public enum MeticaUserGroup : Swift.Codable {
+  case trial
+  case holdout
+  public static func == (a: MeticaSDKFramework.MeticaUserGroup, b: MeticaSDKFramework.MeticaUserGroup) -> Swift.Bool
+  public func encode(to encoder: any Swift.Encoder) throws
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+  public init(from decoder: any Swift.Decoder) throws
+}
+public typealias OnInitializedCallbackDelegate = @convention(c) (Swift.UnsafePointer<Swift.CChar>?) -> Swift.Void
+public typealias OnAdLoadSuccessDelegate = @convention(c) (Swift.UnsafePointer<Swift.CChar>?, Swift.Double, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.Int64) -> Swift.Void
+public typealias OnAdLoadFailedDelegate = @convention(c) (Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?) -> Swift.Void
+public typealias OnAdShowSuccessDelegate = @convention(c) (Swift.UnsafePointer<Swift.CChar>?, Swift.Double, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.Int64) -> Swift.Void
+public typealias OnAdShowFailedDelegate = @convention(c) (Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?) -> Swift.Void
+public typealias OnAdHiddenDelegate = @convention(c) (Swift.UnsafePointer<Swift.CChar>?, Swift.Double, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.Int64) -> Swift.Void
+public typealias OnAdClickedDelegate = @convention(c) (Swift.UnsafePointer<Swift.CChar>?, Swift.Double, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.Int64) -> Swift.Void
+public typealias OnAdRewardedDelegate = @convention(c) (Swift.UnsafePointer<Swift.CChar>?, Swift.Double, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.Int64) -> Swift.Void
+public typealias OnAdRevenuePaidDelegate = @convention(c) (Swift.UnsafePointer<Swift.CChar>?, Swift.Double, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.UnsafePointer<Swift.CChar>?, Swift.Int64) -> Swift.Void
+#if compiler(>=5.3) && $NonescapableTypes
+@_cdecl("ios_sdkInitialize")
+@_Concurrency.MainActor public func ios_sdkInitialize(_ apiKey: Swift.UnsafePointer<Swift.CChar>?, _ appId: Swift.UnsafePointer<Swift.CChar>?, _ userId: Swift.UnsafePointer<Swift.CChar>?, _ mediationKey: Swift.UnsafePointer<Swift.CChar>?, _ onInitSuccess: MeticaSDKFramework.OnInitializedCallbackDelegate?)
+#endif
+@_cdecl("ios_setLogEnabled")
+public func ios_setLogEnabled(value: Swift.CBool)
+@_cdecl("ios_setHasUserConsent")
+public func ios_setHasUserConsent(value: Swift.CBool)
+@_cdecl("ios_setDoNotSell")
+public func ios_setDoNotSell(value: Swift.CBool)
+#if compiler(>=5.3) && $NonescapableTypes
+@_cdecl("ios_isRewardedReady")
+public func ios_isRewardedReady(_ adUnitId: Swift.UnsafePointer<Swift.CChar>?) -> Swift.CBool
+#endif
+#if compiler(>=5.3) && $NonescapableTypes
+@_cdecl("ios_isInterstitialReady")
+public func ios_isInterstitialReady(_ adUnitId: Swift.UnsafePointer<Swift.CChar>?) -> Swift.CBool
+#endif
+#if compiler(>=5.3) && $NonescapableTypes
+@_cdecl("ios_loadRewarded")
+public func ios_loadRewarded(_ adUnitId: Swift.UnsafePointer<Swift.CChar>?, _ onAdLoadSuccess: MeticaSDKFramework.OnAdLoadSuccessDelegate?, _ onAdLoadFailed: MeticaSDKFramework.OnAdLoadFailedDelegate?)
+#endif
+#if compiler(>=5.3) && $NonescapableTypes
+@_cdecl("ios_showRewarded")
+public func ios_showRewarded(_ adUnitId: Swift.UnsafePointer<Swift.CChar>?, _ onShowSuccess: MeticaSDKFramework.OnAdShowSuccessDelegate?, _ onShowFailed: MeticaSDKFramework.OnAdShowFailedDelegate?, _ onAdHidden: MeticaSDKFramework.OnAdHiddenDelegate?, _ onAdClicked: MeticaSDKFramework.OnAdClickedDelegate?, _ onAdRewarded: MeticaSDKFramework.OnAdRewardedDelegate?, _ onAdRevenuePaid: MeticaSDKFramework.OnAdRevenuePaidDelegate?)
+#endif
+#if compiler(>=5.3) && $NonescapableTypes
+@_cdecl("ios_loadInterstitial")
+public func ios_loadInterstitial(_ adUnitId: Swift.UnsafePointer<Swift.CChar>?, _ onAdLoadSuccess: MeticaSDKFramework.OnAdLoadSuccessDelegate?, _ onAdLoadFailed: MeticaSDKFramework.OnAdLoadFailedDelegate?)
+#endif
+#if compiler(>=5.3) && $NonescapableTypes
+@_cdecl("ios_showInterstitial")
+public func ios_showInterstitial(_ adUnitId: Swift.UnsafePointer<Swift.CChar>?, _ onShowSuccess: MeticaSDKFramework.OnAdShowSuccessDelegate?, _ onShowFailed: MeticaSDKFramework.OnAdShowFailedDelegate?, _ onAdHidden: MeticaSDKFramework.OnAdHiddenDelegate?, _ onAdClicked: MeticaSDKFramework.OnAdClickedDelegate?, _ onAdRevenuePaid: MeticaSDKFramework.OnAdRevenuePaidDelegate?)
+#endif
+public class MeticaAdsInitCallbackWrapper : MeticaSDKFramework.MeticaInitCallback {
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(onSuccess: MeticaSDKFramework.OnInitializedCallbackDelegate?)
+  #endif
+  public func onInit(initResponse: MeticaSDKFramework.MeticaInitResponse)
+  @objc deinit
+}
+public class MeticaLoadAdCallbackWrapper : MeticaSDKFramework.MeticaAdsLoadCallback {
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(onSuccess: MeticaSDKFramework.OnAdLoadSuccessDelegate?, onFail: MeticaSDKFramework.OnAdLoadFailedDelegate?)
+  #endif
+  public func onAdLoadSuccess(meticaAd: any MeticaSDKFramework.MeticaAd)
+  public func onAdLoadFailed(meticaAdError: MeticaSDKFramework.MeticaAdError)
+  @objc deinit
+}
+public class MeticaShowAdCallbackWrapper : MeticaSDKFramework.MeticaAdsShowCallback {
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(onAdShowSuccess: MeticaSDKFramework.OnAdShowSuccessDelegate?, onAdShowFailed: MeticaSDKFramework.OnAdShowFailedDelegate?, onAdHidden: MeticaSDKFramework.OnAdHiddenDelegate?, onAdClicked: MeticaSDKFramework.OnAdClickedDelegate?, onAdRewarded: MeticaSDKFramework.OnAdRewardedDelegate?, onAdRevenue: MeticaSDKFramework.OnAdRevenuePaidDelegate?)
+  #endif
+  public func onAdShowSuccess(meticaAd: any MeticaSDKFramework.MeticaAd)
+  public func onAdShowFailed(meticaAd: any MeticaSDKFramework.MeticaAd, meticaAdError: MeticaSDKFramework.MeticaAdError)
+  public func onAdHidden(meticaAd: any MeticaSDKFramework.MeticaAd)
+  public func onAdClicked(meticaAd: any MeticaSDKFramework.MeticaAd)
+  public func onAdRevenuePaid(meticaAd: any MeticaSDKFramework.MeticaAd)
+  public func onAdRewarded(meticaAd: any MeticaSDKFramework.MeticaAd)
+  @objc deinit
+}
+public struct SDKVersion {
+  public static let version: Swift.String
+}
+extension MeticaSDKFramework.MeticaAdFormatType : Swift.Hashable {}
+extension MeticaSDKFramework.MeticaMediationType : Swift.RawRepresentable {}
+extension MeticaSDKFramework.MeticaLogger.LogLevel : Swift.Equatable {}
+extension MeticaSDKFramework.MeticaLogger.LogLevel : Swift.Hashable {}
+extension MeticaSDKFramework.MeticaLogger.LogLevel : Swift.RawRepresentable {}
+extension MeticaSDKFramework.UserIdGenerationError : Swift.Equatable {}
+extension MeticaSDKFramework.UserIdGenerationError : Swift.Hashable {}
+extension MeticaSDKFramework.UserIdManager.Keys : Swift.Equatable {}
+extension MeticaSDKFramework.UserIdManager.Keys : Swift.Hashable {}
+extension MeticaSDKFramework.UserIdManager.Keys : Swift.RawRepresentable {}
+extension MeticaSDKFramework.MeticaUserGroup : Swift.Equatable {}
+extension MeticaSDKFramework.MeticaUserGroup : Swift.Hashable {}
