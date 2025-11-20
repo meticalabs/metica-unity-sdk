@@ -3,7 +3,7 @@
     "rootNamespace": "",
     "references": [
         "GUID:201bb3ee2b9a58648b8158bc0b3694a5",
-        "Metica.SDK"
+        "GUID:7b1e46d44191946cab2b1aef97c675da"
     ],
     "includePlatforms": [
         "Editor"
