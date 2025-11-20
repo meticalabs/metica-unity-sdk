@@ -8,7 +8,7 @@ using UnityEngine.Assertions;
 // ReSharper disable once CheckNamespace
 namespace Metica.Ads
 {
-    internal static class MeticaAds
+    public static class MeticaAds
     {
         public const string TAG = "[MeticaUnityPlugin]";
         private static readonly PlatformDelegate PlatformDelegate;
