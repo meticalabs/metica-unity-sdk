@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 
 using Metica.Core;
-using Metica.SDK;
-using Metica.SDK.Storage;
+using Metica;
+using Metica.Storage;
 
 public class MockLogger : ILog
 {
