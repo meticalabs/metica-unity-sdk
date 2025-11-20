@@ -13,6 +13,8 @@ namespace Metica.Ads.IOS
         private static extern bool ios_hasUserConsent();
         [DllImport("__Internal")]
         private static extern bool ios_isUserConsentSet();
+        [DllImport("__Internal")]
+        private static extern int ios_getConsentFlowUserGeography();
 
         public bool HasUserConsent()
         {
@@ -32,7 +34,10 @@ namespace Metica.Ads.IOS
 
         public MaxSdk.ConsentFlowUserGeography GetConsentFlowUserGeography()
         {
-            return MaxSdk.ConsentFlowUserGeography.Unknown;
+            MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS Max.getConsentFlowUserGeography method");
+            var ordinal = ios_getConsentFlowUserGeography();
+            MeticaAds.Log.LogDebug(() => $"{TAG} iOS Max.getConsentFlowUserGeography returned ordinal: {ordinal}");
+            return (MaxSdkBase.ConsentFlowUserGeography)ordinal;
         }
     }
 }
