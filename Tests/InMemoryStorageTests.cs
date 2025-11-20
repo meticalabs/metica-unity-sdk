@@ -1,4 +1,4 @@
-using Metica.SDK.Storage;
+using Metica.Storage;
 using NUnit.Framework;
 
 [TestFixture]
