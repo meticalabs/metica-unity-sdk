@@ -1,5 +1,5 @@
 {
-    "name": "Metica.SDK",
+    "name": "Metica",
     "rootNamespace": "",
     "references": [
         "GUID:d681d85e7e353c043b47fcbc61583d28",
@@ -17,4 +17,3 @@
     "versionDefines": [],
     "noEngineReferences": false
 }
-
