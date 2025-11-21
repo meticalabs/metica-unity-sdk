@@ -19,7 +19,9 @@ namespace Metica.Ads.IOS
         private static extern bool ios_isMuted();
         [DllImport("__Internal")]
         private static extern void ios_showCmpForExistingUser();
-        
+        [DllImport("__Internal")]
+        private static extern void ios_showMediationDebugger();
+
         public bool HasUserConsent()
         {
             MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS Max.hasUserConsent method");
@@ -47,6 +49,12 @@ namespace Metica.Ads.IOS
             MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS Max.showCmpForExistingUser method");
             ios_showCmpForExistingUser();
             MeticaAds.Log.LogDebug(() => $"{TAG} iOS Max.showCmpForExistingUser method called");
+        }
+
+        public void ShowMediationDebugger() {
+            MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS Max.showMediationDebugger method");
+            ios_showMediationDebugger();
+            MeticaAds.Log.LogDebug(() => $"{TAG} iOS Max.showMediationDebugger method called");
         }
 
         public MaxSdk.ConsentFlowUserGeography GetConsentFlowUserGeography()
