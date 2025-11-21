@@ -15,12 +15,23 @@ namespace Metica.Ads.IOS
         private static extern bool ios_isUserConsentSet();
         [DllImport("__Internal")]
         private static extern int ios_getConsentFlowUserGeography();
-
+        [DllImport("__Internal")]
+        private static extern bool ios_isMuted();
+        [DllImport("__Internal")]
+        private static extern void ios_showCmpForExistingUser();
+        
         public bool HasUserConsent()
         {
             MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS Max.hasUserConsent method");
             var result = ios_hasUserConsent();
             MeticaAds.Log.LogDebug(() => $"{TAG} iOS Max.hasUserConsent returned: {result}");
+            return result;
+        }
+
+        public bool IsMuted() {
+            MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS Max.isMuted method");
+            var result = ios_isMuted();
+            MeticaAds.Log.LogDebug(() => $"{TAG} iOS Max.isMuted returned: {result}");
             return result;
         }
 
@@ -30,6 +41,12 @@ namespace Metica.Ads.IOS
             var result = ios_isUserConsentSet();
             MeticaAds.Log.LogDebug(() => $"{TAG} iOS Max.isUserConsentSet returned: {result}");
             return result;
+        }
+
+        public void ShowCmpForExistingUser() {
+            MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS Max.showCmpForExistingUser method");
+            ios_showCmpForExistingUser();
+            MeticaAds.Log.LogDebug(() => $"{TAG} iOS Max.showCmpForExistingUser method called");
         }
 
         public MaxSdk.ConsentFlowUserGeography GetConsentFlowUserGeography()
