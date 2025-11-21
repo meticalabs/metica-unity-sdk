@@ -52,7 +52,14 @@ internal class IOSDelegate : PlatformDelegate
     private static extern void ios_setHasUserConsent(bool value);
     [DllImport("__Internal")]
     private static extern void ios_setDoNotSell(bool value);
-        
+
+    [DllImport("__Internal")]
+    private static extern void ios_showBanner(string adUnitId);
+    [DllImport("__Internal")]
+    private static extern void ios_hideBanner(string adUnitId);
+    [DllImport("__Internal")]
+    private static extern void ios_destroyBanner(string adUnitId);
+
     public void SetLogEnabled(bool logEnabled)
     {
         MeticaAds.Log.LogDebug(() => $"{TAG} SetLogEnabled called with: {logEnabled}");
@@ -73,18 +80,46 @@ internal class IOSDelegate : PlatformDelegate
 
     public void CreateBanner(string bannerAdUnitId, MeticaBannerPosition position)
     {
+        var callback = new IOSBannerCallbackProxy();
+        callback.AdLoadSuccess += BannerAdLoadSuccess;
+        callback.AdLoadFailed += BannerAdLoadFailed;
+        callback.AdClicked += (meticaAd) => BannerAdClicked?.Invoke(meticaAd);
+        callback.AdRevenuePaid += (meticaAd) => BannerAdRevenuePaid?.Invoke(meticaAd);
+
+        // On Native side the matrix is:
+        //  0 -> top position
+        // -1 -> bottom position
+        var yPosition = position switch
+        {
+            MeticaBannerPosition.Bottom => -1,
+            MeticaBannerPosition.Top => 0,
+            _ => 0,
+        };
+
+        MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS createBanner method");
+        callback.CreateBanner(bannerAdUnitId, yPosition);
+        MeticaAds.Log.LogDebug(() => $"{TAG} iOS createBanner method called");
     }
 
     public void ShowBanner(string adUnitId)
     {
+        MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS showBanner method");
+        ios_showBanner(adUnitId);
+        MeticaAds.Log.LogDebug(() => $"{TAG} iOS showBanner method called");
     }
 
     public void HideBanner(string adUnitId)
     {
+        MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS hideBanner method");
+        ios_hideBanner(adUnitId);
+        MeticaAds.Log.LogDebug(() => $"{TAG} iOS hideBanner method called");
     }
 
     public void DestroyBanner(string adUnitId)
     {
+        MeticaAds.Log.LogDebug(() => $"{TAG} About to call iOS destroyBanner method");
+        ios_destroyBanner(adUnitId);
+        MeticaAds.Log.LogDebug(() => $"{TAG} iOS destroyBanner method called");
     }
 
     public Task<MeticaInitResponse> InitializeAsync(string apiKey, string appId, string userId, string mediationInfoKey)
